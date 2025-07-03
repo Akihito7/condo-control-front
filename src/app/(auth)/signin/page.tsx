@@ -5,7 +5,6 @@ import { User, Lock } from "lucide-react";
 export default function Signin() {
   return (
     <div className="flex min-h-screen">
- 
       <div className="hidden lg:flex w-1/2 items-center justify-center text-white px-8">
         <h2 className="text-3xl font-bold text-center">
           Organização, segurança e praticidade na gestão do seu condomínio.
