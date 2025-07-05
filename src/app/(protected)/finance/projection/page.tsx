@@ -13,7 +13,13 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { CardFinance } from "@/components/card-finance";
-import { TrendingDown, TrendingUp, DollarSign, PiggyBank, FileDown } from "lucide-react";
+import {
+  TrendingDown,
+  TrendingUp,
+  DollarSign,
+  PiggyBank,
+  FileDown,
+} from "lucide-react";
 
 export default function FinancialForecast() {
   const transactions = [
@@ -144,7 +150,7 @@ export default function FinancialForecast() {
                 <TableCell className="text-sm">{transaction.date}</TableCell>
                 <TableCell className="text-right font-semibold text-sm">
                   {transaction.type === "income" ? "+" : "-"}$
-                  {transaction.amount.toLocaleString()}
+                  {transaction.amount.toLocaleString("pt-BR")}
                 </TableCell>
               </TableRow>
             ))}

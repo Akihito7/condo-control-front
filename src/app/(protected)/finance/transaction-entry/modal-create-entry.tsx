@@ -395,7 +395,7 @@ export function ModalCreateEntry() {
 
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant="ghost" type="button">
+              <Button variant="ghost">
                 Cancelar
               </Button>
             </DialogClose>

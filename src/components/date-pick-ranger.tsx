@@ -32,13 +32,8 @@ export function DatePickRange({ range, setRange }: DatePickRangeProps) {
 
   return (
     <Popover>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          className="w-[260px] justify-start text-left font-normal h-10"
-        >
-          {formatted}
-        </Button>
+      <PopoverTrigger className="w-[260px] bg-white border rounded-md px-4 h-10 justify-start text-left font-normal cursor-pointer">
+        {formatted}
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
         <Calendar

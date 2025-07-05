@@ -167,7 +167,7 @@ export default function Finance() {
                 <TableCell className="text-sm">{transaction.date}</TableCell>
                 <TableCell className="text-right font-semibold text-sm">
                   {transaction.type === "income" ? "+" : "-"}$
-                  {transaction.amount.toLocaleString()}
+                  {transaction.amount.toLocaleString("pt-BR")}
                 </TableCell>
               </TableRow>
             ))}
