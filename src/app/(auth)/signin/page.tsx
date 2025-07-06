@@ -1,6 +1,4 @@
-import { Button } from "@/components/button";
-import { CustomInput } from "@/components/input";
-import { User, Lock } from "lucide-react";
+import { LoginForm } from "./login-form";
 
 export default function Signin() {
   return (
@@ -16,21 +14,7 @@ export default function Signin() {
             Seja bem-vindo novamente 👋
           </h1>
 
-          <CustomInput.Root>
-            <CustomInput.Input placeholder="Email" />
-            <CustomInput.Icon>
-              <User size={18} />
-            </CustomInput.Icon>
-          </CustomInput.Root>
-
-          <CustomInput.Root>
-            <CustomInput.Input type="password" placeholder="Senha" />
-            <CustomInput.Icon>
-              <Lock size={18} />
-            </CustomInput.Icon>
-          </CustomInput.Root>
-
-          <Button className="w-full">Iniciar sessão</Button>
+          <LoginForm />
         </div>
       </div>
     </div>

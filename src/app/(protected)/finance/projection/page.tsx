@@ -125,9 +125,6 @@ export default function FinancialForecast() {
           <h2 className="font-medium text-gray-800 text-lg">
             Detalhes da Projeção
           </h2>
-          <Button variant="outline" className="text-sm bg-white cursor-pointer">
-            Adicionar projeção
-          </Button>
         </div>
         <Table>
           <TableHeader>
