@@ -1,7 +1,7 @@
 "use client";
 
 import { Breadcrumb } from "@/components/breadcrumb";
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -29,13 +29,19 @@ import Select, { MultiValue } from "react-select";
 import { FinancialRecord } from "@/api/fetch-financial-records";
 import { useUserContext } from "@/providers/use-user-context";
 
+export type OptionType = {
+  value: number;
+  label: string;
+};
+
 export default function Finance() {
   const [range, setRange] = useState({
     from: new Date(),
     to: new Date(),
   });
+
   const [incomeExpenseOptionsSelected, setIncomeExpenseOptionSelected] =
-    useState<MultiValue<string>>();
+    useState<MultiValue<OptionType>>([]);
 
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [transactionSelected, setTransacationSelected] = useState<
@@ -43,18 +49,13 @@ export default function Finance() {
   >();
   const { user } = useUserContext();
   const condominiumId = user.condominiumId;
-  console.log("its me condominium id", condominiumId);
 
   const {
     transactions,
-    errorTransactions,
     categoriesOptions,
-    erorrCategoriesOptions,
     incomeExpenseOptions,
-    errorIncomeExpenseOptions,
     paymentMethodsOptions,
     apartments,
-    errorApartments,
     paymentStatusOptions,
     cardsTransaction,
     cardsTransactionIsLoading,
@@ -66,6 +67,25 @@ export default function Finance() {
     condominiumId,
   });
 
+  useEffect(() => {
+    if (
+      incomeExpenseOptions?.length &&
+      incomeExpenseOptionsSelected?.length === 0
+    ) {
+      const defaultOptions = incomeExpenseOptions.map((option) => ({
+        value: option.id,
+        label: option.name,
+      }));
+      setIncomeExpenseOptionSelected(defaultOptions);
+    }
+  }, [incomeExpenseOptions]);
+
+  const incomeExpenseSelectOptions: OptionType[] =
+    incomeExpenseOptions?.map((option) => ({
+      value: option.id,
+      label: option.name,
+    })) ?? [];
+
   return (
     <main className="bg-gray-50 min-h-screen w-full p-8 flex flex-col gap-6">
       <div className="space-y-2">
@@ -76,34 +96,26 @@ export default function Finance() {
       </div>
 
       <div className="flex flex-col sm:flex-row gap-4 items-end">
-        <div className="">
+        <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Selecione o periodo
+            Selecione o período
           </label>
           <DatePickRange range={range} setRange={setRange} />
         </div>
 
-        <div className="">
+        <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Tipo de registros
           </label>
-          <Select
-            defaultValue={incomeExpenseOptions as any}
-            isMulti={true}
+          <Select<OptionType, true>
+            isMulti
             value={incomeExpenseOptionsSelected}
             onChange={(value) => {
-              const optionsSelected = value.map((option) => option);
-              if (optionsSelected.length === 0) return;
-              setIncomeExpenseOptionSelected(optionsSelected);
+              if (value.length === 0) return;
+              setIncomeExpenseOptionSelected(value);
             }}
-            options={
-              incomeExpenseOptions
-                ? incomeExpenseOptions.map((option) => ({
-                    value: option.id,
-                    label: option.name,
-                  }))
-                : ([] as any)
-            }
+            options={incomeExpenseSelectOptions}
+            placeholder="Selecione..."
           />
         </div>
 
@@ -192,7 +204,7 @@ export default function Finance() {
               <TableHead>Tipo Receita/Despesa</TableHead>
               <TableHead>Categoria</TableHead>
               <TableHead>Apartamento</TableHead>
-              <TableHead>Tipo Fixo/Variavel</TableHead>
+              <TableHead>Tipo Fixo/Variável</TableHead>
               <TableHead>Forma de Pagamento</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Valor</TableHead>
@@ -207,7 +219,6 @@ export default function Finance() {
                 <TableCell className="font-medium">
                   {transaction.dueDate}
                 </TableCell>
-
                 <TableCell className="capitalize text-sm">
                   {transaction.categoryTypeName === "income"
                     ? "Receita"
@@ -218,7 +229,7 @@ export default function Finance() {
                   {transaction.apartmentNumber}
                 </TableCell>
                 <TableCell className="text-sm">
-                  {transaction.isRecurring ? "Fixo" : "Variavel"}
+                  {transaction.isRecurring ? "Fixo" : "Variável"}
                 </TableCell>
                 <TableCell className="text-sm">
                   {transaction.paymentMethodName ?? "-"}
@@ -243,7 +254,6 @@ export default function Finance() {
                   >
                     <Pencil className="w-5 h-5" />
                   </button>
-
                   <button
                     aria-label="Deletar"
                     className="p-1 rounded hover:bg-gray-200 ml-2"

@@ -8,13 +8,14 @@ import { fetchPaymentMethodOptions } from "@/api/fetch-payment-method.options";
 import { fetchPaymentStatusOptions } from "@/api/fetch-payment-status.options";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { MultiValue } from "react-select";
+import { OptionType } from "./page";
 
 
 
 interface UseTransactionProps {
   startDate: Date;
   endDate: Date
-  incomeExpenseOptionsSelected: MultiValue<string> | undefined
+  incomeExpenseOptionsSelected: MultiValue<OptionType>
   condominiumId: number
 }
 export function useTransaction({ startDate, endDate, incomeExpenseOptionsSelected, condominiumId }: UseTransactionProps) {

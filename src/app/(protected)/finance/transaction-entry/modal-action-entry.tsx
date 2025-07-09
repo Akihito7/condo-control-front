@@ -200,10 +200,6 @@ export function ModalActionEntry({
   }, [categoryId]);
 
   useEffect(() => {
-    console.log("record type", watch("incomeExpenseId"));
-  }, [errors, watch("incomeExpenseId")]);
-
-  useEffect(() => {
     if (transactionSelected) {
       console.log("transaction selected", transactionSelected);
       const dueDate = dayjs(transactionSelected.dueDate).toDate();
