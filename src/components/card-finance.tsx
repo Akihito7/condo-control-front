@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import React from "react";
+import { CardFinanceSkeleton } from "./card-finance-skeleton";
 
 interface CardFinance {
   title: string;
@@ -7,6 +8,7 @@ interface CardFinance {
   percentage: number;
   icon: React.ReactNode;
   type?: "revenue" | "expensive";
+  isLoading?: boolean;
 }
 
 export function CardFinance({
@@ -15,6 +17,7 @@ export function CardFinance({
   percentage,
   icon,
   type = "revenue",
+  isLoading,
 }: CardFinance) {
   const moneyFormmated = value.toLocaleString("pt-br", {
     currency: "BRL",
@@ -23,6 +26,10 @@ export function CardFinance({
 
   const stylePercentage =
     type === "revenue" ? "text-green-500" : "text-red-500";
+
+  if (isLoading) {
+    return <CardFinanceSkeleton />;
+  }
 
   return (
     <Card>

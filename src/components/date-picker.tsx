@@ -19,7 +19,7 @@ export function DatePicker({ date, setDate }: DatePickerProps) {
 
   return (
     <Popover>
-      <PopoverTrigger className="w-[260px] bg-white border rounded-md px-4 h-10 justify-start text-left font-normal cursor-pointer">
+      <PopoverTrigger className="w-[260px] bg-white border rounded-md px-4 h-9 justify-start text-left font-normal cursor-pointer">
         {dateFormmated}
       </PopoverTrigger>
       <PopoverContent>

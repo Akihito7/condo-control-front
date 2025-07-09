@@ -50,7 +50,6 @@ export function ModalCreateDelinquency() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    console.log("Inadimplência adicionada:", form);
     alert("Inadimplência registrada com sucesso!");
   }
 

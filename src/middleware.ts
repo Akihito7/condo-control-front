@@ -16,7 +16,6 @@ export function middleware(request: NextRequest) {
   const [, pathInital] = request.nextUrl.pathname.split('/')
 
   if (!token && ROUTES_PROTECTED.includes(pathInital)) {
-    console.log("request url", request)
     return NextResponse.redirect(new URL('signin', request.nextUrl.origin))
   }
 

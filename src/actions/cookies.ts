@@ -14,3 +14,8 @@ export async function setCookies({ key, value, options }: SetCookiesProps) {
   const cookieStore = await cookies();
   cookieStore.set(key, value, options)
 }
+
+export async function getCookies(key: string): Promise<string | undefined> {
+  const cookieStore = await cookies();
+  return cookieStore.get(key)?.value;
+}

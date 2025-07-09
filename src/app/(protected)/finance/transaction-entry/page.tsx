@@ -1,7 +1,7 @@
 "use client";
 
 import { Breadcrumb } from "@/components/breadcrumb";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -10,68 +10,56 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FaDollarSign } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 import { DatePickRange } from "@/components/date-pick-ranger";
 import { CardFinance } from "@/components/card-finance";
-import { DollarSign, FileDown, TrendingDown, TrendingUp } from "lucide-react";
-import { ModalCreateEntry } from "./modal-create-entry";
 import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select";
-export default function Finance() {
-  const transactions = [
-    {
-      id: 1,
-      description: "Salário",
-      amount: 5000,
-      type: "income",
-      date: "2023-05-01",
-    },
-    {
-      id: 2,
-      description: "Aluguel",
-      amount: 1200,
-      type: "expense",
-      date: "2023-05-05",
-    },
-    {
-      id: 3,
-      description: "Supermercado",
-      amount: 350,
-      type: "expense",
-      date: "2023-05-10",
-    },
-    {
-      id: 4,
-      description: "Freelance",
-      amount: 800,
-      type: "income",
-      date: "2023-05-15",
-    },
-  ];
+  DollarSign,
+  FileDown,
+  Pencil,
+  Trash2,
+  TrendingDown,
+  TrendingUp,
+} from "lucide-react";
+import { ModalActionEntry } from "./modal-action-entry";
+import { useTransaction } from "./use-transaction";
+import Select, { MultiValue } from "react-select";
+import { FinancialRecord } from "@/api/fetch-financial-records";
 
+export default function Finance() {
   const [range, setRange] = useState({
     from: new Date(),
     to: new Date(),
   });
+  const [incomeExpenseOptionsSelected, setIncomeExpenseOptionSelected] =
+    useState<MultiValue<string>>();
 
-  const totalExpenses = transactions
-    .filter((t) => t.type === "expense")
-    .reduce((sum, t) => sum + t.amount, 0);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [transactionSelected, setTransacationSelected] = useState<
+    FinancialRecord | undefined
+  >();
 
-  const totalIncome = transactions
-    .filter((t) => t.type === "income")
-    .reduce((sum, t) => sum + t.amount, 0);
-
-  const balance = totalIncome - totalExpenses;
+  const {
+    transactions,
+    errorTransactions,
+    categoriesOptions,
+    erorrCategoriesOptions,
+    incomeExpenseOptions,
+    errorIncomeExpenseOptions,
+    paymentMethodsOptions,
+    apartments,
+    errorApartments,
+    paymentStatusOptions,
+    cardsTransaction,
+    cardsTransactionIsLoading,
+    handleDeleteRegister,
+  } = useTransaction({
+    startDate: range.from,
+    endDate: range.to,
+    incomeExpenseOptionsSelected,
+  });
 
   return (
     <main className="bg-gray-50 min-h-screen w-full p-8 flex flex-col gap-6">
@@ -94,16 +82,24 @@ export default function Finance() {
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Tipo de registros
           </label>
-          <Select onValueChange={(value) => console.log("Selecionado:", value)}>
-            <SelectTrigger className="bg-white w-[260px] min-h-[40px]">
-              <SelectValue placeholder="Selecione o tipo" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="todos">Todos</SelectItem>
-              <SelectItem value="receita">Receita</SelectItem>
-              <SelectItem value="despesa">Despesa</SelectItem>
-            </SelectContent>
-          </Select>
+          <Select
+            defaultValue={incomeExpenseOptions as any}
+            isMulti={true}
+            value={incomeExpenseOptionsSelected}
+            onChange={(value) => {
+              const optionsSelected = value.map((option) => option);
+              if (optionsSelected.length === 0) return;
+              setIncomeExpenseOptionSelected(optionsSelected);
+            }}
+            options={
+              incomeExpenseOptions
+                ? incomeExpenseOptions.map((option) => ({
+                    value: option.id,
+                    label: option.name,
+                  }))
+                : ([] as any)
+            }
+          />
         </div>
 
         <Button
@@ -118,24 +114,44 @@ export default function Finance() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <CardFinance
           title="Receita Total"
-          value={4800}
+          value={cardsTransaction?.totalIncome ?? 0}
           percentage={20}
           icon={<TrendingUp color="#22c55e" />}
+          isLoading={cardsTransactionIsLoading}
         />
 
         <CardFinance
           title="Despesas Totais"
-          value={2200}
+          value={cardsTransaction?.totalExpenses ?? 0}
           percentage={90}
           icon={<TrendingDown color="#ef4444" />}
           type="expensive"
+          isLoading={cardsTransactionIsLoading}
         />
 
         <CardFinance
           title="Saldo"
-          value={500}
+          value={cardsTransaction?.balance ?? 0}
           percentage={40}
-          icon={<DollarSign color="#22c55e" />}
+          icon={
+            <DollarSign
+              color={
+                cardsTransaction
+                  ? cardsTransaction.balance > 0
+                    ? "#22c55e"
+                    : "#ef4444"
+                  : "#22c55e"
+              }
+            />
+          }
+          type={
+            cardsTransaction
+              ? cardsTransaction.balance > 0
+                ? "revenue"
+                : "expensive"
+              : "revenue"
+          }
+          isLoading={cardsTransactionIsLoading}
         />
       </div>
 
@@ -144,30 +160,91 @@ export default function Finance() {
           <h2 className="font-medium text-gray-800 text-lg">
             Transações Recentes
           </h2>
-          <ModalCreateEntry />
+          {Array.isArray(categoriesOptions) &&
+            Array.isArray(incomeExpenseOptions) &&
+            Array.isArray(paymentMethodsOptions) &&
+            Array.isArray(apartments) &&
+            Array.isArray(paymentStatusOptions) && (
+              <ModalActionEntry
+                categoriesOptions={categoriesOptions}
+                incomeExpenseOptions={incomeExpenseOptions}
+                paymentMethodsOptions={paymentMethodsOptions}
+                apartments={apartments}
+                paymentStatusOptions={paymentStatusOptions}
+                type={transactionSelected?.id ? "edit" : "create"}
+                isOpen={modalIsOpen}
+                setIsOpen={setModalIsOpen}
+                setTransacationSelected={setTransacationSelected}
+                transactionSelected={transactionSelected}
+              />
+            )}
         </div>
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[50%]">Descrição</TableHead>
-              <TableHead>Tipo</TableHead>
-              <TableHead>Data</TableHead>
+              <TableHead className="w-[20%]">Data de vencimento</TableHead>
+              <TableHead>Tipo Receita/Despesa</TableHead>
+              <TableHead>Categoria</TableHead>
+              <TableHead>Apartamento</TableHead>
+              <TableHead>Tipo Fixo/Variavel</TableHead>
+              <TableHead>Forma de Pagamento</TableHead>
+              <TableHead>Status</TableHead>
               <TableHead className="text-right">Valor</TableHead>
+              <TableHead>Data do Pagamento</TableHead>
+              <TableHead>Observação</TableHead>
+              <TableHead>Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {transactions.map((transaction) => (
+            {transactions?.map((transaction) => (
               <TableRow key={transaction.id}>
                 <TableCell className="font-medium">
-                  {transaction.description}
+                  {transaction.dueDate}
                 </TableCell>
+
                 <TableCell className="capitalize text-sm">
-                  {transaction.type === "income" ? "Receita" : "Despesa"}
+                  {transaction.categoryTypeName === "income"
+                    ? "Receita"
+                    : "Despesa"}
                 </TableCell>
-                <TableCell className="text-sm">{transaction.date}</TableCell>
+                <TableCell>{transaction.categoryName}</TableCell>
+                <TableCell className="text-center">
+                  {transaction.apartmentNumber}
+                </TableCell>
+                <TableCell className="text-sm">
+                  {transaction.isRecurring ? "Fixo" : "Variavel"}
+                </TableCell>
+                <TableCell className="text-sm">
+                  {transaction.paymentMethodName ?? "-"}
+                </TableCell>
+                <TableCell>{transaction.paymentStatusName ?? "-"}</TableCell>
                 <TableCell className="text-right font-semibold text-sm">
-                  {transaction.type === "income" ? "+" : "-"}$
+                  {transaction.categoryTypeName === "income" ? "+" : "-"}$
                   {transaction.amount.toLocaleString("pt-BR")}
+                </TableCell>
+                <TableCell className="text-center">
+                  {transaction.paymentDate ?? "-"}
+                </TableCell>
+                <TableCell>{transaction.observation}</TableCell>
+                <TableCell>
+                  <button
+                    aria-label="Editar"
+                    className="p-1 rounded hover:bg-gray-200"
+                    onClick={() => {
+                      setTransacationSelected(transaction);
+                      setModalIsOpen(true);
+                    }}
+                  >
+                    <Pencil className="w-5 h-5" />
+                  </button>
+
+                  <button
+                    aria-label="Deletar"
+                    className="p-1 rounded hover:bg-gray-200 ml-2"
+                    onClick={() => handleDeleteRegister(transaction.id)}
+                  >
+                    <Trash2 className="w-5 h-5 text-red-500" />
+                  </button>
                 </TableCell>
               </TableRow>
             ))}
