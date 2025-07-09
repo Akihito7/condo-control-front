@@ -55,6 +55,7 @@ interface ModalCreateEntryProps {
   setIsOpen: (value: boolean) => void;
   setTransacationSelected: (value: FinancialRecord | undefined) => void;
   transactionSelected: FinancialRecord | undefined;
+  condominiumId: number;
 }
 
 const SchemaCreateEntry = z.object({
@@ -93,6 +94,7 @@ export function ModalActionEntry({
   setIsOpen,
   setTransacationSelected,
   transactionSelected,
+  condominiumId,
 }: ModalCreateEntryProps) {
   const {
     control,
@@ -107,7 +109,7 @@ export function ModalActionEntry({
     defaultValues: {
       amount: 0,
       amountPaid: 0,
-      condominiumId: 5,
+      condominiumId,
       dueDate: new Date(),
       incomeExpenseId: incomeExpenseOptions?.[0].id,
       categoryId: -1,

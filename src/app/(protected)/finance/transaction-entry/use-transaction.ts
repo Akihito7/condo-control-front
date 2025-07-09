@@ -15,8 +15,9 @@ interface UseTransactionProps {
   startDate: Date;
   endDate: Date
   incomeExpenseOptionsSelected: MultiValue<string> | undefined
+  condominiumId: number
 }
-export function useTransaction({ startDate, endDate, incomeExpenseOptionsSelected }: UseTransactionProps) {
+export function useTransaction({ startDate, endDate, incomeExpenseOptionsSelected, condominiumId }: UseTransactionProps) {
 
   const queryClient = useQueryClient()
   const startDateFormmated = startDate.toISOString().slice(0, 10);
@@ -25,7 +26,7 @@ export function useTransaction({ startDate, endDate, incomeExpenseOptionsSelecte
   const incomeExpenseOptionsSelectedId = incomeExpenseOptionsSelected?.map((option: any) => option.value)
   const { data: transactions, error: errorTransactions } = useQuery({
     queryKey: ["transactions", startDate, endDate, incomeExpenseOptionsSelected],
-    queryFn: () => fetchFinancialRecords({ condominiumId: 5, startDate: startDateFormmated, endDate: endDateFormmated, incomeExpenseOptionsSelectedId }),
+    queryFn: () => fetchFinancialRecords({ condominiumId, startDate: startDateFormmated, endDate: endDateFormmated, incomeExpenseOptionsSelectedId }),
     enabled: incomeExpenseOptionsSelectedId ? incomeExpenseOptionsSelectedId.length > 0 : false
   });
 
@@ -46,7 +47,7 @@ export function useTransaction({ startDate, endDate, incomeExpenseOptionsSelecte
 
   const { data: apartments, error: errorApartments } = useQuery({
     queryKey: ['apartments'],
-    queryFn: async () => fetchApartments({ condominiumId: 5 })
+    queryFn: async () => fetchApartments({ condominiumId })
   })
 
   const { data: paymentStatusOptions, error: errorPaymentStatus } = useQuery({
@@ -57,7 +58,7 @@ export function useTransaction({ startDate, endDate, incomeExpenseOptionsSelecte
   const { data: cardsTransaction, error: errorCardsTransaction, isLoading: cardsTransactionIsLoading, } = useQuery({
     queryKey: ['revenueTotal', startDate, endDate],
     queryFn: async () => fetchCardsTransactionEntry({
-      condominiumId: 5,
+      condominiumId,
       startDate: startDateFormmated,
       endDate: endDateFormmated
     })
@@ -74,7 +75,6 @@ export function useTransaction({ startDate, endDate, incomeExpenseOptionsSelecte
       });
     }
   })
-
 
   return {
     transactions,

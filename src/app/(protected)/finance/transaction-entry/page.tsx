@@ -1,7 +1,7 @@
 "use client";
 
 import { Breadcrumb } from "@/components/breadcrumb";
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -27,6 +27,7 @@ import { ModalActionEntry } from "./modal-action-entry";
 import { useTransaction } from "./use-transaction";
 import Select, { MultiValue } from "react-select";
 import { FinancialRecord } from "@/api/fetch-financial-records";
+import { useUserContext } from "@/providers/use-user-context";
 
 export default function Finance() {
   const [range, setRange] = useState({
@@ -40,6 +41,9 @@ export default function Finance() {
   const [transactionSelected, setTransacationSelected] = useState<
     FinancialRecord | undefined
   >();
+  const { user } = useUserContext();
+  const condominiumId = user.condominiumId;
+  console.log("its me condominium id", condominiumId);
 
   const {
     transactions,
@@ -59,6 +63,7 @@ export default function Finance() {
     startDate: range.from,
     endDate: range.to,
     incomeExpenseOptionsSelected,
+    condominiumId,
   });
 
   return (
@@ -176,6 +181,7 @@ export default function Finance() {
                 setIsOpen={setModalIsOpen}
                 setTransacationSelected={setTransacationSelected}
                 transactionSelected={transactionSelected}
+                condominiumId={condominiumId}
               />
             )}
         </div>
