@@ -201,7 +201,6 @@ export function ModalActionEntry({
 
   useEffect(() => {
     if (transactionSelected) {
-      console.log("transaction selected", transactionSelected);
       const dueDate = dayjs(transactionSelected.dueDate).toDate();
       const paymentDate = transactionSelected.paymentDate
         ? dayjs(transactionSelected.paymentDate).toDate()
@@ -268,7 +267,7 @@ export function ModalActionEntry({
               Informações básicas
             </legend>
             <div className="grid grid-cols-4 items-center gap-4 mb-4">
-              <Label className="text-right">Data</Label>
+              <Label className="text-right">Data de Vencimento</Label>
               <div className="col-span-3">
                 <Controller
                   name="dueDate"

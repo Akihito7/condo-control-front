@@ -10,6 +10,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
@@ -201,14 +207,16 @@ export default function Finance() {
           <TableHeader>
             <TableRow>
               <TableHead className="w-[20%]">Data de vencimento</TableHead>
-              <TableHead>Tipo Receita/Despesa</TableHead>
+              <TableHead>Tipo</TableHead>
               <TableHead>Categoria</TableHead>
               <TableHead>Apartamento</TableHead>
-              <TableHead>Tipo Fixo/Variável</TableHead>
+              <TableHead>Tipo</TableHead>
+              <TableHead>Recorrente</TableHead>
               <TableHead>Forma de Pagamento</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead className="text-right">Valor</TableHead>
+              <TableHead className="text-center">Valor</TableHead>
               <TableHead>Data do Pagamento</TableHead>
+              <TableHead>Valor Pago</TableHead>
               <TableHead>Observação</TableHead>
               <TableHead>Ações</TableHead>
             </TableRow>
@@ -220,7 +228,7 @@ export default function Finance() {
                   {transaction.dueDate}
                 </TableCell>
                 <TableCell className="capitalize text-sm">
-                  {transaction.categoryTypeName === "income"
+                  {transaction.incomeExpenseTypeId === 4
                     ? "Receita"
                     : "Despesa"}
                 </TableCell>
@@ -229,38 +237,53 @@ export default function Finance() {
                   {transaction.apartmentNumber}
                 </TableCell>
                 <TableCell className="text-sm">
-                  {transaction.isRecurring ? "Fixo" : "Variável"}
+                  {transaction.recordTypeId === 1 ? "Fixo" : "Variável"}
+                </TableCell>
+                <TableCell className="text-sm">
+                  {transaction.isRecurring ? "Sim" : "Não"}
                 </TableCell>
                 <TableCell className="text-sm">
                   {transaction.paymentMethodName ?? "-"}
                 </TableCell>
+
                 <TableCell>{transaction.paymentStatusName ?? "-"}</TableCell>
-                <TableCell className="text-right font-semibold text-sm">
-                  {transaction.categoryTypeName === "income" ? "+" : "-"}$
-                  {transaction.amount.toLocaleString("pt-BR")}
+                <TableCell className="text-center font-semibold text-sm">
+                  {transaction.amount.toLocaleString("pt-BR", {
+                    currency: "BRL",
+                    style: "currency",
+                  })}
                 </TableCell>
                 <TableCell className="text-center">
                   {transaction.paymentDate ?? "-"}
                 </TableCell>
+                <TableCell className="text-center">
+                  {transaction.amountPaid?.toLocaleString("pt-BR", {
+                    currency: "BRL",
+                    style: "currency",
+                  }) ?? "-"}
+                </TableCell>
                 <TableCell>{transaction.observation}</TableCell>
                 <TableCell>
-                  <button
-                    aria-label="Editar"
-                    className="p-1 rounded hover:bg-gray-200"
-                    onClick={() => {
-                      setTransacationSelected(transaction);
-                      setModalIsOpen(true);
-                    }}
-                  >
-                    <Pencil className="w-5 h-5" />
-                  </button>
-                  <button
-                    aria-label="Deletar"
-                    className="p-1 rounded hover:bg-gray-200 ml-2"
-                    onClick={() => handleDeleteRegister(transaction.id)}
-                  >
-                    <Trash2 className="w-5 h-5 text-red-500" />
-                  </button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger className="outline-none ring-0 focus:outline-none focus:ring-0 cursor-pointer">
+                      <Pencil className="w-4 h-4 text-gray-700" />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem
+                        onClick={() => {
+                          setTransacationSelected(transaction);
+                          setModalIsOpen(true);
+                        }}
+                      >
+                        Editar
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleDeleteRegister(transaction.id)}
+                      >
+                        Excluir
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </TableCell>
               </TableRow>
             ))}
