@@ -137,12 +137,13 @@ export default function Finance() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <CardFinance
           title="Receita Total"
-          type="revenue"
+          type="income"
           value={cardsTransaction?.totalIncome ?? 0}
           target={cardsTransaction?.incomeTarget}
           icon={<TrendingUp color="#22c55e" />}
           isLoading={cardsTransactionIsLoading}
           isSameMonth={cardsTransaction?.isSameMonth ?? false}
+          date={range.from}
         />
 
         <CardFinance
@@ -153,12 +154,12 @@ export default function Finance() {
           type="expensive"
           isLoading={cardsTransactionIsLoading}
           isSameMonth={cardsTransaction?.isSameMonth ?? false}
+          date={range.from}
         />
 
         <CardFinance
           title="Saldo"
           value={cardsTransaction?.balance ?? 0}
-  
           target={cardsTransaction?.incomeTarget}
           isSameMonth={cardsTransaction?.isSameMonth ?? false}
           icon={
@@ -173,6 +174,7 @@ export default function Finance() {
             />
           }
           isLoading={cardsTransactionIsLoading}
+          date={range.from}
         />
       </div>
 

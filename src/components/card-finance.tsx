@@ -15,21 +15,30 @@ import { Controller, useForm } from "react-hook-form";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DialogClose } from "@radix-ui/react-dialog";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { updateCondominiumIncomes } from "@/api/update-condominium-incomes";
+import { format } from "date-fns";
+import { useUserContext } from "@/providers/use-user-context";
+import { updateCondominiumExpenses } from "@/api/update-condominium-expenses";
+import { redefineIncomesExpensesToCalculated } from "@/api/redefine-incomes-expenses-to-calculated";
 
 interface CardFinance {
   title: string;
   value: number;
   icon: React.ReactNode;
-  type?: "revenue" | "expensive" | "balance";
+  type?: "income" | "expensive" | "balance";
   isLoading?: boolean;
   target: number | undefined;
   isSameMonth: boolean;
+  date: Date;
 }
 
 const SchemaFormFinanace = z.object({
   value: z.string().optional(),
   target: z.string().optional(),
 });
+
+type FormFinanceData = z.infer<typeof SchemaFormFinanace>;
 
 export function CardFinance({
   title,
@@ -39,24 +48,102 @@ export function CardFinance({
   isLoading,
   target,
   isSameMonth,
+  date,
 }: CardFinance) {
   const {
     control,
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm({
+  } = useForm<FormFinanceData>({
     resolver: zodResolver(SchemaFormFinanace),
   });
 
+  const { user } = useUserContext();
+  const queryClient = useQueryClient();
+
+  const dateFormmated = format(date, '"yyyy-MM"');
+
+  const { mutateAsync: handleUpdateCondominiumIncomes } = useMutation({
+    mutationFn: (data: FormFinanceData) =>
+      updateCondominiumIncomes({
+        date: dateFormmated,
+        income: data.value,
+        targetIncome: data.target,
+        condominiumId: user.condominiumId,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["revenueTotal"],
+        exact: false,
+      });
+      setModalIsOpen(false);
+    },
+  });
+
+  const { mutateAsync: handleUpdateCondominiumExpenses } = useMutation({
+    mutationFn: (data: FormFinanceData) =>
+      updateCondominiumExpenses({
+        date: dateFormmated,
+        expenses: data.value,
+        targetExpenses: data.target,
+        condominiumId: user.condominiumId,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["revenueTotal"],
+        exact: false,
+      });
+      setModalIsOpen(false);
+    },
+  });
+
+  const { mutateAsync: handleRedefineForCalculated } = useMutation({
+    mutationFn: () =>
+      redefineIncomesExpensesToCalculated({
+        date: dateFormmated,
+        condominiumId: user.condominiumId,
+        type: type as "income" | "expenses",
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["revenueTotal"],
+        exact: false,
+      });
+      setModalIsOpen(false);
+    },
+  });
+
+  async function handleUpdate(data: FormFinanceData) {
+    if (type === "income") {
+      handleUpdateCondominiumIncomes(data);
+    }
+
+    if (type === "expensive") {
+      handleUpdateCondominiumExpenses(data);
+    }
+  }
+
+  function handleResetForm() {
+    reset({
+      value: "",
+      target: "",
+    });
+  }
+
+  async function handleRedefine() {
+    await handleRedefineForCalculated();
+  }
   const moneyFormmated = value.toLocaleString("pt-br", {
     currency: "BRL",
     style: "currency",
   });
-  let styleTitle = "";
-  const modalTitle = type === "revenue" ? "Editar Receitas" : "Editar Despesas";
 
-  const isRevenue = type === "revenue";
+  let styleTitle = "";
+
+  const modalTitle = type === "income" ? "Editar Receitas" : "Editar Despesas";
+
+  const isRevenue = type === "income";
   const isExpense = type === "expensive";
 
   const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -81,17 +168,6 @@ export function CardFinance({
 
   if (isLoading) {
     return <CardFinanceSkeleton />;
-  }
-
-  async function handleUpdate(data: any) {
-    console.log("its me data", data);
-  }
-
-  function handleResetForm() {
-    reset({
-      value: "",
-      target: "",
-    });
   }
 
   return (
@@ -167,6 +243,13 @@ export function CardFinance({
               <CurrencyInput onChange={onChange} value={value} />
             )}
           />
+
+          <span
+            onClick={handleRedefine}
+            className="text-blue-600 text-sm font-medium cursor-pointer"
+          >
+            Redefinir para calculado
+          </span>
         </div>
 
         <div className="flex flex-col gap-2">
