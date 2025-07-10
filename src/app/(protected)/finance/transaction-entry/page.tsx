@@ -137,25 +137,30 @@ export default function Finance() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <CardFinance
           title="Receita Total"
+          type="revenue"
           value={cardsTransaction?.totalIncome ?? 0}
-          percentage={20}
+          target={cardsTransaction?.incomeTarget}
           icon={<TrendingUp color="#22c55e" />}
           isLoading={cardsTransactionIsLoading}
+          isSameMonth={cardsTransaction?.isSameMonth ?? false}
         />
 
         <CardFinance
           title="Despesas Totais"
           value={cardsTransaction?.totalExpenses ?? 0}
-          percentage={90}
+          target={cardsTransaction?.expensesTarget}
           icon={<TrendingDown color="#ef4444" />}
           type="expensive"
           isLoading={cardsTransactionIsLoading}
+          isSameMonth={cardsTransaction?.isSameMonth ?? false}
         />
 
         <CardFinance
           title="Saldo"
           value={cardsTransaction?.balance ?? 0}
-          percentage={40}
+  
+          target={cardsTransaction?.incomeTarget}
+          isSameMonth={cardsTransaction?.isSameMonth ?? false}
           icon={
             <DollarSign
               color={
@@ -166,13 +171,6 @@ export default function Finance() {
                   : "#22c55e"
               }
             />
-          }
-          type={
-            cardsTransaction
-              ? cardsTransaction.balance > 0
-                ? "revenue"
-                : "expensive"
-              : "revenue"
           }
           isLoading={cardsTransactionIsLoading}
         />

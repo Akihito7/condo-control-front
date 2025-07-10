@@ -26,9 +26,9 @@ export function useTransaction({ startDate, endDate, incomeExpenseOptionsSelecte
 
   const incomeExpenseOptionsSelectedId = incomeExpenseOptionsSelected?.map((option: any) => option.value)
   const { data: transactions, error: errorTransactions } = useQuery({
-    queryKey: ["transactions", startDate, endDate, incomeExpenseOptionsSelected],
+    queryKey: ["transactions", startDate, endDate, incomeExpenseOptionsSelected, condominiumId],
     queryFn: () => fetchFinancialRecords({ condominiumId, startDate: startDateFormmated, endDate: endDateFormmated, incomeExpenseOptionsSelectedId }),
-    enabled: incomeExpenseOptionsSelectedId ? incomeExpenseOptionsSelectedId.length > 0 : false
+    enabled: incomeExpenseOptionsSelectedId ? incomeExpenseOptionsSelectedId.length > 0 && !!condominiumId : false
   });
 
   const { data: categoriesOptions, error: erorrCategoriesOptions } = useQuery({
@@ -57,22 +57,23 @@ export function useTransaction({ startDate, endDate, incomeExpenseOptionsSelecte
   })
 
   const { data: cardsTransaction, error: errorCardsTransaction, isLoading: cardsTransactionIsLoading, } = useQuery({
-    queryKey: ['revenueTotal', startDate, endDate],
+    queryKey: ['revenueTotal', startDate, endDate, condominiumId],
     queryFn: async () => fetchCardsTransactionEntry({
       condominiumId,
       startDate: startDateFormmated,
       endDate: endDateFormmated
-    })
+    }),
+    enabled: !!condominiumId
   })
 
   const { mutateAsync: handleDeleteRegister } = useMutation({
     mutationFn: (registerId: number) => deleteRegister({ registerId }),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['transactions', startDate, endDate, incomeExpenseOptionsSelected],
+        queryKey: ['transactions', startDate, endDate, incomeExpenseOptionsSelected, condominiumId],
       });
       queryClient.invalidateQueries({
-        queryKey: ['revenueTotal', startDate, endDate],
+        queryKey: ['revenueTotal', startDate, endDate, condominiumId],
       });
     }
   })

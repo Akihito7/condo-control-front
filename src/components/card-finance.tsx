@@ -5,27 +5,48 @@ import { CardFinanceSkeleton } from "./card-finance-skeleton";
 interface CardFinance {
   title: string;
   value: number;
-  percentage: number;
   icon: React.ReactNode;
-  type?: "revenue" | "expensive";
+  type?: "revenue" | "expensive" | "balance";
   isLoading?: boolean;
+  target: number | undefined;
+  isSameMonth: boolean;
 }
 
 export function CardFinance({
   title,
   value,
-  percentage,
   icon,
-  type = "revenue",
+  type = "balance",
   isLoading,
+  target,
+  isSameMonth,
 }: CardFinance) {
   const moneyFormmated = value.toLocaleString("pt-br", {
     currency: "BRL",
     style: "currency",
   });
+  let styleTitle = "";
 
-  const stylePercentage =
-    type === "revenue" ? "text-green-500" : "text-red-500";
+  const isRevenue = type === "revenue";
+  const isExpense = type === "expensive";
+
+  if (!target) {
+    if (value === 0) {
+    } else {
+      styleTitle = isRevenue
+        ? "text-green-500"
+        : isExpense
+        ? "text-red-500"
+        : "";
+    }
+  } else {
+    if (isRevenue) {
+      styleTitle = value > target ? "text-green-500" : "text-red-500";
+    }
+    if (isExpense) {
+      styleTitle = value < target ? "text-green-500" : "text-red-500";
+    }
+  }
 
   if (isLoading) {
     return <CardFinanceSkeleton />;
@@ -42,13 +63,27 @@ export function CardFinance({
         </div>
       </CardHeader>
       <CardContent className="flex flex-col gap-1">
-        <span className="text-3xl font-bold dark:text-foreground">
+        <span
+          className={`text-3xl font-bold dark:text-foreground ${styleTitle}`}
+        >
           {moneyFormmated}
         </span>
-        <span className="text-sm font-medium text-zinc-600 dark:text-foreground">
-          <span className={`${stylePercentage}`}>{percentage}%</span> Em relação
-          ao período anterior
-        </span>
+
+        {isSameMonth && target && target > 0 && (
+          <span className="text-sm font-medium text-zinc-600 dark:text-foreground">
+            Meta{" "}
+            {target?.toLocaleString("pt-br", {
+              currency: "BRL",
+              style: "currency",
+            })}
+          </span>
+        )}
+
+        {isSameMonth && !target && (
+          <span className="text-sm font-medium text-zinc-600 dark:text-foreground">
+            Sem metas para este mês
+          </span>
+        )}
       </CardContent>
     </Card>
   );

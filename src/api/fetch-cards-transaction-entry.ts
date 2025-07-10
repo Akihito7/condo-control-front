@@ -11,6 +11,9 @@ interface FetchCardsTransactionEntryResponse {
   totalIncome: number,
   totalExpenses: number,
   balance: number
+  incomeTarget: number | undefined
+  expensesTarget: number | undefined
+  isSameMonth: boolean
 }
 
 export async function fetchCardsTransactionEntry({
