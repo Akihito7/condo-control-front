@@ -27,7 +27,6 @@ interface CardFinance {
   value: number;
   icon: React.ReactNode;
   type?: "income" | "expensive" | "balance";
-  isLoading?: boolean;
   target: number | undefined;
   isSameMonth: boolean;
   date: Date;
@@ -45,7 +44,6 @@ export function CardFinance({
   value,
   icon,
   type = "balance",
-  isLoading,
   target,
   isSameMonth,
   date,
@@ -164,10 +162,6 @@ export function CardFinance({
     if (isExpense) {
       styleTitle = value < target ? "text-green-500" : "text-red-500";
     }
-  }
-
-  if (isLoading) {
-    return <CardFinanceSkeleton />;
   }
 
   return (

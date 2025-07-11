@@ -43,6 +43,7 @@ import {
 } from "@/api/create-transaction";
 import { UpdateRegisteProps, updateRegister } from "@/api/update-transaction";
 import { FinancialRecord } from "@/api/fetch-financial-records";
+import { CurrencyInput } from "@/components/currency-input";
 
 interface ModalCreateEntryProps {
   categoriesOptions: CategoryType[];
@@ -59,8 +60,8 @@ interface ModalCreateEntryProps {
 }
 
 const SchemaCreateEntry = z.object({
-  amount: z.coerce.number(),
-  amountPaid: z.coerce.number().optional(),
+  amount: z.string(),
+  amountPaid: z.string().optional(),
   condominiumId: z.coerce.number(),
   dueDate: z.date(),
   incomeExpenseId: z.coerce
@@ -107,8 +108,8 @@ export function ModalActionEntry({
   } = useForm({
     resolver: zodResolver(SchemaCreateEntry),
     defaultValues: {
-      amount: 0,
-      amountPaid: 0,
+      amount: "0",
+      amountPaid: "0",
       condominiumId,
       dueDate: new Date(),
       incomeExpenseId: incomeExpenseOptions?.[0].id,
@@ -157,8 +158,8 @@ export function ModalActionEntry({
       incomeExpenseId: incomeExpenseOptions?.[0].id,
       recurring: false,
       type: -1,
-      amount: 0,
-      amountPaid: 0,
+      amount: "0",
+      amountPaid: "0",
     });
   }
 
@@ -208,8 +209,8 @@ export function ModalActionEntry({
       reset({
         incomeExpenseId: transactionSelected.incomeExpenseTypeId,
         paymentStatusId: transactionSelected.paymentStatusId,
-        amount: transactionSelected.amount,
-        amountPaid: transactionSelected.amountPaid,
+        amount: String(transactionSelected.amount),
+        amountPaid: String(transactionSelected.amountPaid),
         apartmentId: transactionSelected.apartmentId,
         categoryId: transactionSelected.categoryId,
         condominiumId: transactionSelected.condominiumId,
@@ -221,6 +222,10 @@ export function ModalActionEntry({
       });
     }
   }, [type]);
+
+  useEffect(() => {
+    console.log(watch("amount"));
+  }, [watch("amount")]);
 
   return (
     <Dialog
@@ -252,6 +257,7 @@ export function ModalActionEntry({
         <form
           onSubmit={handleSubmit((data) => {
             if (type === "create") {
+              console.log("its me data", data);
               return handleCreateTransaction(data as any);
             }
             return handleUpdateTransaction({
@@ -419,11 +425,16 @@ export function ModalActionEntry({
             <div className="grid grid-cols-4 items-center gap-4 mb-4">
               <Label className="text-right">Total a pagar</Label>
               <div className="col-span-3">
-                <Input
-                  type="number"
-                  {...register("amount")}
-                  className="w-[250px]"
+                <Controller
+                  name="amount"
+                  control={control}
+                  render={({ field: { onChange, value } }: any) => (
+                    <div className="w-[250px]">
+                      <CurrencyInput value={value} onChange={onChange} />{" "}
+                    </div>
+                  )}
                 />
+
                 {errors.type && (
                   <p className="text-red-500 text-sm mt-1">
                     {errors.type.message}
@@ -508,10 +519,14 @@ export function ModalActionEntry({
             <div className="grid grid-cols-4 items-center gap-4 mb-4">
               <Label className="text-right">Total pago</Label>
               <div className="col-span-3">
-                <Input
-                  type="number"
-                  {...register("amountPaid")}
-                  className="w-[250px]"
+                <Controller
+                  name="amountPaid"
+                  control={control}
+                  render={({ field: { onChange, value } }: any) => (
+                    <div className="w-[250px]">
+                      <CurrencyInput value={value} onChange={onChange} />{" "}
+                    </div>
+                  )}
                 />
                 {errors.type && (
                   <p className="text-red-500 text-sm mt-1">

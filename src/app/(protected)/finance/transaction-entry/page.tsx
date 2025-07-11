@@ -34,6 +34,9 @@ import { useTransaction } from "./use-transaction";
 import Select, { MultiValue } from "react-select";
 import { FinancialRecord } from "@/api/fetch-financial-records";
 import { useUserContext } from "@/providers/use-user-context";
+import { array } from "zod/v4";
+import { CardFinanceSkeleton } from "@/components/card-finance-skeleton";
+import { TableRowSkeleton } from "@/components/table-row-skeleton";
 
 export type OptionType = {
   value: number;
@@ -64,8 +67,9 @@ export default function Finance() {
     apartments,
     paymentStatusOptions,
     cardsTransaction,
-    cardsTransactionIsLoading,
     handleDeleteRegister,
+    cardsTransactionStatus,
+    transactionsStatus,
   } = useTransaction({
     startDate: range.from,
     endDate: range.to,
@@ -135,50 +139,61 @@ export default function Finance() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <CardFinance
-          title="Receita Total"
-          type="income"
-          value={cardsTransaction?.totalIncome ?? 0}
-          target={cardsTransaction?.incomeTarget}
-          icon={<TrendingUp color="#22c55e" />}
-          isLoading={cardsTransactionIsLoading}
-          isSameMonth={cardsTransaction?.isSameMonth ?? false}
-          date={range.from}
-        />
-
-        <CardFinance
-          title="Despesas Totais"
-          value={cardsTransaction?.totalExpenses ?? 0}
-          target={cardsTransaction?.expensesTarget}
-          icon={<TrendingDown color="#ef4444" />}
-          type="expensive"
-          isLoading={cardsTransactionIsLoading}
-          isSameMonth={cardsTransaction?.isSameMonth ?? false}
-          date={range.from}
-        />
-
-        <CardFinance
-          title="Saldo"
-          value={cardsTransaction?.balance ?? 0}
-          target={cardsTransaction?.incomeTarget}
-          isSameMonth={cardsTransaction?.isSameMonth ?? false}
-          icon={
-            <DollarSign
-              color={
-                cardsTransaction
-                  ? cardsTransaction.balance > 0
-                    ? "#22c55e"
-                    : "#ef4444"
-                  : "#22c55e"
-              }
+        {cardsTransactionStatus === "pending" ? (
+          <>
+            {Array.from({ length: 3 }).map(() => (
+              <CardFinanceSkeleton />
+            ))}
+          </>
+        ) : cardsTransactionStatus === "success" ? (
+          <>
+            <CardFinance
+              title="Receita Total"
+              type="income"
+              value={cardsTransaction?.totalIncome ?? 0}
+              target={cardsTransaction?.incomeTarget}
+              icon={<TrendingUp color="#22c55e" />}
+              isSameMonth={cardsTransaction?.isSameMonth ?? false}
+              date={range.from}
             />
-          }
-          isLoading={cardsTransactionIsLoading}
-          date={range.from}
-        />
+
+            <CardFinance
+              title="Despesas Totais"
+              value={cardsTransaction?.totalExpenses ?? 0}
+              target={cardsTransaction?.expensesTarget}
+              icon={<TrendingDown color="#ef4444" />}
+              type="expensive"
+              isSameMonth={cardsTransaction?.isSameMonth ?? false}
+              date={range.from}
+            />
+
+            <CardFinance
+              title="Saldo"
+              value={cardsTransaction?.balance ?? 0}
+              target={cardsTransaction?.incomeTarget}
+              isSameMonth={cardsTransaction?.isSameMonth ?? false}
+              icon={
+                <DollarSign
+                  color={
+                    cardsTransaction
+                      ? cardsTransaction.balance > 0
+                        ? "#22c55e"
+                        : "#ef4444"
+                      : "#22c55e"
+                  }
+                />
+              }
+              date={range.from}
+            />
+          </>
+        ) : (
+          <div className="col-span-3 text-center text-sm text-red-500">
+            Ocorreu um erro ao carregar os dados. Tente novamente mais tarde.
+          </div>
+        )}
       </div>
 
-      <section className="rounded-xl overflow-auto border">
+      <section className="rounded-xl overflow-auto border ">
         <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200">
           <h2 className="font-medium text-gray-800 text-lg">
             Transações Recentes
@@ -203,92 +218,101 @@ export default function Finance() {
               />
             )}
         </div>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[20%]">Data de vencimento</TableHead>
-              <TableHead>Tipo</TableHead>
-              <TableHead>Categoria</TableHead>
-              <TableHead>Apartamento</TableHead>
-              <TableHead>Tipo</TableHead>
-              <TableHead>Recorrente</TableHead>
-              <TableHead>Forma de Pagamento</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-center">Valor</TableHead>
-              <TableHead>Data do Pagamento</TableHead>
-              <TableHead>Valor Pago</TableHead>
-              <TableHead>Observação</TableHead>
-              <TableHead>Ações</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {transactions?.map((transaction) => (
-              <TableRow key={transaction.id}>
-                <TableCell className="font-medium">
-                  {transaction.dueDate}
-                </TableCell>
-                <TableCell className="capitalize text-sm">
-                  {transaction.incomeExpenseTypeId === 4
-                    ? "Receita"
-                    : "Despesa"}
-                </TableCell>
-                <TableCell>{transaction.categoryName}</TableCell>
-                <TableCell className="text-center">
-                  {transaction.apartmentNumber}
-                </TableCell>
-                <TableCell className="text-sm">
-                  {transaction.recordTypeId === 1 ? "Fixo" : "Variável"}
-                </TableCell>
-                <TableCell className="text-sm">
-                  {transaction.isRecurring ? "Sim" : "Não"}
-                </TableCell>
-                <TableCell className="text-sm">
-                  {transaction.paymentMethodName ?? "-"}
-                </TableCell>
 
-                <TableCell>{transaction.paymentStatusName ?? "-"}</TableCell>
-                <TableCell className="text-center font-semibold text-sm">
-                  {transaction.amount.toLocaleString("pt-BR", {
-                    currency: "BRL",
-                    style: "currency",
-                  })}
-                </TableCell>
-                <TableCell className="text-center">
-                  {transaction.paymentDate ?? "-"}
-                </TableCell>
-                <TableCell className="text-center">
-                  {transaction.amountPaid?.toLocaleString("pt-BR", {
-                    currency: "BRL",
-                    style: "currency",
-                  }) ?? "-"}
-                </TableCell>
-                <TableCell>{transaction.observation}</TableCell>
-                <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger className="outline-none ring-0 focus:outline-none focus:ring-0 cursor-pointer">
-                      <Pencil className="w-4 h-4 text-gray-700" />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      <DropdownMenuItem
-                        onClick={() => {
-                          setTransacationSelected(transaction);
-                          setModalIsOpen(true);
-                        }}
-                      >
-                        Editar
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => handleDeleteRegister(transaction.id)}
-                      >
-                        Excluir
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
+        <div className="max-h-[70vh] overflow-y-auto border border-gray-300 rounded">
+          <Table className="min-w-full border-collapse">
+            <TableHeader className="sticky top-0 bg-white shadow-md z-10">
+              <TableRow>
+                <TableHead className="w-[20%]">Data de vencimento</TableHead>
+                <TableHead>Tipo</TableHead>
+                <TableHead>Categoria</TableHead>
+                <TableHead>Apartamento</TableHead>
+                <TableHead>Tipo</TableHead>
+                <TableHead>Recorrente</TableHead>
+                <TableHead>Forma de Pagamento</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-center">Valor</TableHead>
+                <TableHead>Data do Pagamento</TableHead>
+                <TableHead>Valor Pago</TableHead>
+                <TableHead>Observação</TableHead>
+                <TableHead>Ações</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            {transactionsStatus === "pending" ? (
+              Array.from({ length: 5 }).map(() => <TableRowSkeleton />)
+            ) : (
+              <TableBody>
+                {transactions?.map((transaction) => (
+                  <TableRow key={transaction.id}>
+                    <TableCell className="font-medium">
+                      {transaction.dueDate}
+                    </TableCell>
+                    <TableCell className="capitalize text-sm">
+                      {transaction.incomeExpenseTypeId === 4
+                        ? "Receita"
+                        : "Despesa"}
+                    </TableCell>
+                    <TableCell>{transaction.categoryName}</TableCell>
+                    <TableCell className="text-center">
+                      {transaction.apartmentNumber}
+                    </TableCell>
+                    <TableCell className="text-sm">
+                      {transaction.recordTypeId === 1 ? "Fixo" : "Variável"}
+                    </TableCell>
+                    <TableCell className="text-sm">
+                      {transaction.isRecurring ? "Sim" : "Não"}
+                    </TableCell>
+                    <TableCell className="text-sm">
+                      {transaction.paymentMethodName ?? "-"}
+                    </TableCell>
+
+                    <TableCell>
+                      {transaction.paymentStatusName ?? "-"}
+                    </TableCell>
+                    <TableCell className="text-center font-semibold text-sm">
+                      {transaction.amount.toLocaleString("pt-BR", {
+                        currency: "BRL",
+                        style: "currency",
+                      })}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {transaction.paymentDate ?? "-"}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {transaction.amountPaid?.toLocaleString("pt-BR", {
+                        currency: "BRL",
+                        style: "currency",
+                      }) ?? "-"}
+                    </TableCell>
+                    <TableCell>{transaction.observation}</TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger className="outline-none ring-0 focus:outline-none focus:ring-0 cursor-pointer">
+                          <Pencil className="w-4 h-4 text-gray-700" />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              setTransacationSelected(transaction);
+                              setModalIsOpen(true);
+                            }}
+                          >
+                            Editar
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => handleDeleteRegister(transaction.id)}
+                          >
+                            Excluir
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            )}
+          </Table>
+        </div>
       </section>
     </main>
   );

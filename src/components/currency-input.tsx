@@ -30,7 +30,7 @@ export function CurrencyInput({
             rawValueTrimPrefix: true,
             numeralDecimalScale: 2,
           }}
-          className="pl-10 pr-3 py-2 w-full border-2  rounded-lg focus:outline-none text-right focus:border-blue-500"
+          className="pl-10 pr-3 py-2 w-full border-2 h-10 rounded-lg focus:outline-none text-right focus:border-blue-500"
         />
       </div>
     </div>

@@ -25,7 +25,7 @@ export function useTransaction({ startDate, endDate, incomeExpenseOptionsSelecte
   const endDateFormmated = endDate.toISOString().slice(0, 10);
 
   const incomeExpenseOptionsSelectedId = incomeExpenseOptionsSelected?.map((option: any) => option.value)
-  const { data: transactions, error: errorTransactions } = useQuery({
+  const { data: transactions, error: errorTransactions, status: transactionsStatus } = useQuery({
     queryKey: ["transactions", startDate, endDate, incomeExpenseOptionsSelected, condominiumId],
     queryFn: () => fetchFinancialRecords({ condominiumId, startDate: startDateFormmated, endDate: endDateFormmated, incomeExpenseOptionsSelectedId }),
     enabled: incomeExpenseOptionsSelectedId ? incomeExpenseOptionsSelectedId.length > 0 && !!condominiumId : false
@@ -56,7 +56,7 @@ export function useTransaction({ startDate, endDate, incomeExpenseOptionsSelecte
     queryFn: fetchPaymentStatusOptions
   })
 
-  const { data: cardsTransaction, error: errorCardsTransaction, isLoading: cardsTransactionIsLoading, } = useQuery({
+  const { data: cardsTransaction, isLoading: cardsTransactionIsLoading, status: cardsTransactionStatus } = useQuery({
     queryKey: ['revenueTotal', startDate, endDate, condominiumId],
     queryFn: async () => fetchCardsTransactionEntry({
       condominiumId,
@@ -93,6 +93,8 @@ export function useTransaction({ startDate, endDate, incomeExpenseOptionsSelecte
     errorPaymentStatus,
     cardsTransaction,
     cardsTransactionIsLoading,
-    handleDeleteRegister
+    handleDeleteRegister,
+    cardsTransactionStatus,
+    transactionsStatus
   }
 }
