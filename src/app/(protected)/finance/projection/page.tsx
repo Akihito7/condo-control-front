@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Breadcrumb } from "@/components/breadcrumb";
 import { DatePicker } from "@/components/date-picker";
 import {
@@ -20,6 +20,8 @@ import {
   PiggyBank,
   FileDown,
 } from "lucide-react";
+import { CardProjection } from "./card-projection";
+import { MonthYearPicker } from "@/components/month-year-select";
 
 export default function FinancialForecast() {
   const transactions = [
@@ -53,7 +55,11 @@ export default function FinancialForecast() {
     },
   ];
 
-  const [date, setDate] = useState<Date>(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+
+  useEffect(() => {
+    console.log("new date", selectedDate);
+  }, [selectedDate]);
 
   const totalExpenses = transactions
     .filter((t) => t.type === "expense")
@@ -77,7 +83,10 @@ export default function FinancialForecast() {
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Mês de referência
           </label>
-          <DatePicker date={date} setDate={setDate} />
+          <MonthYearPicker
+            selectedDate={selectedDate}
+            onChange={setSelectedDate}
+          />
         </div>
 
         <Button
@@ -90,33 +99,28 @@ export default function FinancialForecast() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <CardFinance
-          title="Receita Projetadas"
-          value={4800}
-          percentage={20}
+        <CardProjection
+          title="Receitas Projetadas"
+          amount={1200}
           icon={<TrendingUp color="#22c55e" />}
         />
 
-        <CardFinance
+        <CardProjection
           title="Despesas Projetadas"
-          value={2200}
-          percentage={90}
+          amount={1200}
           icon={<TrendingDown color="#ef4444" />}
-          type="expensive"
         />
 
-        <CardFinance
-          title="Saldo Projetado"
-          value={500}
-          percentage={40}
-          icon={<DollarSign color="#22c55e" />}
+        <CardProjection
+          title="Saldo Projetado Mês"
+          amount={1200}
+          icon={<DollarSign color="#2768bd" />}
         />
 
-        <CardFinance
-          title="Saldo Acumulado Projetado"
-          value={2000}
-          percentage={40}
-          icon={<PiggyBank color="#22c55e" />}
+        <CardProjection
+          title="Saldo Projetado Total"
+          amount={1200}
+          icon={<PiggyBank color="#9f22c5" />}
         />
       </div>
 
@@ -126,33 +130,36 @@ export default function FinancialForecast() {
             Detalhes da Projeção
           </h2>
         </div>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[50%]">Descrição</TableHead>
-              <TableHead>Tipo</TableHead>
-              <TableHead>Data</TableHead>
-              <TableHead className="text-right">Valor</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {transactions.map((transaction) => (
-              <TableRow key={transaction.id}>
-                <TableCell className="font-medium">
-                  {transaction.description}
-                </TableCell>
-                <TableCell className="capitalize text-sm">
-                  {transaction.type === "income" ? "Receita" : "Despesa"}
-                </TableCell>
-                <TableCell className="text-sm">{transaction.date}</TableCell>
-                <TableCell className="text-right font-semibold text-sm">
-                  {transaction.type === "income" ? "+" : "-"}$
-                  {transaction.amount.toLocaleString("pt-BR")}
-                </TableCell>
+
+        <div className="max-h-[70vh] overflow-y-auto border border-gray-300 rounded">
+          <Table className="min-w-full border-collapse">
+            <TableHeader className="sticky top-0 bg-white shadow-md z-10">
+              <TableRow>
+                <TableHead className="w-[50%]">Mês</TableHead>
+                <TableHead>Tipo</TableHead>
+                <TableHead>Categoria</TableHead>
+                <TableHead className="text-right">Valor Projetado</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {transactions.map((transaction) => (
+                <TableRow key={transaction.id}>
+                  <TableCell className="font-medium">
+                    {transaction.description}
+                  </TableCell>
+                  <TableCell className="capitalize text-sm">
+                    {transaction.type === "income" ? "Receita" : "Despesa"}
+                  </TableCell>
+                  <TableCell className="text-sm">{transaction.date}</TableCell>
+                  <TableCell className="text-right font-semibold text-sm">
+                    {transaction.type === "income" ? "+" : "-"}$
+                    {transaction.amount.toLocaleString("pt-BR")}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </section>
     </div>
   );
