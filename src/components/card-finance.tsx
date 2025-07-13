@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import React, { useState } from "react";
-import { CardFinanceSkeleton } from "./card-finance-skeleton";
+import { CardFinanceSkeleton } from "./card-skeleton";
 
 import {
   Dialog,

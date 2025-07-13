@@ -16,7 +16,7 @@ export function CardProjection({ title, icon, amount }: CardProjectionProps) {
           </CardTitle>
           {icon}
         </div>
-      </CardHeader>ls
+      </CardHeader>
       <CardContent className="flex flex-col gap-1">
         <span className={`text-3xl font-bold dark:text-foreground`}>
           {amount.toLocaleString("pt-br", {

@@ -34,8 +34,7 @@ import { useTransaction } from "./use-transaction";
 import Select, { MultiValue } from "react-select";
 import { FinancialRecord } from "@/api/fetch-financial-records";
 import { useUserContext } from "@/providers/use-user-context";
-import { array } from "zod/v4";
-import { CardFinanceSkeleton } from "@/components/card-finance-skeleton";
+import { CardSkeleton } from "@/components/card-skeleton";
 import { TableRowSkeleton } from "@/components/table-row-skeleton";
 
 export type OptionType = {
@@ -142,7 +141,7 @@ export default function Finance() {
         {cardsTransactionStatus === "pending" ? (
           <>
             {Array.from({ length: 3 }).map(() => (
-              <CardFinanceSkeleton />
+              <CardSkeleton />
             ))}
           </>
         ) : cardsTransactionStatus === "success" ? (
