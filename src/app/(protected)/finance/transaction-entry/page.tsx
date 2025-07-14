@@ -25,7 +25,6 @@ import {
   DollarSign,
   FileDown,
   Pencil,
-  Trash2,
   TrendingDown,
   TrendingUp,
 } from "lucide-react";
@@ -36,6 +35,10 @@ import { FinancialRecord } from "@/api/fetch-financial-records";
 import { useUserContext } from "@/providers/use-user-context";
 import { CardSkeleton } from "@/components/card-skeleton";
 import { TableRowSkeleton } from "@/components/table-row-skeleton";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import { useIsMobile } from "@/lib/use-is-mobile";
+import { ButtonOpenSidebar } from "@/components/button-open-sidebar";
 
 export type OptionType = {
   value: number;
@@ -57,6 +60,8 @@ export default function Finance() {
   >();
   const { user } = useUserContext();
   const condominiumId = user.condominiumId;
+
+  const isMobile = useIsMobile();
 
   const {
     transactions,
@@ -96,15 +101,18 @@ export default function Finance() {
     })) ?? [];
 
   return (
-    <main className="bg-gray-50 min-h-screen w-full p-8 flex flex-col gap-6">
+    <main className="bg-gray-50 min-h-screen w-full p-0 py-8 px-2 sm:p-8 flex flex-col gap-6">
       <div className="space-y-2">
-        <Breadcrumb paths={["Início", "Finanças"]} />
+        <div className="flex items-center mb-8 gap-2">
+          <ButtonOpenSidebar />
+          <Breadcrumb paths={["Início", "Finanças"]} />
+        </div>
         <h1 className="text-2xl font-semibold text-gray-800">
           Visão Geral Financeira
         </h1>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-4 items-end">
+      <div className="flex  flex-col gap-4 md:items-end md:flex-row ">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Selecione o período
@@ -112,7 +120,7 @@ export default function Finance() {
           <DatePickRange range={range} setRange={setRange} />
         </div>
 
-        <div>
+        <div className="max-w-[300px]">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Tipo de registros
           </label>
@@ -137,7 +145,7 @@ export default function Finance() {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
         {cardsTransactionStatus === "pending" ? (
           <>
             {Array.from({ length: 3 }).map(() => (
@@ -145,46 +153,97 @@ export default function Finance() {
             ))}
           </>
         ) : cardsTransactionStatus === "success" ? (
-          <>
-            <CardFinance
-              title="Receita Total"
-              type="income"
-              value={cardsTransaction?.totalIncome ?? 0}
-              target={cardsTransaction?.incomeTarget}
-              icon={<TrendingUp color="#22c55e" />}
-              isSameMonth={cardsTransaction?.isSameMonth ?? false}
-              date={range.from}
-            />
+          isMobile ? (
+            <>
+              <Swiper className="w-full" spaceBetween={16} slidesPerView={1.2}>
+                <SwiperSlide>
+                  <CardFinance
+                    title="Receita Total"
+                    type="income"
+                    value={cardsTransaction?.totalIncome ?? 0}
+                    target={cardsTransaction?.incomeTarget}
+                    icon={<TrendingUp color="#22c55e" />}
+                    isSameMonth={cardsTransaction?.isSameMonth ?? false}
+                    date={range.from}
+                  />
+                </SwiperSlide>
 
-            <CardFinance
-              title="Despesas Totais"
-              value={cardsTransaction?.totalExpenses ?? 0}
-              target={cardsTransaction?.expensesTarget}
-              icon={<TrendingDown color="#ef4444" />}
-              type="expensive"
-              isSameMonth={cardsTransaction?.isSameMonth ?? false}
-              date={range.from}
-            />
+                <SwiperSlide>
+                  <CardFinance
+                    title="Despesas Totais"
+                    value={cardsTransaction?.totalExpenses ?? 0}
+                    target={cardsTransaction?.expensesTarget}
+                    icon={<TrendingDown color="#ef4444" />}
+                    type="expensive"
+                    isSameMonth={cardsTransaction?.isSameMonth ?? false}
+                    date={range.from}
+                  />
+                </SwiperSlide>
 
-            <CardFinance
-              title="Saldo"
-              value={cardsTransaction?.balance ?? 0}
-              target={cardsTransaction?.incomeTarget}
-              isSameMonth={cardsTransaction?.isSameMonth ?? false}
-              icon={
-                <DollarSign
-                  color={
-                    cardsTransaction
-                      ? cardsTransaction.balance > 0
-                        ? "#22c55e"
-                        : "#ef4444"
-                      : "#22c55e"
-                  }
-                />
-              }
-              date={range.from}
-            />
-          </>
+                <SwiperSlide>
+                  <CardFinance
+                    title="Saldo"
+                    value={cardsTransaction?.balance ?? 0}
+                    target={cardsTransaction?.incomeTarget}
+                    isSameMonth={cardsTransaction?.isSameMonth ?? false}
+                    icon={
+                      <DollarSign
+                        color={
+                          cardsTransaction
+                            ? cardsTransaction.balance > 0
+                              ? "#22c55e"
+                              : "#ef4444"
+                            : "#22c55e"
+                        }
+                      />
+                    }
+                    date={range.from}
+                  />
+                </SwiperSlide>
+              </Swiper>
+            </>
+          ) : (
+            <>
+              <CardFinance
+                title="Receita Total"
+                type="income"
+                value={cardsTransaction?.totalIncome ?? 0}
+                target={cardsTransaction?.incomeTarget}
+                icon={<TrendingUp color="#22c55e" />}
+                isSameMonth={cardsTransaction?.isSameMonth ?? false}
+                date={range.from}
+              />
+
+              <CardFinance
+                title="Despesas Totais"
+                value={cardsTransaction?.totalExpenses ?? 0}
+                target={cardsTransaction?.expensesTarget}
+                icon={<TrendingDown color="#ef4444" />}
+                type="expensive"
+                isSameMonth={cardsTransaction?.isSameMonth ?? false}
+                date={range.from}
+              />
+
+              <CardFinance
+                title="Saldo"
+                value={cardsTransaction?.balance ?? 0}
+                target={cardsTransaction?.incomeTarget}
+                isSameMonth={cardsTransaction?.isSameMonth ?? false}
+                icon={
+                  <DollarSign
+                    color={
+                      cardsTransaction
+                        ? cardsTransaction.balance > 0
+                          ? "#22c55e"
+                          : "#ef4444"
+                        : "#22c55e"
+                    }
+                  />
+                }
+                date={range.from}
+              />
+            </>
+          )
         ) : (
           <div className="col-span-3 text-center text-sm text-red-500">
             Ocorreu um erro ao carregar os dados. Tente novamente mais tarde.
@@ -192,9 +251,9 @@ export default function Finance() {
         )}
       </div>
 
-      <section className="rounded-xl overflow-auto border ">
+      <section className="rounded-xl overflow-auto border">
         <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200">
-          <h2 className="font-medium text-gray-800 text-lg">
+          <h2 className="font-medium text-gray-800  text-md md:text-lg">
             Transações Recentes
           </h2>
           {Array.isArray(categoriesOptions) &&

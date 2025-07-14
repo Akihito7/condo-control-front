@@ -4,7 +4,7 @@ interface BreadcrumbProps {
 
 export function Breadcrumb({ paths }: BreadcrumbProps) {
   return (
-    <nav aria-label="breadcrumb" className="select-none mb-8">
+    <nav aria-label="breadcrumb" className="select-none">
       <ol className="flex items-center gap-2 md:gap-3 text-base md:text-lg">
         {paths.map((path, index) => {
           const isLast = index === paths.length - 1;

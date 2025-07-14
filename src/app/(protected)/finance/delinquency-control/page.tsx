@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Breadcrumb } from "@/components/breadcrumb";
-import { DatePicker } from "@/components/date-picker";
 import {
   Select,
   SelectTrigger,
@@ -11,7 +10,7 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 
-import { FileDown } from "lucide-react";
+import { FileDown, Pencil } from "lucide-react";
 
 import {
   Table,
@@ -21,41 +20,55 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
 import { ModalCreateDelinquency } from "./modal-create-delinquency";
 import { Button } from "@/components/ui/button";
+import { MonthYearPicker } from "@/components/month-year-select";
+import { ButtonOpenSidebar } from "@/components/button-open-sidebar";
+import { useDelinquencyControl } from "./use-delinquency-control";
+import { Delinquency } from "@/api/fetch-delinquency-registers";
 
 export default function DelinquencyControl() {
-  const transactions = [
-    {
-      id: 1,
-      vencimento: "2023-07-01",
-      apartamento: "101",
-      tipo: "Condomínio",
-      valor: 500,
-      dataPagamento: "2023-07-03",
-      valorPago: 500,
-      status: "Pago",
-      diasAtraso: 2,
-    },
-    {
-      id: 2,
-      vencimento: "2023-07-01",
-      apartamento: "102",
-      tipo: "Condomínio",
-      valor: 500,
-      dataPagamento: null,
-      valorPago: 0,
-      status: "Pendente",
-      diasAtraso: 5,
-    },
-  ];
+  const [delinquencySelected, setDelinquencySelected] = useState<Delinquency>();
+
+  const [modalIsOpen, setModalIsOpen] = useState(false);
 
   const [date, setDate] = useState<Date>(new Date());
+
+  const [paymentStatus, setStatusPayment] = useState<string>("1");
+
+  const {
+    categoriesOptions,
+    categorioOptionsStatus,
+    apartaments,
+    delinequencyRegisters,
+    handeDeleteRegister,
+  } = useDelinquencyControl({ date });
+
+  const delinquencyRegistersFiltered = delinequencyRegisters?.filter(
+    (delinquencyRegister) => {
+      if (paymentStatus === "2") {
+        return delinquencyRegister.paymentDate;
+      }
+
+      return !delinquencyRegister.paymentDate;
+    }
+  );
 
   return (
     <div className="bg-gray-50 min-h-screen w-full p-8 flex flex-col gap-6">
       <div className="space-y-2">
-        <Breadcrumb paths={["Início", "Finanças"]} />
+        <div className="flex items-center mb-8 gap-2">
+          <ButtonOpenSidebar />
+          <Breadcrumb paths={["Início", "Finanças"]} />
+        </div>
         <h1 className="text-2xl font-semibold text-gray-800">
           Gestão de Inadimplência
         </h1>
@@ -66,26 +79,37 @@ export default function DelinquencyControl() {
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Mês de referência
           </label>
-          <DatePicker date={date} setDate={setDate} />
+          <MonthYearPicker selectedDate={date} onChange={setDate} />
         </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Status de Pagamentos
           </label>
-          <Select onValueChange={(value) => console.log("Selecionado:", value)}>
-            <SelectTrigger className="bg-white w-[260px] min-h-[40px]">
+          <Select
+            value={paymentStatus}
+            defaultValue={paymentStatus}
+            onValueChange={(value) => {
+              setStatusPayment(value);
+            }}
+          >
+            <SelectTrigger
+              value={paymentStatus}
+              className="bg-white w-[260px] min-h-[40px]"
+            >
               <SelectValue placeholder="Selecione o status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="todos">Todos</SelectItem>
-              <SelectItem value="pendente">Pendente</SelectItem>
-              <SelectItem value="pago">Pago</SelectItem>
+              <SelectItem value="2">Pago</SelectItem>
+              <SelectItem value="1">Pendente</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
-        <Button variant="outline" className="ml-auto flex items-center gap-2 h-10 cursor-pointer">
+        <Button
+          variant="outline"
+          className="ml-auto flex items-center gap-2 h-10 cursor-pointer"
+        >
           <FileDown className="w-6 h-6" />
           Exportar PDF
         </Button>
@@ -96,50 +120,102 @@ export default function DelinquencyControl() {
           <h2 className="font-medium text-gray-800 text-lg">
             Registros de Inadimplência
           </h2>
-          <ModalCreateDelinquency />
+          {categorioOptionsStatus === "success" &&
+            categoriesOptions != undefined && (
+              <ModalCreateDelinquency
+                categoriesOptions={categoriesOptions}
+                apartaments={apartaments!}
+                modalIsOpen={modalIsOpen}
+                setModalIsOpen={setModalIsOpen}
+                delinquencySelected={delinquencySelected}
+                setDelinquencySelected={setDelinquencySelected}
+                type={delinquencySelected ? "edit" : "create"}
+              />
+            )}
         </div>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Vencimento</TableHead>
-              <TableHead>Apartamento</TableHead>
-              <TableHead>Tipo</TableHead>
-              <TableHead className="text-left">Valor</TableHead>
-              <TableHead>Data de Pagamento</TableHead>
-              <TableHead className="text-left">Valor Pago</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-center">Dias de Atraso</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {transactions.map((t) => (
-              <TableRow key={t.id}>
-                <TableCell>{t.vencimento}</TableCell>
-                <TableCell>{t.apartamento}</TableCell>
-                <TableCell>{t.tipo}</TableCell>
-                <TableCell className="text-left">
-                  R$ {t.valor.toFixed(2)}
-                </TableCell>
-                <TableCell>{t.dataPagamento ? t.dataPagamento : "-"}</TableCell>
-                <TableCell className="text-left">
-                  R$ {t.valorPago.toFixed(2)}
-                </TableCell>
-                <TableCell>
-                  <span
-                    className={`px-2 py-1 rounded text-xs font-semibold ${
-                      t.status === "Pago"
-                        ? "text-green-500 bg-green-100"
-                        : "text-red-500 bg-red-100"
-                    }`}
-                  >
-                    {t.status}
-                  </span>
-                </TableCell>
-                <TableCell className="text-center">{t.diasAtraso}</TableCell>
+
+        <div className="max-h-[70vh] overflow-y-auto border border-gray-300 rounded">
+          <Table className="min-w-full border-collapse">
+            <TableHeader className="sticky top-0 bg-white shadow-md z-10">
+              <TableRow>
+                <TableHead>Vencimento</TableHead>
+                <TableHead>Apartamento</TableHead>
+                <TableHead>Tipo</TableHead>
+                <TableHead className="text-left">Valor</TableHead>
+                <TableHead>Data de Pagamento</TableHead>
+                <TableHead className="text-left">Valor Pago</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-center">Dias de Atraso</TableHead>
+                <TableHead className="text-center">Ações</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {delinquencyRegistersFiltered?.map((delinquencyRegister) => (
+                <TableRow key={delinquencyRegister.id}>
+                  <TableCell>{delinquencyRegister.dueDate}</TableCell>
+                  <TableCell>{delinquencyRegister.apartamentId}</TableCell>
+                  <TableCell>{delinquencyRegister.categoryName}</TableCell>
+                  <TableCell className="text-left">
+                    {delinquencyRegister.amount.toLocaleString("pt-br", {
+                      currency: "BRL",
+                      style: "currency",
+                    })}
+                  </TableCell>
+                  <TableCell>
+                    {delinquencyRegister.paymentDate
+                      ? delinquencyRegister.paymentDate
+                      : "-"}
+                  </TableCell>
+                  <TableCell className="text-left">
+                    {delinquencyRegister.amountPaid?.toLocaleString("pt-br", {
+                      currency: "BRL",
+                      style: "currency",
+                    })}
+                  </TableCell>
+                  <TableCell>
+                    <span
+                      className={`px-2 py-1 rounded text-xs font-semibold ${
+                        delinquencyRegister.paymentDate
+                          ? "text-green-500 bg-green-100"
+                          : "text-red-500 bg-red-100"
+                      }`}
+                    >
+                      {delinquencyRegister.paymentDate ? "Pago" : "Pendente"}
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    {delinquencyRegister.daysLate}
+                  </TableCell>
+
+                  <TableCell className="text-center">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger className="outline-none ring-0 focus:outline-none focus:ring-0 cursor-pointer">
+                        <Pencil className="w-4 h-4 text-gray-700" />
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setDelinquencySelected(delinquencyRegister);
+                            setModalIsOpen(true);
+                          }}
+                        >
+                          Editar
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            handeDeleteRegister(delinquencyRegister.id);
+                          }}
+                        >
+                          Excluir
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </section>
     </div>
   );

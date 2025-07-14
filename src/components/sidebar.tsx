@@ -1,5 +1,7 @@
 "use client";
 
+import { useIsMobile } from "@/lib/use-is-mobile";
+import { useSidebarContext } from "@/providers/use-sidebar-context";
 import {
   ChevronUp,
   ChevronDown,
@@ -14,10 +16,19 @@ import {
 import { useState } from "react";
 
 export function Sidebar() {
+  const { isOpen } = useSidebarContext();
   const [showFinanceSubmenu, setShowFinanceSubmenu] = useState(true);
+  const isMobile = useIsMobile();
 
   return (
-    <aside className="w-80 min-h-screen bg-white border-r border-gray-200 flex flex-col font-sans text-sm text-gray-800">
+    <aside
+      style={{
+        display: isOpen ? "flex" : "none",
+        position: isMobile ? "fixed" : "static",
+        zIndex: isMobile ? 999 : 1,
+      }}
+      className="w-72 sm:w-80 min-h-screen bg-white border-r border-gray-200 flex flex-col font-sans text-sm text-gray-800"
+    >
       {/* Topo */}
       <div className="p-6 border-b border-gray-200">
         <h1 className="text-xl font-semibold tracking-tight">CondoControl</h1>

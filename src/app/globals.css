@@ -43,7 +43,7 @@
 }
 
 .layout-base {
-  @apply bg-white w-full grid grid-cols-[auto_1fr];
+  @apply bg-white h-screen w-full flex;
 }
 
 .rdr-weeknumbers {

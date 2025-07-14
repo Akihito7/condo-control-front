@@ -1,6 +1,5 @@
 "use client";
 
-import { Paperclip } from "lucide-react";
 import {
   Dialog,
   DialogClose,
@@ -21,40 +20,171 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useState } from "react";
+import { DatePicker } from "@/components/date-picker";
+import { CurrencyInput } from "@/components/currency-input";
+import { CategoryType } from "@/api/fecth-categories-options";
+import { useForm, Controller } from "react-hook-form";
+import z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ApartmentWithBlock } from "@/api/fetch-apartments";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { createDelinquency } from "@/api/create-delinquency";
+import { useUserContext } from "@/providers/use-user-context";
+import React, { useEffect, useRef } from "react";
+import { Delinquency } from "@/api/fetch-delinquency-registers";
+import { deleteDelinquencyRegister } from "@/api/delete-delinquency-register";
+import { updateDelinquencyRegister } from "@/api/update-delinquency-register";
+import { parseISO } from "date-fns";
 
-export function ModalCreateDelinquency() {
-  const [form, setForm] = useState({
-    apartment: "",
-    dueDate: "",
-    amount: "",
-    status: "Pendente",
-    notes: "",
-    documents: null as FileList | null,
+const INCOME_TYPE_ID = 4;
+interface ModalCreateDelinquencyProps {
+  categoriesOptions: CategoryType[];
+  apartaments: ApartmentWithBlock[];
+  modalIsOpen: boolean;
+  setModalIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  delinquencySelected: Delinquency | undefined;
+  setDelinquencySelected: React.Dispatch<
+    React.SetStateAction<Delinquency | undefined>
+  >;
+  type?: "create" | "edit";
+}
+
+const SchemaDeliquency = z.object({
+  dueDate: z.date().default(new Date()),
+  amount: z.string(),
+  amountPaid: z.string().optional(),
+  paymentDate: z.date().optional().nullable(),
+  apartamentId: z.string(),
+  categoryId: z.string(),
+});
+
+export function ModalCreateDelinquency({
+  categoriesOptions,
+  apartaments,
+  delinquencySelected,
+  setDelinquencySelected,
+  modalIsOpen,
+  setModalIsOpen,
+  type = "create",
+}: ModalCreateDelinquencyProps) {
+  const buttonCloseRef = useRef<HTMLButtonElement>(null);
+
+  const { user } = useUserContext();
+
+  const queryClient = useQueryClient();
+
+  const condominiumId = user.condominiumId;
+
+  const {
+    control,
+    handleSubmit,
+    getValues,
+    setValue,
+    reset,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(SchemaDeliquency),
   });
 
-  function handleChange(
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+  const categoriesFiltered = categoriesOptions.filter(
+    (category) => category.incomeExpenseTypeId === INCOME_TYPE_ID
+  );
+
+  async function handleSubmitDeliquency(data: any) {
+    if (type === "create") {
+      handleCreateDelinquency({ condominiumId, ...data });
+    }
+
+    if (type === "edit") {
+      handleUpdateDelinquency(data);
+    }
   }
 
-  function handleSelect(value: string, name: string) {
-    setForm((prev) => ({ ...prev, [name]: value }));
+  const { mutateAsync: handleCreateDelinquency } = useMutation({
+    mutationFn: (data: any) => createDelinquency(data),
+    onSuccess: () => {
+      buttonCloseRef?.current?.click();
+      queryClient.invalidateQueries({
+        queryKey: ["delinquencyRegisters"],
+        exact: false,
+      });
+    },
+  });
+
+  const { mutateAsync: handleUpdateDelinquency } = useMutation({
+    mutationFn: (data: any) =>
+      updateDelinquencyRegister({
+        ...data,
+        delinquencyId: delinquencySelected!.id,
+      }),
+    onSuccess: () => {
+      buttonCloseRef?.current?.click();
+      queryClient.invalidateQueries({
+        queryKey: ["delinquencyRegisters"],
+        exact: false,
+      });
+    },
+  });
+
+  useEffect(() => {
+    console.log(errors);
+  }, [errors]);
+
+  function handleResetForm() {
+    reset({
+      amount: "0",
+      amountPaid: "0",
+      apartamentId: "0",
+      categoryId: "0",
+      dueDate: new Date(),
+      paymentDate: null as unknown as undefined,
+    });
   }
 
-  function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
-    setForm((prev) => ({ ...prev, documents: e.target.files }));
-  }
+  useEffect(() => {
+    if (!delinquencySelected) {
+      handleResetForm();
+      return;
+    }
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    alert("Inadimplência registrada com sucesso!");
-  }
+    const {
+      amount,
+      amountPaid,
+      apartamentId,
+      categoryId,
+      categoryName,
+      condominiumId,
+      createdAt,
+      paymentDate,
+      dueDate,
+    } = delinquencySelected;
+
+    console.log("paymentDated", paymentDate);
+    const dueDateFormmated = parseISO(dueDate) ?? new Date();
+    const paymentDateFormmated = paymentDate
+      ? parseISO(paymentDate)
+      : undefined;
+    reset({
+      amount: String(amount),
+      amountPaid: String(amountPaid),
+      apartamentId: String(apartamentId),
+      categoryId: String(categoryId),
+      dueDate: dueDateFormmated,
+      paymentDate: paymentDateFormmated,
+    });
+  }, [delinquencySelected]);
 
   return (
-    <Dialog>
+    <Dialog
+      open={modalIsOpen}
+      onOpenChange={(open) => {
+        setModalIsOpen(open);
+
+        if (!open && delinquencySelected) {
+          setDelinquencySelected(undefined);
+        }
+      }}
+    >
       <DialogTrigger asChild>
         <Button variant="outline">Registrar Inadimplência</Button>
       </DialogTrigger>
@@ -62,31 +192,69 @@ export function ModalCreateDelinquency() {
       <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl">
-            Adicionar Inadimplência
+            {type === "create"
+              ? "Adicionar Inadimplência"
+              : "Editar Inadimplência"}
           </DialogTitle>
           <DialogDescription>
             Preencha os dados da inadimplência abaixo.
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-6 py-4">
+        <form
+          onSubmit={handleSubmit(handleSubmitDeliquency)}
+          className="space-y-6 py-4"
+        >
           <fieldset className="border border-gray-200 rounded-md p-4">
             <legend className="text-sm font-semibold mb-2">
               Dados da Inadimplência
             </legend>
 
-            <div className="grid grid-cols-4 items-center gap-4 mb-4">
+            <div className="grid grid-cols-4 items-center gap-4 mb-4 ">
               <Label htmlFor="apartment" className="text-right">
                 Apartamento
               </Label>
-              <Input
-                id="apartment"
-                name="apartment"
-                value={form.apartment}
-                onChange={handleChange}
-                className="col-span-3"
-                placeholder="Ex: 202"
-                required
+              <Controller
+                name="apartamentId"
+                control={control}
+                render={({ field: { value, onChange } }) => (
+                  <Select value={value} onValueChange={onChange}>
+                    <SelectTrigger className="col-span-3 w-[150px]">
+                      <SelectValue placeholder="Selecione o apartamento." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {apartaments.map((apartament, index) => (
+                        <SelectItem key={index} value={String(apartament.id)}>
+                          {apartament.apartmentNumber}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+
+            <div className="grid grid-cols-4 items-center gap-4 mb-4">
+              <Label htmlFor="category" className="text-right">
+                Categoria
+              </Label>
+              <Controller
+                name="categoryId"
+                control={control}
+                render={({ field: { value, onChange } }) => (
+                  <Select value={value} onValueChange={onChange}>
+                    <SelectTrigger className="col-span-3 w-[250px] focus:border-blue-500">
+                      <SelectValue placeholder="Selecione a categoria" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categoriesFiltered.map((category, index) => (
+                        <SelectItem key={index} value={String(category.id)}>
+                          {category.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
               />
             </div>
 
@@ -94,14 +262,12 @@ export function ModalCreateDelinquency() {
               <Label htmlFor="dueDate" className="text-right">
                 Data de Vencimento
               </Label>
-              <Input
-                id="dueDate"
+              <Controller
                 name="dueDate"
-                type="date"
-                value={form.dueDate}
-                onChange={handleChange}
-                className="col-span-3"
-                required
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <DatePicker date={value!} setDate={onChange} />
+                )}
               />
             </div>
 
@@ -109,75 +275,45 @@ export function ModalCreateDelinquency() {
               <Label htmlFor="amount" className="text-right">
                 Valor (R$)
               </Label>
-              <Input
-                id="amount"
+              <Controller
                 name="amount"
-                type="number"
-                value={form.amount}
-                onChange={handleChange}
-                className="col-span-3"
-                required
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <CurrencyInput value={value} onChange={onChange} />
+                )}
               />
             </div>
 
             <div className="grid grid-cols-4 items-center gap-4 mb-4">
-              <Label htmlFor="status" className="text-right">
-                Status
+              <Label htmlFor="paymentDate" className="text-right">
+                Data do Pagamento
               </Label>
-              <Select
-                value={form.status}
-                onValueChange={(val) => handleSelect(val, "status")}
-              >
-                <SelectTrigger className="col-span-3">
-                  <SelectValue placeholder="Selecione o status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Pendente">Pendente</SelectItem>
-                  <SelectItem value="Pago">Pago</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="grid items-start gap-4 mb-4">
-              <Label htmlFor="notes" className="text-right pt-2">
-                Observações
-              </Label>
-              <textarea
-                id="notes"
-                name="notes"
-                value={form.notes}
-                onChange={handleChange}
-                className="col-span-3 resize-none border rounded-md p-2"
-                rows={3}
-                placeholder="Escreva observacões aqui..."
+              <Controller
+                name="paymentDate"
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <DatePicker date={value!} setDate={onChange} />
+                )}
               />
             </div>
 
-            <div className="grid items-center gap-4">
-              <Label htmlFor="documents" className="text-right">
-                Documentos
+            <div className="grid grid-cols-4 items-center gap-4 mb-4">
+              <Label htmlFor="amount" className="text-right">
+                Valor Pago (R$)
               </Label>
-              <label
-                htmlFor="documents"
-                className="col-span-3 flex flex-col items-center justify-center gap-2 rounded-md border-2 border-dashed border-gray-400 text-gray-600 cursor-pointer p-8 hover:border-gray-600 transition select-none"
-              >
-                <Paperclip />
-                Arraste ou clique para anexar
-                <input
-                  id="documents"
-                  name="documents"
-                  type="file"
-                  onChange={handleFile}
-                  multiple
-                  className="hidden"
-                />
-              </label>
+              <Controller
+                name="amountPaid"
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <CurrencyInput value={value} onChange={onChange} />
+                )}
+              />
             </div>
           </fieldset>
 
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant="ghost" type="button">
+              <Button variant="ghost" type="button" ref={buttonCloseRef}>
                 Cancelar
               </Button>
             </DialogClose>

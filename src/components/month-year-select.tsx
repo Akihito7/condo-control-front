@@ -64,7 +64,7 @@ export function MonthYearPicker({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" className="w-[200px] justify-between">
+        <Button variant="outline" className="w-[200px] justify-between h-10">
           {format(selectedDate, "MMMM yyyy", { locale: ptBR })}
         </Button>
       </PopoverTrigger>

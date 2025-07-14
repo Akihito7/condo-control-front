@@ -25,6 +25,10 @@ import { CardSkeleton } from "@/components/card-skeleton";
 import { TableRowSkeleton } from "@/components/table-row-skeleton";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { ButtonOpenSidebar } from "@/components/button-open-sidebar";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import { useIsMobile } from "@/lib/use-is-mobile";
 
 export default function FinancialForecast() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -40,16 +44,22 @@ export default function FinancialForecast() {
 
   const dateFormatted = format(selectedDate, "MMMM/yyyy", { locale: ptBR });
 
+  const isMobile = useIsMobile();
+
   return (
     <div className="bg-gray-50 min-h-screen w-full p-8 flex flex-col gap-6">
       <div className="space-y-2">
-        <Breadcrumb paths={["Início", "Finanças"]} />
+        <div className="flex items-center mb-8 gap-2">
+          <ButtonOpenSidebar />
+          <Breadcrumb paths={["Início", "Finanças"]} />
+        </div>
+
         <h1 className="text-2xl font-semibold text-gray-800">
           Previsões Financeiras
         </h1>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-4 items-end">
+      <div className="flex flex-row gap-4 items-end">
         <div className="">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Mês de referência
@@ -70,12 +80,47 @@ export default function FinancialForecast() {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {cardsProjectionStatus === "pending" ? (
           <>
             {Array.from({ length: 4 }).map(() => (
               <CardSkeleton className="px-4 py-1" />
             ))}
+          </>
+        ) : isMobile ? (
+          <>
+            <Swiper className="w-full" spaceBetween={16} slidesPerView={1.2}>
+              <SwiperSlide>
+                <CardProjection
+                  title="Receitas Projetadas"
+                  amount={cardsProjection?.incomesTotal ?? 0}
+                  icon={<TrendingUp color="#22c55e" />}
+                />
+              </SwiperSlide>
+
+              <SwiperSlide>
+                <CardProjection
+                  title="Despesas Projetadas"
+                  amount={cardsProjection?.expensesTotal ?? 0}
+                  icon={<TrendingDown color="#ef4444" />}
+                />
+              </SwiperSlide>
+
+              <SwiperSlide>
+                <CardProjection
+                  title="Saldo Projetado Mês"
+                  amount={cardsProjection?.balance ?? 0}
+                  icon={<DollarSign color="#2768bd" />}
+                />
+              </SwiperSlide>
+              <SwiperSlide>
+                <CardProjection
+                  title="Saldo Projetado Total"
+                  amount={cardsProjection?.balanceAccumulated ?? 0}
+                  icon={<PiggyBank color="#9f22c5" />}
+                />
+              </SwiperSlide>
+            </Swiper>
           </>
         ) : (
           <>
