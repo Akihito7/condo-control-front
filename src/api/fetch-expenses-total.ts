@@ -19,6 +19,5 @@ export async function fetchExpensesTotal({
   const response = await api.get(
     `/finance/expenses-total/${condominiumId}/${startDate}/${endDate}`
   );
-  console.log(response)
   return response.data;
 }

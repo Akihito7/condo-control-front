@@ -41,7 +41,6 @@ export type FinancialRecord = {
 export async function fetchFinancialRecords(
   { condominiumId, startDate, endDate, incomeExpenseOptionsSelectedId }: FetchFinancialRecordsProps)
   : Promise<FinancialRecord[]> {
-  console.log("options", incomeExpenseOptionsSelectedId)
   const response = await api.get(
     `/finance/registers/${condominiumId}/${startDate}/${endDate}`, {
     params: {

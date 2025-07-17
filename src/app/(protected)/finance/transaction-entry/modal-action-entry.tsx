@@ -223,10 +223,6 @@ export function ModalActionEntry({
     }
   }, [type]);
 
-  useEffect(() => {
-    console.log(watch("amount"));
-  }, [watch("amount")]);
-
   return (
     <Dialog
       onOpenChange={(open) => {
@@ -257,7 +253,6 @@ export function ModalActionEntry({
         <form
           onSubmit={handleSubmit((data) => {
             if (type === "create") {
-              console.log("its me data", data);
               return handleCreateTransaction(data as any);
             }
             return handleUpdateTransaction({

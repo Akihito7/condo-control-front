@@ -28,5 +28,4 @@ export async function createDelinquency({
     paymentDate
   });
   const data = response.data;
-  console.log(data)
 }

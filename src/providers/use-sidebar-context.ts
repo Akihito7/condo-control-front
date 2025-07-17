@@ -2,7 +2,6 @@ import { SidebarContext } from "@/contexts/sidebar-context";
 import { useContext } from "react";
 
 export function useSidebarContext() {
-  
   const data = useContext(SidebarContext);
 
   if (!data) {

@@ -126,10 +126,6 @@ export function ModalCreateDelinquency({
     },
   });
 
-  useEffect(() => {
-    console.log(errors);
-  }, [errors]);
-
   function handleResetForm() {
     reset({
       amount: "0",
@@ -158,8 +154,7 @@ export function ModalCreateDelinquency({
       paymentDate,
       dueDate,
     } = delinquencySelected;
-
-    console.log("paymentDated", paymentDate);
+    
     const dueDateFormmated = parseISO(dueDate) ?? new Date();
     const paymentDateFormmated = paymentDate
       ? parseISO(paymentDate)

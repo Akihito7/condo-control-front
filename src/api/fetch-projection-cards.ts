@@ -15,6 +15,5 @@ interface ProjectionCardsResponse {
 export async function fetchProjectionCards({ condominiumId, date }: GetProjectionProps): Promise<ProjectionCardsResponse> {
   const response = await api.get(`/finance/projection/cards/${condominiumId}/${date}`);
   const data = response.data;
-  console.log("data", data)
   return data
 }

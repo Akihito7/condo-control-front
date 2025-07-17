@@ -3,7 +3,6 @@ import React from "react";
 import { QueryProvider } from "@/providers/query-provider";
 import { UserContextProvider } from "@/contexts/user-context";
 import { SidebarContextProvider } from "@/contexts/sidebar-context";
-import { WrapperSidebar } from "@/components/wrapper-sidebar";
 
 export default async function Layout({
   children,
@@ -16,7 +15,7 @@ export default async function Layout({
         <QueryProvider>
           <div className="layout-base">
             <Sidebar />
-            <WrapperSidebar>{children}</WrapperSidebar>
+            {children}
           </div>
         </QueryProvider>
       </UserContextProvider>
