@@ -1,8 +1,8 @@
 "use client";
-import React, { createContext, Dispatch, useState } from "react";
+import React, { createContext, useState } from "react";
 
 interface SidebarContextProps {
-  isOpen: Boolean;
+  isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 export const SidebarContext = createContext({} as SidebarContextProps);

@@ -119,7 +119,6 @@ export default function Finance() {
           </label>
           <DatePickRange range={range} setRange={setRange} />
         </div>
-
         <div className="max-w-[300px]">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Tipo de registros
@@ -135,7 +134,6 @@ export default function Finance() {
             placeholder="Selecione..."
           />
         </div>
-
         <Button
           variant="outline"
           className="ml-auto flex items-center gap-2 h-10 cursor-pointer"
@@ -143,13 +141,14 @@ export default function Finance() {
           <FileDown className="w-6 h-6" />
           Exportar PDF
         </Button>
+        s
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
         {cardsTransactionStatus === "pending" ? (
           <>
-            {Array.from({ length: 3 }).map(() => (
-              <CardSkeleton />
+            {Array.from({ length: 3 }).map((_, index) => (
+              <CardSkeleton key={index} />
             ))}
           </>
         ) : cardsTransactionStatus === "success" ? (
@@ -296,79 +295,86 @@ export default function Finance() {
                 <TableHead>Ações</TableHead>
               </TableRow>
             </TableHeader>
-            {transactionsStatus === "pending" ? (
-              Array.from({ length: 5 }).map(() => <TableRowSkeleton />)
-            ) : (
-              <TableBody>
-                {transactions?.map((transaction) => (
-                  <TableRow key={transaction.id}>
-                    <TableCell className="font-medium">
-                      {transaction.dueDate}
-                    </TableCell>
-                    <TableCell className="capitalize text-sm">
-                      {transaction.incomeExpenseTypeId === 4
-                        ? "Receita"
-                        : "Despesa"}
-                    </TableCell>
-                    <TableCell>{transaction.categoryName}</TableCell>
-                    <TableCell className="text-center">
-                      {transaction.apartmentNumber}
-                    </TableCell>
-                    <TableCell className="text-sm">
-                      {transaction.recordTypeId === 1 ? "Fixo" : "Variável"}
-                    </TableCell>
-                    <TableCell className="text-sm">
-                      {transaction.isRecurring ? "Sim" : "Não"}
-                    </TableCell>
-                    <TableCell className="text-sm">
-                      {transaction.paymentMethodName ?? "-"}
-                    </TableCell>
 
-                    <TableCell>
-                      {transaction.paymentStatusName ?? "-"}
-                    </TableCell>
-                    <TableCell className="text-center font-semibold text-sm">
-                      {transaction.amount.toLocaleString("pt-BR", {
-                        currency: "BRL",
-                        style: "currency",
-                      })}
-                    </TableCell>
-                    <TableCell className="text-center">
-                      {transaction.paymentDate ?? "-"}
-                    </TableCell>
-                    <TableCell className="text-center">
-                      {transaction.amountPaid?.toLocaleString("pt-BR", {
-                        currency: "BRL",
-                        style: "currency",
-                      }) ?? "-"}
-                    </TableCell>
-                    <TableCell>{transaction.observation}</TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger className="outline-none ring-0 focus:outline-none focus:ring-0 cursor-pointer">
-                          <Pencil className="w-4 h-4 text-gray-700" />
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                          <DropdownMenuItem
-                            onClick={() => {
-                              setTransacationSelected(transaction);
-                              setModalIsOpen(true);
-                            }}
-                          >
-                            Editar
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => handleDeleteRegister(transaction.id)}
-                          >
-                            Excluir
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            )}
+            <TableBody>
+              {transactionsStatus === "pending" ? (
+                Array.from({ length: 5 }).map((_, index) => (
+                  <TableRowSkeleton key={index} />
+                ))
+              ) : (
+                <>
+                  {transactions?.map((transaction) => (
+                    <TableRow key={transaction.id}>
+                      <TableCell className="font-medium">
+                        {transaction.dueDate}
+                      </TableCell>
+                      <TableCell className="capitalize text-sm">
+                        {transaction.incomeExpenseTypeId === 4
+                          ? "Receita"
+                          : "Despesa"}
+                      </TableCell>
+                      <TableCell>{transaction.categoryName}</TableCell>
+                      <TableCell className="text-center">
+                        {transaction.apartmentNumber}
+                      </TableCell>
+                      <TableCell className="text-sm">
+                        {transaction.recordTypeId === 1 ? "Fixo" : "Variável"}
+                      </TableCell>
+                      <TableCell className="text-sm">
+                        {transaction.isRecurring ? "Sim" : "Não"}
+                      </TableCell>
+                      <TableCell className="text-sm">
+                        {transaction.paymentMethodName ?? "-"}
+                      </TableCell>
+
+                      <TableCell>
+                        {transaction.paymentStatusName ?? "-"}
+                      </TableCell>
+                      <TableCell className="text-center font-semibold text-sm">
+                        {transaction.amount.toLocaleString("pt-BR", {
+                          currency: "BRL",
+                          style: "currency",
+                        })}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {transaction.paymentDate ?? "-"}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {transaction.amountPaid?.toLocaleString("pt-BR", {
+                          currency: "BRL",
+                          style: "currency",
+                        }) ?? "-"}
+                      </TableCell>
+                      <TableCell>{transaction.observation}</TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger className="outline-none ring-0 focus:outline-none focus:ring-0 cursor-pointer">
+                            <Pencil className="w-4 h-4 text-gray-700" />
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setTransacationSelected(transaction);
+                                setModalIsOpen(true);
+                              }}
+                            >
+                              Editar
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() =>
+                                handleDeleteRegister(transaction.id)
+                              }
+                            >
+                              Excluir
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </>
+              )}
+            </TableBody>
           </Table>
         </div>
       </section>

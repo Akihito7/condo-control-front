@@ -83,8 +83,8 @@ export default function FinancialForecast() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {cardsProjectionStatus === "pending" ? (
           <>
-            {Array.from({ length: 4 }).map(() => (
-              <CardSkeleton className="px-4 py-1" />
+            {Array.from({ length: 4 }).map((_, index) => (
+              <CardSkeleton className="px-4 py-1" key={index} />
             ))}
           </>
         ) : isMobile ? (
@@ -166,36 +166,38 @@ export default function FinancialForecast() {
               </TableRow>
             </TableHeader>
 
-            {registersProjectionStatus === "pending" ? (
-              <>
-                {Array.from({ length: 5 }).map(() => (
-                  <TableRowSkeleton />
-                ))}
-              </>
-            ) : (
-              <TableBody>
-                {registersProjection &&
-                  registersProjection.map((projectionRegister) => (
-                    <TableRow key={projectionRegister.id}>
-                      <TableCell className="font-medium">
-                        {dateFormatted}
-                      </TableCell>
-                      <TableCell className="capitalize text-sm">
-                        {projectionRegister.name}
-                      </TableCell>
-                      <TableCell className="text-sm">
-                        {projectionRegister.type}
-                      </TableCell>
-                      <TableCell className="text-right font-semibold text-sm">
-                        {projectionRegister.total.toLocaleString("pt-br", {
-                          currency: "BRL",
-                          style: "currency",
-                        })}
-                      </TableCell>
-                    </TableRow>
+            <TableBody>
+              {registersProjectionStatus === "pending" ? (
+                <>
+                  {Array.from({ length: 5 }).map((_, index) => (
+                    <TableRowSkeleton key={index} />
                   ))}
-              </TableBody>
-            )}
+                </>
+              ) : (
+                <>
+                  {registersProjection &&
+                    registersProjection.map((projectionRegister) => (
+                      <TableRow key={projectionRegister.id}>
+                        <TableCell className="font-medium">
+                          {dateFormatted}
+                        </TableCell>
+                        <TableCell className="capitalize text-sm">
+                          {projectionRegister.name}
+                        </TableCell>
+                        <TableCell className="text-sm">
+                          {projectionRegister.type}
+                        </TableCell>
+                        <TableCell className="text-right font-semibold text-sm">
+                          {projectionRegister.total.toLocaleString("pt-br", {
+                            currency: "BRL",
+                            style: "currency",
+                          })}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                </>
+              )}
+            </TableBody>
           </Table>
         </div>
       </section>

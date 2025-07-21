@@ -12,116 +12,229 @@ import {
   FileText,
   FileBarChart,
   DollarSign,
+  UserCircle,
+  MessageSquare,
+  Phone,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import clsx from "clsx";
 
 export function Sidebar() {
-  const { isOpen } = useSidebarContext();
-  const [showFinanceSubmenu, setShowFinanceSubmenu] = useState(true);
+  const { isOpen, setIsOpen } = useSidebarContext();
+  const [isSubMenuOpen, setIsSubMenuOpen] = useState({
+    finance: false,
+    communication: false,
+  });
   const isMobile = useIsMobile();
+  const sidebarRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        isMobile &&
+        sidebarRef.current &&
+        !sidebarRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isMobile, isOpen, setIsOpen]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setIsSubMenuOpen({
+        finance: false,
+        communication: false,
+      });
+    }
+  }, [isOpen]);
 
   return (
     <aside
+      ref={sidebarRef}
       style={{
-        display: isOpen ? "flex" : "none",
         position: isMobile ? "fixed" : "static",
         zIndex: isMobile ? 999 : 1,
       }}
-      className="w-72 sm:w-80 min-h-screen bg-white border-r border-gray-200 flex flex-col font-sans text-sm text-gray-800"
+      className={clsx(
+        "h-screen bg-white border-r border-gray-200 flex flex-col font-sans text-sm text-gray-800 transition-all duration-300 ease-in-out",
+        isMobile ? (isOpen ? "w-72" : "hidden") : isOpen ? "w-90" : "w-16"
+      )}
     >
       {/* Topo */}
       <div className="p-6 border-b border-gray-200">
-        <h1 className="text-xl font-semibold tracking-tight">CondoControl</h1>
+        <h1
+          className={clsx(
+            "text-xl font-semibold tracking-tight transition-all duration-300 origin-left",
+            isOpen ? "opacity-100 scale-100" : "opacity-0 scale-90"
+          )}
+        >
+          CondoControl
+        </h1>
       </div>
 
       {/* Navegação */}
-      <nav className="flex-1 px-4 py-6 space-y-2">
+      <nav className="flex-1 px-2 py-6 space-y-2">
         {/* Finanças */}
         <div>
           <button
-            onClick={() => setShowFinanceSubmenu((prev) => !prev)}
+            onClick={() => {
+              if (!isOpen) setIsOpen(true);
+              setIsSubMenuOpen((prev) => ({
+                ...prev,
+                finance: !prev.finance,
+              }));
+            }}
             className="w-full flex items-center justify-between px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700 font-medium transition"
           >
             <span className="flex items-center">
-              <LayoutDashboard className="w-5 h-5" />
-              <span className="ml-3 text-lg">Finanças</span>
+              <LayoutDashboard className="w-5 h-5" size={18} />
+              {isOpen && <span className="ml-3">Finanças</span>}
             </span>
-            {showFinanceSubmenu ? (
-              <ChevronUp className="w-4 h-4" />
-            ) : (
-              <ChevronDown className="w-4 h-4" />
-            )}
+            {isOpen &&
+              (isSubMenuOpen.finance ? (
+                <ChevronUp className="w-4 h-4" />
+              ) : (
+                <ChevronDown className="w-4 h-4" />
+              ))}
           </button>
 
-          {showFinanceSubmenu && (
+          {isSubMenuOpen.finance && isOpen && (
             <div className="ml-7 mt-2 space-y-1">
-              <a
-                href="transaction-entry"
-                className="flex items-center px-3 py-1.5 rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition"
-              >
-                <FileText className="w-4 h-4" />
-                <span className="ml-2">Lançamento de registros</span>
-              </a>
-              <a
-                href="delinquency-control"
-                className="flex items-center px-3 py-1.5 rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition"
-              >
-                <FileBarChart className="w-4 h-4" />
-                <span className="ml-2">Gestão de Inadimplência</span>
-              </a>
-              <a
-                href="projection"
-                className="flex items-center px-3 py-1.5 rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition"
-              >
-                <DollarSign className="w-4 h-4" />
-                <span className="ml-2">Previsões financeiras</span>
-              </a>
+              <SidebarItem
+                href="/finance/transaction-entry"
+                icon={<FileText className="w-4 h-4" />}
+                label="Lançamento de registros"
+              />
+              <SidebarItem
+                href="/finance/delinquency-control"
+                icon={<FileBarChart className="w-4 h-4" />}
+                label="Gestão de Inadimplência"
+              />
+              <SidebarItem
+                href="/finance/projection"
+                icon={<DollarSign className="w-4 h-4" />}
+                label="Previsões financeiras"
+              />
             </div>
           )}
         </div>
 
-        {/* Usuários */}
-        <a
+        <div>
+          <button
+            onClick={() => {
+              if (!isOpen) setIsOpen(true);
+              setIsSubMenuOpen((prev) => ({
+                ...prev,
+                communication: !prev.communication,
+              }));
+            }}
+            className="w-full flex items-center justify-between px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700 font-medium transition"
+          >
+            <span className="flex items-center">
+              <MessageSquare size={18} />
+              {isOpen && <span className="ml-3">Comunicação e Suporte</span>}
+            </span>
+            {isOpen &&
+              (isSubMenuOpen.communication ? (
+                <ChevronUp className="w-4 h-4" />
+              ) : (
+                <ChevronDown className="w-4 h-4" />
+              ))}
+          </button>
+
+          {isSubMenuOpen.communication && isOpen && (
+            <div className="ml-7 mt-2 space-y-1">
+              <SidebarItem
+                href="/communication/opening-of-calls"
+                icon={<Phone className="w-4 h-4" />}
+                label="Abertura de chamados"
+              />
+            </div>
+          )}
+        </div>
+        {/* Links */}
+        <SidebarLink
           href="#usuarios"
-          className="flex items-center px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700 font-medium transition"
-        >
-          <Users className="w-5 h-5" />
-          <span className="ml-3">Usuários</span>
-        </a>
-
-        {/* Condomínios */}
-        <a
+          icon={<Users size={18} />}
+          label="Usuários"
+          isOpen={isOpen}
+        />
+        <SidebarLink
           href="#condominios"
-          className="flex items-center px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700 font-medium transition"
-        >
-          <Building className="w-5 h-5" />
-          <span className="ml-3">Condomínios</span>
-        </a>
-
-        {/* Configurações */}
-        <a
+          icon={<Building size={18} />}
+          label="Condomínios"
+          isOpen={isOpen}
+        />
+        <SidebarLink
           href="#configuracoes"
-          className="flex items-center px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700 font-medium transition"
-        >
-          <Settings className="w-5 h-5" />
-          <span className="ml-3">Configurações</span>
-        </a>
+          icon={<Settings size={18} />}
+          label="Configurações"
+          isOpen={isOpen}
+        />
       </nav>
 
-      {/* Rodapé com usuário */}
+      {/* Rodapé */}
       <div className="p-4 border-t border-gray-200 hover:bg-gray-50 transition">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center">
-            <span className="text-gray-700 font-semibold">AD</span>
+        {isOpen ? (
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center">
+              <span className="text-gray-700 font-semibold">AD</span>
+            </div>
+            <div className="flex-1 transition-opacity duration-300">
+              <p className="text-sm font-medium">Admin User</p>
+              <p className="text-xs text-gray-500">admin@example.com</p>
+            </div>
           </div>
-          <div className="flex-1">
-            <p className="text-sm font-medium">Admin User</p>
-            <p className="text-xs text-gray-500">admin@example.com</p>
-          </div>
-
-          <ChevronUp className="w-4 h-4 text-gray-500" />
-        </div>
+        ) : (
+          <UserCircle className="w-6 h-6" />
+        )}
       </div>
     </aside>
+  );
+}
+
+function SidebarLink({
+  href,
+  icon,
+  label,
+  isOpen,
+}: {
+  href: string;
+  icon: React.ReactNode;
+  label: string;
+  isOpen: boolean;
+}) {
+  return (
+    <a
+      href={href}
+      className="flex items-center px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700 font-medium transition"
+    >
+      <div className="w-5 h-5">{icon}</div>
+      {isOpen && <span className="ml-3">{label}</span>}
+    </a>
+  );
+}
+
+function SidebarItem({
+  href,
+  icon,
+  label,
+}: {
+  href: string;
+  icon: React.ReactNode;
+  label: string;
+}) {
+  return (
+    <a
+      href={href}
+      className="flex items-center px-3 py-1.5 rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition"
+    >
+      {icon}
+      <span className="ml-2">{label}</span>
+    </a>
   );
 }
