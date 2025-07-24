@@ -15,6 +15,8 @@ import {
   UserCircle,
   MessageSquare,
   Phone,
+  Box,
+  Package,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
@@ -152,6 +154,12 @@ export function Sidebar() {
                 href="/communication/opening-of-calls"
                 icon={<Phone className="w-4 h-4" />}
                 label="Abertura de chamados"
+              />
+
+              <SidebarItem
+                href="/communication/ordering-management"
+                icon={<Package className="w-4 h-4" />}
+                label="Gestão de Encomendas"
               />
             </div>
           )}
