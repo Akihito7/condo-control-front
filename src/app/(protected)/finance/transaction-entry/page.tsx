@@ -141,7 +141,6 @@ export default function Finance() {
           <FileDown className="w-6 h-6" />
           Exportar PDF
         </Button>
-        s
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">

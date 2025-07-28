@@ -17,6 +17,8 @@ import {
   Phone,
   Box,
   Package,
+  Shield,
+  UserCheck,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
@@ -26,6 +28,7 @@ export function Sidebar() {
   const [isSubMenuOpen, setIsSubMenuOpen] = useState({
     finance: false,
     communication: false,
+    security: false,
   });
   const isMobile = useIsMobile();
   const sidebarRef = useRef<HTMLDivElement>(null);
@@ -50,6 +53,7 @@ export function Sidebar() {
       setIsSubMenuOpen({
         finance: false,
         communication: false,
+        security: false,
       });
     }
   }, [isOpen]);
@@ -164,13 +168,41 @@ export function Sidebar() {
             </div>
           )}
         </div>
-        {/* Links */}
-        <SidebarLink
-          href="#usuarios"
-          icon={<Users size={18} />}
-          label="Usuários"
-          isOpen={isOpen}
-        />
+
+        <div>
+          <button
+            onClick={() => {
+              if (!isOpen) setIsOpen(true);
+              setIsSubMenuOpen((prev) => ({
+                ...prev,
+                security: !prev.security,
+              }));
+            }}
+            className="w-full flex items-center justify-between px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700 font-medium transition"
+          >
+            <span className="flex items-center">
+              <Shield size={18} />
+              {isOpen && <span className="ml-3">Segurança</span>}
+            </span>
+            {isOpen &&
+              (isSubMenuOpen.security ? (
+                <ChevronUp className="w-4 h-4" />
+              ) : (
+                <ChevronDown className="w-4 h-4" />
+              ))}
+          </button>
+
+          {isSubMenuOpen.security && isOpen && (
+            <div className="ml-7 mt-2 space-y-1">
+              <SidebarItem
+                href="/security/visitor-registration"
+                icon={<UserCheck className="w-4 h-4" />}
+                label="Registro de Visitantes"
+              />
+            </div>
+          )}
+        </div>
+
         <SidebarLink
           href="#condominios"
           icon={<Building size={18} />}
