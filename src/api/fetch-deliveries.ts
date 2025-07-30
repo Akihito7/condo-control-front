@@ -44,6 +44,5 @@ export async function fetchDeliveries({
   endDate
 }: FetchDeliveriesProps): Promise<Delivery[]> {
   const response = await api.get(`/communication/deliveries/${condominiumId}/${startDate}/${endDate}`)
-  console.log('its me response', response)
   return response.data;
 }

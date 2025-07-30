@@ -36,7 +36,6 @@ export function useVisitorRegistration({
     }
   })
 
-
   return {
     visitors,
     visitorsStatus,

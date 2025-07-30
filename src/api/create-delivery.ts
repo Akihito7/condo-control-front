@@ -5,6 +5,5 @@ interface CreateDeliveryProps {
 }
 
 export async function createDelivery({ formData }: CreateDeliveryProps) {
-  const response = await api.post('/communication/delivery/create', formData);
-  console.log("response", response.data)
+  await api.post('/communication/delivery/create', formData);
 }

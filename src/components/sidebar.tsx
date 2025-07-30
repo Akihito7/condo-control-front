@@ -29,6 +29,7 @@ export function Sidebar() {
     finance: false,
     communication: false,
     security: false,
+    indicators: false,
   });
   const isMobile = useIsMobile();
   const sidebarRef = useRef<HTMLDivElement>(null);
@@ -54,6 +55,7 @@ export function Sidebar() {
         finance: false,
         communication: false,
         security: false,
+        indicators: false,
       });
     }
   }, [isOpen]);
@@ -202,13 +204,39 @@ export function Sidebar() {
             </div>
           )}
         </div>
+        <div>
+          <button
+            onClick={() => {
+              if (!isOpen) setIsOpen(true);
+              setIsSubMenuOpen((prev) => ({
+                ...prev,
+                indicators: !prev.indicators,
+              }));
+            }}
+            className="w-full flex items-center justify-between px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700 font-medium transition"
+          >
+            <span className="flex items-center">
+              <Shield size={18} />
+              {isOpen && <span className="ml-3">Indicadores</span>}
+            </span>
+            {isOpen &&
+              (isSubMenuOpen.security ? (
+                <ChevronUp className="w-4 h-4" />
+              ) : (
+                <ChevronDown className="w-4 h-4" />
+              ))}
+          </button>
 
-        <SidebarLink
-          href="#condominios"
-          icon={<Building size={18} />}
-          label="Condomínios"
-          isOpen={isOpen}
-        />
+          {isSubMenuOpen.indicators && isOpen && (
+            <div className="ml-7 mt-2 space-y-1">
+              <SidebarItem
+                href="/indicators/financial-summary"
+                icon={<DollarSign className="w-4 h-4" />}
+                label="Resumo financeiro"
+              />
+            </div>
+          )}
+        </div>
         <SidebarLink
           href="#configuracoes"
           icon={<Settings size={18} />}
