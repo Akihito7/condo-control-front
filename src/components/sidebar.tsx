@@ -19,6 +19,9 @@ import {
   Package,
   Shield,
   UserCheck,
+  Calendar,
+  ArrowUpWideNarrow,
+  TrendingUp,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
@@ -163,6 +166,12 @@ export function Sidebar() {
               />
 
               <SidebarItem
+                href="/communication/condominium-schedule"
+                icon={<Calendar className="w-4 h-4" />}
+                label="Agenda do Condomínio"
+              />
+
+              <SidebarItem
                 href="/communication/ordering-management"
                 icon={<Package className="w-4 h-4" />}
                 label="Gestão de Encomendas"
@@ -216,7 +225,7 @@ export function Sidebar() {
             className="w-full flex items-center justify-between px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700 font-medium transition"
           >
             <span className="flex items-center">
-              <Shield size={18} />
+              <TrendingUp  size={18} />
               {isOpen && <span className="ml-3">Indicadores</span>}
             </span>
             {isOpen &&
