@@ -20,8 +20,8 @@ import {
   Shield,
   UserCheck,
   Calendar,
-  ArrowUpWideNarrow,
   TrendingUp,
+  Wrench,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
@@ -30,6 +30,7 @@ export function Sidebar() {
   const { isOpen, setIsOpen } = useSidebarContext();
   const [isSubMenuOpen, setIsSubMenuOpen] = useState({
     finance: false,
+    structure: false,
     communication: false,
     security: false,
     indicators: false,
@@ -56,6 +57,7 @@ export function Sidebar() {
     if (!isOpen) {
       setIsSubMenuOpen({
         finance: false,
+        structure: false,
         communication: false,
         security: false,
         indicators: false,
@@ -129,6 +131,40 @@ export function Sidebar() {
                 href="/finance/projection"
                 icon={<DollarSign className="w-4 h-4" />}
                 label="Previsões financeiras"
+              />
+            </div>
+          )}
+        </div>
+
+        <div>
+          <button
+            onClick={() => {
+              if (!isOpen) setIsOpen(true);
+              setIsSubMenuOpen((prev) => ({
+                ...prev,
+                structure: !prev.structure,
+              }));
+            }}
+            className="w-full flex items-center justify-between px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700 font-medium transition"
+          >
+            <span className="flex items-center">
+              <Wrench className="w-5 h-5" size={18} />
+              {isOpen && <span className="ml-3">Estrutura e Operações</span>}
+            </span>
+            {isOpen &&
+              (isSubMenuOpen.finance ? (
+                <ChevronUp className="w-4 h-4" />
+              ) : (
+                <ChevronDown className="w-4 h-4" />
+              ))}
+          </button>
+
+          {isSubMenuOpen.structure && isOpen && (
+            <div className="ml-7 mt-2 space-y-1">
+              <SidebarItem
+                href="/structure/maintenance-backlog"
+                icon={<Wrench className="w-4 h-4" />}
+                label="Backlog de manutenções"
               />
             </div>
           )}

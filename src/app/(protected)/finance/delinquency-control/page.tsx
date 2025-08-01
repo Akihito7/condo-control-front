@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Breadcrumb } from "@/components/breadcrumb";
 import {
   Select,
