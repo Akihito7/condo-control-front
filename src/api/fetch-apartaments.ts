@@ -18,6 +18,5 @@ export async function fetchApartaments({
   condominiumId
 }: FetchApartamentsProps): Promise<Apartment[]> {
   const response = await api.get(`/communication/apartaments/${condominiumId}`);
-  console.log("its me response", response.data);
   return response.data;
 }

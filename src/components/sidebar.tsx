@@ -166,6 +166,12 @@ export function Sidebar() {
                 icon={<Wrench className="w-4 h-4" />}
                 label="Backlog de manutenções"
               />
+
+              <SidebarItem
+                href="/structure/employee-management"
+                icon={<Users className="w-4 h-4" />}
+                label="Gestão de Funcionários"
+              />
             </div>
           )}
         </div>

@@ -18,6 +18,5 @@ export async function fetchChartExpensiveFixedVsVariable({
 }: FetchChartExpensiveFixedVsVariableProps) {
   const response = await api.get(`indicators/chart/expensive/fixed-vs-variable/${condominiumId}/${startDate}/${endDate}`);
   const data = response.data;
-  console.log("its me data expensive", data)
   return data
 }
