@@ -262,7 +262,7 @@ export function ModalActionEntry({
           })}
           className="space-y-6 py-4"
         >
-          {/* Bloco: Informações básicas */}
+  
           <fieldset className="border border-gray-200 rounded-md p-4">
             <legend className="text-sm font-semibold mb-2">
               Informações básicas
@@ -327,7 +327,7 @@ export function ModalActionEntry({
             </div>
           </fieldset>
 
-          {/* Categoria e apartamento */}
+        
           <fieldset className="border border-gray-200 rounded-md p-4">
             <legend className="text-sm font-semibold mb-2">
               Categoria e Apartamento
@@ -411,7 +411,7 @@ export function ModalActionEntry({
             </div>
           </fieldset>
 
-          {/* Tipo, pagamento e recorrência */}
+      
           <fieldset className="border border-gray-200 rounded-md p-4">
             <legend className="text-sm font-semibold mb-2">
               Tipo e Pagamento
@@ -606,7 +606,7 @@ export function ModalActionEntry({
             </div>
           </fieldset>
 
-          {/* Observações e anexos */}
+  
           <fieldset className="border border-gray-200 rounded-md p-4">
             <legend className="text-sm font-semibold mb-2">
               Informações adicionais

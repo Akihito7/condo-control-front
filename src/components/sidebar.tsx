@@ -22,6 +22,7 @@ import {
   Calendar,
   TrendingUp,
   Wrench,
+  MapPin,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
@@ -77,7 +78,7 @@ export function Sidebar() {
         isMobile ? (isOpen ? "w-72" : "hidden") : isOpen ? "w-90" : "w-16"
       )}
     >
-      {/* Topo */}
+   
       <div className="p-6 border-b border-gray-200">
         <h1
           className={clsx(
@@ -89,9 +90,9 @@ export function Sidebar() {
         </h1>
       </div>
 
-      {/* Navegação */}
+   
       <nav className="flex-1 px-2 py-6 space-y-2">
-        {/* Finanças */}
+      
         <div>
           <button
             onClick={() => {
@@ -171,6 +172,12 @@ export function Sidebar() {
                 href="/structure/employee-management"
                 icon={<Users className="w-4 h-4" />}
                 label="Gestão de Funcionários"
+              />
+
+              <SidebarItem
+                href="/structure/management-of-common-spaces"
+                icon={<MapPin className="w-4 h-4" />}
+                label="Gestão de Espaços Comuns"
               />
             </div>
           )}
@@ -302,7 +309,7 @@ export function Sidebar() {
         />
       </nav>
 
-      {/* Rodapé */}
+
       <div className="p-4 border-t border-gray-200 hover:bg-gray-50 transition">
         {isOpen ? (
           <div className="flex items-center gap-3">

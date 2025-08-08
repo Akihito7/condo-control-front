@@ -249,13 +249,13 @@ export function ModalActionEmployee({
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-4">
-          {/* Dados Pessoais */}
+        
           <fieldset className="space-y-4 border border-gray-200 p-4 rounded-md">
             <legend className="text-sm font-medium text-gray-700 px-1">
               Informações Pessoais
             </legend>
 
-            {/* Nome */}
+         
             <div className="grid grid-cols-4 items-center gap-4">
               <Label className="text-right">Nome Completo</Label>
               <Input {...register("name")} className="col-span-3" />
@@ -266,7 +266,6 @@ export function ModalActionEmployee({
               </p>
             )}
 
-            {/* CPF */}
             <div className="grid grid-cols-4 items-center gap-4">
               <Label className="text-right">CPF</Label>
               <Input {...register("cpf")} className="col-span-3 w-[200px]" />
@@ -277,7 +276,7 @@ export function ModalActionEmployee({
               </p>
             )}
 
-            {/* Número */}
+          
             <div className="grid grid-cols-4 items-center gap-4">
               <Label className="text-right">Número</Label>
               <Input
@@ -292,13 +291,13 @@ export function ModalActionEmployee({
             )}
           </fieldset>
 
-          {/* Profissional */}
+       
           <fieldset className="space-y-4 border border-gray-200 p-4 rounded-md">
             <legend className="text-sm font-medium text-gray-700 px-1">
               Informações Profissionais
             </legend>
 
-            {/* Área */}
+       
             <div className="grid grid-cols-4 items-center gap-4">
               <Label className="text-right">Área</Label>
               <div className="col-span-3">
@@ -328,7 +327,6 @@ export function ModalActionEmployee({
               </p>
             )}
 
-            {/* Cargo */}
             <div className="grid grid-cols-4 items-center gap-4">
               <Label className="text-right">Cargo</Label>
               <div className="col-span-3">
@@ -358,7 +356,7 @@ export function ModalActionEmployee({
               </p>
             )}
 
-            {/* Salário */}
+    
             <div className="grid grid-cols-4 items-center gap-4">
               <Label className="text-right">Salário</Label>
               <div className="col-span-3">
@@ -380,7 +378,7 @@ export function ModalActionEmployee({
               </p>
             )}
 
-            {/* Status */}
+       
             <div className="grid grid-cols-4 items-center gap-4">
               <Label className="text-right">Status</Label>
               <div className="col-span-3">
@@ -414,14 +412,14 @@ export function ModalActionEmployee({
             )}
           </fieldset>
 
-          {/* Login */}
+    
           {hasLogin && (
             <fieldset className="space-y-4 border border-gray-200 p-4 rounded-md">
               <legend className="text-sm font-medium text-gray-700 px-1">
                 Acesso ao Sistema
               </legend>
 
-              {/* Email */}
+          
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label className="text-right">Email</Label>
                 <Input
@@ -435,7 +433,7 @@ export function ModalActionEmployee({
                 </p>
               )}
 
-              {/* Password */}
+           
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label className="text-right">Senha</Label>
                 <Input
@@ -451,7 +449,7 @@ export function ModalActionEmployee({
             </fieldset>
           )}
 
-          {/* Ações */}
+     
           <DialogFooter className="pt-4">
             <DialogClose asChild>
               <Button ref={closeButtonRef} variant="ghost">

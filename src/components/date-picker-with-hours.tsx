@@ -56,7 +56,6 @@ export function DatePickerWithHours({
 
   return (
     <div className="flex gap-4">
-      {/* Date Picker */}
       <div className="flex flex-col gap-3">
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
@@ -80,7 +79,6 @@ export function DatePickerWithHours({
         </Popover>
       </div>
 
-      {/* Time Picker */}
       <div className="flex flex-col gap-3">
         <Input
           type="time"

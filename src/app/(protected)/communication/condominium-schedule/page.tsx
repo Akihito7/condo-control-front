@@ -31,7 +31,7 @@ export default function CondominiumSchedule() {
         setModalIsOpen={setModalEventDetailsIsOpen}
       />
 
-      {/* Top Navigation */}
+
       <div className="space-y-2">
         <div className="flex items-center gap-4">
           <ButtonOpenSidebar />
@@ -42,9 +42,8 @@ export default function CondominiumSchedule() {
         </h1>
       </div>
 
-      {/* Calendar Container */}
       <div className="bg-white shadow-md rounded-xl border border-gray-200 overflow-hidden">
-        {/* Header */}
+     
         <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200">
           <div className="flex items-center gap-3">
             <div
@@ -69,7 +68,7 @@ export default function CondominiumSchedule() {
           <AddEventModal />
         </div>
 
-        {/* Week Days */}
+        
         <div className="grid grid-cols-7 bg-gray-100 text-center text-sm font-medium text-gray-700 border-b border-gray-200">
           {["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"].map((day, i) => (
             <div key={i} className="py-2">
@@ -78,7 +77,7 @@ export default function CondominiumSchedule() {
           ))}
         </div>
 
-        {/* Calendar Grid */}
+     
         <div className="grid grid-cols-7">
           {Array.from({ length: 31 }).map((_, index) => (
             <div
@@ -89,7 +88,7 @@ export default function CondominiumSchedule() {
                 {index + 1}
               </span>
 
-              {/* Events */}
+        
               <div className="flex flex-col gap-2">
                 <div
                   onClick={() => setModalEventDetailsIsOpen(true)}

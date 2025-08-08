@@ -31,7 +31,6 @@ export function AddEventModal() {
           <DialogTitle>Adicionar Novo Evento</DialogTitle>
         </DialogHeader>
 
-        {/* Informações do Evento */}
         <fieldset className="border border-gray-300 rounded-md px-4 pt-4 pb-2 mb-4 relative">
           <legend className="text-sm font-medium px-2 text-gray-700">
             Informações do Evento
@@ -64,7 +63,7 @@ export function AddEventModal() {
           </div>
         </fieldset>
 
-        {/* Horário do Evento */}
+  
         <fieldset className="border border-gray-300 rounded-md px-4 pt-4 pb-2 mb-4 relative ">
           <legend className="text-sm font-medium px-2 text-gray-700">
             Horário do Evento

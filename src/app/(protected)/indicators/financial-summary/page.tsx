@@ -79,7 +79,7 @@ export default function FinancialSummary() {
       </div>
 
       <section className="grid grid-cols-2 grid-rows-3 gap-2">
-        {/* Receitas por Categoria */}
+  
         <div className="w-full  bg-white rounded-xl shadow-md p-4">
           <div className="mb-4 border-b pb-2">
             <h2 className="text-gray-800 font-semibold text-lg">
@@ -133,7 +133,7 @@ export default function FinancialSummary() {
           </div>
         </div>
 
-        {/* Despesas por Categoria */}
+     
         <div className="w-full  bg-white rounded-xl shadow-md p-4">
           <div className="mb-4 border-b pb-2">
             <h2 className="text-gray-800 font-semibold text-lg">
@@ -187,7 +187,7 @@ export default function FinancialSummary() {
           </div>
         </div>
 
-        {/* Tipos de Receita */}
+  
         <div className="w-full l bg-white rounded-xl shadow-md p-4">
           <div className="mb-4 border-b pb-2">
             <h2 className="text-gray-800 font-semibold text-lg">
@@ -256,7 +256,7 @@ export default function FinancialSummary() {
           </div>
         </div>
 
-        {/* Tipos de despesas */}
+    
         <div className="w-full  bg-white rounded-xl shadow-md p-4">
           <div className="mb-4 border-b pb-2">
             <h2 className="text-gray-800 font-semibold text-lg">
@@ -325,7 +325,6 @@ export default function FinancialSummary() {
           </div>
         </div>
 
-        {/* Receitas vs Despesas com Evolução do Saldo */}
         <div className="w-full bg-white rounded-xl shadow-md p-4 mx-auto col-span-2">
           <div className="mb-4 border-b pb-2">
             <h2 className="text-gray-800 font-semibold text-lg">

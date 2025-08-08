@@ -22,76 +22,44 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { CreatePollModal } from "./create-poll-modal";
+import { DatePicker } from "@/components/date-picker";
+import { useVirtualAssembly } from "./use-virtual-assembly";
+import { PollWithStats } from "@/api/fetch-assembly-polls";
+import { VotePollModal } from "./vote-poll-modal";
+import { ActionPollModal } from "./action-poll-modal";
 
 export default function VirtualAssembly() {
-  const [rangeDate, setRangeDate] = useState({
-    from: new Date(),
-    to: new Date(),
-  });
+  const [date, setDate] = useState(new Date());
+  const [pollSelected, setPollSelected] = useState<PollWithStats | undefined>();
+  const [voteModalIsOpen, setVoteModalIsOpen] = useState(false);
+  const [actionPollModalIsOpen, setActionPollModalActionIsOpen] =
+    useState(false);
 
-  const mockPolls = [
-    {
-      id: 1,
-      title: "Aprovação do orçamento 2025",
-      createdAt: "2025-07-01",
-      closedAt: "2025-07-10",
-      status: "Encerrada",
-      totalVotes: 45,
-      participation: "75%",
-      result: "Aprovado",
-      resultDetails: { yes: 32, no: 13 },
-    },
-    {
-      id: 2,
-      title: "Mudança no regulamento interno",
-      createdAt: "2025-07-15",
-      closedAt: "2025-07-20",
-      status: "Aberta",
-      totalVotes: 12,
-      participation: "20%",
-      result: "-",
-      resultDetails: null,
-    },
-    {
-      id: 3,
-      title: "Pintura da fachada",
-      createdAt: "2025-06-10",
-      closedAt: "2025-06-18",
-      status: "Encerrada",
-      totalVotes: 38,
-      participation: "68%",
-      result: "Rejeitado",
-      resultDetails: { yes: 15, no: 16 },
-    },
-  ];
-
-  const renderYesNoBar = (poll: (typeof mockPolls)[0]) => {
-    if (!poll.resultDetails) return "-";
-
-    const { yes, no } = poll.resultDetails;
-    const total = yes + no;
-    const percentYes = Math.round((yes / total) * 100);
-    const percentNo = 100 - percentYes;
+  const renderYesNoBar = (poll: PollWithStats) => {
+    if (!poll) return "-";
 
     return (
       <div className="w-48">
         <div className="text-xs text-muted-foreground mb-1">
-          {percentYes}% /{percentNo}%
+          {poll.percentageYes}% /{poll.percentageNo}%
         </div>
         <div className="w-full bg-gray-200 rounded-full h-2 relative overflow-hidden">
           <div
             className="bg-green-500 h-2 absolute left-0 top-0"
-            style={{ width: `${percentYes}%` }}
+            style={{ width: `${poll.percentageYes}%` }}
           />
           <div
             className="bg-red-500 h-2 absolute right-0 top-0"
-            style={{ width: `${percentNo}%` }}
+            style={{ width: `${poll.percentageNo}%` }}
           />
         </div>
       </div>
     );
   };
+
+  const { polls, pollsStatus, handleDeletePoll } = useVirtualAssembly({
+    date,
+  });
 
   return (
     <div className="bg-gray-50 min-h-screen w-full p-8 flex flex-col gap-6">
@@ -104,13 +72,12 @@ export default function VirtualAssembly() {
           Assembleia Digital
         </h1>
       </div>
-
       <div className="flex flex-col sm:flex-row gap-4 items-end">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Mês de referência
           </label>
-          <DatePickRange range={rangeDate} setRange={setRangeDate} />
+          <DatePicker date={date} setDate={setDate} />
         </div>
 
         <Button
@@ -121,7 +88,6 @@ export default function VirtualAssembly() {
           Exportar PDF
         </Button>
       </div>
-
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="min-w-[210px] max-w-[350px]cursor-pointer flex justify-between">
           <CardHeader>
@@ -135,7 +101,7 @@ export default function VirtualAssembly() {
 
           <CardContent className="flex flex-col gap-1">
             <span className="text-2xl md:text-3xl font-bold dark:text-foreground">
-              2
+              {polls?.length}
             </span>
             <span className="text-[12px] dark:text-foreground">
               Total de novas enquetes neste mês.
@@ -163,13 +129,26 @@ export default function VirtualAssembly() {
           </CardContent>
         </Card>
       </div>
-
-      {/* Tabela */}
+  
       <section className="rounded-xl overflow-auto border">
         <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200">
           <h2 className="font-medium text-gray-800 text-lg">Enquetes</h2>
 
-          <CreatePollModal />
+          <ActionPollModal
+            isOpen={actionPollModalIsOpen}
+            setIsOpen={setActionPollModalActionIsOpen}
+            pollSelected={pollSelected}
+            setPollSelected={setPollSelected}
+            type={pollSelected ? "edit" : "create"}
+          />
+
+          <VotePollModal
+            pollTitle={pollSelected?.title ?? ""}
+            setIsOpen={setVoteModalIsOpen}
+            isOpen={voteModalIsOpen}
+            setPollSelected={setPollSelected}
+            pollSelected={pollSelected}
+          />
         </div>
 
         <div className="max-h-[70vh] overflow-y-auto border border-gray-300 rounded">
@@ -188,29 +167,47 @@ export default function VirtualAssembly() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {mockPolls.map((poll) => (
+              {polls?.map((poll) => (
                 <TableRow key={poll.id}>
                   <TableCell>{poll.title}</TableCell>
                   <TableCell>
-                    {format(new Date(poll.createdAt), "dd/MM/yyyy")}
+                    {format(new Date(poll.createdAt), "dd/MM/yyyy HH:mm:ss")}
                   </TableCell>
                   <TableCell>
-                    {format(new Date(poll.closedAt), "dd/MM/yyyy")}
+                    {format(new Date(poll.endDate), "dd/MM/yyyy HH:mm:ss")}
                   </TableCell>
                   <TableCell>{poll.status}</TableCell>
                   <TableCell>{poll.totalVotes}</TableCell>
-                  <TableCell>{poll.participation}</TableCell>
+                  <TableCell>-</TableCell>
                   <TableCell>{renderYesNoBar(poll)}</TableCell>
-                  <TableCell>{poll.result}</TableCell>
+                  <TableCell>{poll.finalResult ?? "-"}</TableCell>
                   <TableCell className="text-center">
                     <DropdownMenu>
                       <DropdownMenuTrigger className="outline-none">
                         <MoreHorizontal className="w-5 h-5 cursor-pointer text-gray-600" />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent>
-                        <DropdownMenuItem>Visualizar</DropdownMenuItem>
-                        <DropdownMenuItem>Editar</DropdownMenuItem>
-                        <DropdownMenuItem>Excluir</DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setPollSelected(poll);
+                            setVoteModalIsOpen(true);
+                          }}
+                        >
+                          Visualizar
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setPollSelected(poll);
+                            setActionPollModalActionIsOpen(true);
+                          }}
+                        >
+                          Editar
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => handleDeletePoll(poll.id)}
+                        >
+                          Excluir
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
