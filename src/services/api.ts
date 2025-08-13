@@ -1,10 +1,8 @@
 import { getCookies } from "@/actions/cookies";
 import axios from "axios"
 
-import { cookies } from "next/headers";
-
 export const api = axios.create({
-  baseURL: 'http://localhost:3030',
+  baseURL: process.env.NEXT_PUBLIC_APIURL,
 });
 
 api.interceptors.request.use(async (config) => {
