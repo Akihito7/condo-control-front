@@ -1,0 +1,97 @@
+import { deleteIntervention } from "@/api/delete-intervention";
+import { fetchCondominiumAreas } from "@/api/fetch-condominium-areas";
+import { fetchInterventionCards } from "@/api/fetch-intervention-cards";
+import { fetchInterventions } from "@/api/fetch-interventions";
+import { fetchMaintenancesStatus } from "@/api/fetch-maintenances-status";
+import { fetchMaintenancesTypes } from "@/api/fetch-maintenances-types";
+import { fetchPaymentMethodOptions } from "@/api/fetch-payment-method.options";
+import { fetchPriorityOptions } from "@/api/fetch-priority-options";
+import { useUserContext } from "@/providers/use-user-context";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { format } from 'date-fns'
+
+
+interface UseMaintenanceBacklogProps {
+  date: Date;
+}
+
+export function useMaintenanceBacklog({
+  date
+}: UseMaintenanceBacklogProps) {
+  const {
+    user
+  } = useUserContext();
+  const { condominiumId } = user;
+  const dateFormatted = format(date, 'yyyy-MM-dd');
+  const queryClient = useQueryClient();
+
+  const { data: priorityOptions, status: priorityOptionsStatus } = useQuery({
+    queryKey: ['priority-options'],
+    queryFn: fetchPriorityOptions
+  })
+
+  const { data: areasOptions, status: areasOptionsStatus } = useQuery({
+    queryKey: ['areas-options'],
+    queryFn: async () => fetchCondominiumAreas(condominiumId)
+  })
+
+  const { data: paymentMethodsOptions, status: paymentMethodsOptionsStatus } = useQuery({
+    queryKey: ['payment-methods-options'],
+    queryFn: async () => fetchPaymentMethodOptions(),
+    enabled: !!condominiumId
+  })
+
+
+  const { data: maintenancesStatusOptions, status: maintenancesStatusOptionsStatus } = useQuery({
+    queryKey: ['status-options'],
+    queryFn: fetchMaintenancesStatus,
+    enabled: !!condominiumId
+  })
+
+
+  const { data: maintenancesTypes, status: maintenancesTypesStatus } = useQuery({
+    queryKey: ['types'],
+    queryFn: fetchMaintenancesTypes,
+    enabled: !!condominiumId
+  })
+
+  const { data: interventions, status: interventionsStatus } = useQuery({
+    queryKey: ['interventions', dateFormatted],
+    queryFn: async () => fetchInterventions({ date: dateFormatted })
+  })
+
+  const { data: interventionsCards, status: interventionsCardsStatus } = useQuery({
+    queryKey: ['interventionsCards', dateFormatted],
+    queryFn: async () => fetchInterventionCards({ date: dateFormatted })
+  })
+
+  const { mutateAsync: handleDeleteIntervention } = useMutation({
+    mutationFn: async (interventionId: number) => deleteIntervention(interventionId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['interventions', dateFormatted],
+      })
+      queryClient.invalidateQueries({
+        queryKey: ['interventionsCards', dateFormatted],
+      })
+    }
+  })
+
+  return {
+    priorityOptions,
+    priorityOptionsStatus,
+    areasOptions,
+    areasOptionsStatus,
+    paymentMethodsOptions,
+    paymentMethodsOptionsStatus,
+    maintenancesStatusOptions,
+    maintenancesStatusOptionsStatus,
+    maintenancesTypes,
+    maintenancesTypesStatus,
+    interventions,
+    interventionsStatus,
+    handleDeleteIntervention,
+    interventionsCards,
+    interventionsCardsStatus
+  }
+}

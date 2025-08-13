@@ -2,9 +2,15 @@
 
 import { Breadcrumb } from "@/components/breadcrumb";
 import { ButtonOpenSidebar } from "@/components/button-open-sidebar";
-import { DatePickRange } from "@/components/date-pick-ranger";
 import { Button } from "@/components/ui/button";
-import { CreditCard, FileDown, Pencil, TrendingUp, Wallet } from "lucide-react";
+import {
+  CardSim,
+  CreditCard,
+  FileDown,
+  Pencil,
+  TrendingUp,
+  Wallet,
+} from "lucide-react";
 import { useState } from "react";
 import { CardMaintenance } from "./card-maintenance";
 import {
@@ -21,75 +27,54 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-const MOCK_DATA = [
-  {
-    prioridade: "Alta",
-    tipo: "Serviço",
-    descricao: "Conserto do portão da garagem",
-    fornecedor: "Portões Silva",
-    valor: 1200.0,
-    formaPagamento: "Transferência",
-    dataPagamento: "2025-08-05",
-    conclusaoPagamento: "2025-08-06",
-    status: "Pago",
-    acoes: ["Visualizar", "Editar"],
-  },
-  {
-    prioridade: "Média",
-    tipo: "Produto",
-    descricao: "Compra de lâmpadas LED",
-    fornecedor: "Eletrônica Lima",
-    valor: 350.0,
-    formaPagamento: "Boleto",
-    dataPagamento: "2025-08-07",
-    conclusaoPagamento: null,
-    status: "Pendente",
-    acoes: ["Visualizar", "Cancelar"],
-  },
-  {
-    prioridade: "Baixa",
-    tipo: "Serviço",
-    descricao: "Limpeza da caixa d'água",
-    fornecedor: "Água Limpa Ltda",
-    valor: 700.0,
-    formaPagamento: "Pix",
-    dataPagamento: "2025-08-10",
-    conclusaoPagamento: null,
-    status: "Aguardando Pagamento",
-    acoes: ["Visualizar", "Confirmar"],
-  },
-  {
-    prioridade: "Alta",
-    tipo: "Produto",
-    descricao: "Compra de extintores",
-    fornecedor: "Segurança Total",
-    valor: 890.0,
-    formaPagamento: "Cartão",
-    dataPagamento: "2025-07-30",
-    conclusaoPagamento: "2025-07-30",
-    status: "Pago",
-    acoes: ["Visualizar"],
-  },
-  {
-    prioridade: "Média",
-    tipo: "Serviço",
-    descricao: "Dedetização das áreas comuns",
-    fornecedor: "Controle Pragas BR",
-    valor: 980.0,
-    formaPagamento: "Transferência",
-    dataPagamento: "2025-08-03",
-    conclusaoPagamento: null,
-    status: "Em Processamento",
-    acoes: ["Visualizar", "Editar", "Cancelar"],
-  },
-];
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { MonthYearPicker } from "@/components/month-year-select";
+import { useMaintenanceBacklog } from "./use-maintenance-backlog";
+import { ModalActionIntervention } from "./modal-action-intervation";
+import { Intervention } from "@/api/fetch-interventions";
+import { Label } from "@radix-ui/react-label";
 
 export default function MaintenanceBacklog() {
-  const [range, setRange] = useState({
-    from: new Date(),
-    to: new Date(),
+  const [date, setDate] = useState(new Date());
+  const [typeSelected, setTypeSelected] = useState("-1");
+  const [statusSelected, setStatusSelected] = useState("-1");
+
+  const [interventionSelected, setInterventionSelected] =
+    useState<Intervention>();
+
+  const [modalTypeAction, setModalTypeAction] = useState<
+    "create" | "edit" | "view"
+  >("create");
+
+  const [modalActionInvervationIsOpen, setModalActionIntervationIsOpen] =
+    useState(false);
+
+  const {
+    areasOptions,
+    areasOptionsStatus,
+    paymentMethodsOptions,
+    paymentMethodsOptionsStatus,
+    priorityOptions,
+    priorityOptionsStatus,
+    maintenancesStatusOptions,
+    maintenancesStatusOptionsStatus,
+    maintenancesTypes,
+    maintenancesTypesStatus,
+    interventions,
+    interventionsCards,
+    interventionsCardsStatus,
+    interventionsStatus,
+    handleDeleteIntervention,
+  } = useMaintenanceBacklog({
+    date,
   });
+
   return (
     <main className="bg-gray-50 min-h-screen w-full p-0 py-8 px-2 sm:p-8 flex flex-col gap-6">
       <div className="space-y-2">
@@ -103,11 +88,65 @@ export default function MaintenanceBacklog() {
       </div>
 
       <div className="flex  flex-col gap-4 md:items-end md:flex-row ">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Selecione o período
-          </label>
-          <DatePickRange range={range} setRange={setRange} />
+        <div className="flex gap-2">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Mês e Ano de referência
+            </label>
+            <MonthYearPicker selectedDate={date} onChange={setDate} />
+          </div>
+
+          <div>
+            <Label className="block text-sm font-medium text-gray-700 mb-2">
+              Tipo
+            </Label>
+            <Select
+              value={typeSelected}
+              onValueChange={(value) => setTypeSelected(value)}
+            >
+              <SelectTrigger
+                className="w-full"
+                style={{
+                  height: 40,
+                  width: 200,
+                }}
+              >
+                <SelectValue placeholder="Selecione o tipo" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="-1">Todos</SelectItem>
+                {maintenancesTypes?.map((type) => (
+                  <SelectItem value={String(type.id)}>{type.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label className="block text-sm font-medium text-gray-700 mb-2">
+              Status
+            </Label>
+            <Select
+              value={statusSelected}
+              onValueChange={(value) => setStatusSelected(value)}
+            >
+              <SelectTrigger
+                className="w-full"
+                style={{
+                  height: 40,
+                  width: 200,
+                }}
+              >
+                <SelectValue placeholder="Selecione o status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="-1">Todos</SelectItem>
+                {maintenancesStatusOptions?.map((type) => (
+                  <SelectItem value={String(type.id)}>{type.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         <Button
@@ -121,22 +160,17 @@ export default function MaintenanceBacklog() {
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
         <CardMaintenance
-          amount={15000}
+          amount={interventionsCards?.balance ?? 0}
           title="Saldo Atual"
           icon={<Wallet className="text-blue-400" />}
         />
         <CardMaintenance
-          amount={8500}
+          amount={interventionsCards?.approvedImprovementsCost ?? 0}
           title="Custo Melhorias Aprov./Inic."
           icon={<TrendingUp className="text-orange-400" />}
         />
         <CardMaintenance
-          amount={15000}
-          title="Saldo Futuro Projetado"
-          icon={<Wallet className="text-purple-400" />}
-        />
-        <CardMaintenance
-          amount={15000}
+          amount={interventionsCards?.newMonthlyFixedCosts ?? 0}
           title="Novos Custos Fixos Mensais"
           icon={<CreditCard className="text-green-400" />}
         />
@@ -145,8 +179,22 @@ export default function MaintenanceBacklog() {
       <section className="rounded-xl overflow-auto border">
         <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200">
           <h2 className="font-medium text-gray-800 text-lg">
-            Registros de Inadimplência
+            Backlog de Manutenções
           </h2>
+
+          <ModalActionIntervention
+            isOpen={modalActionInvervationIsOpen}
+            setIsOpen={setModalActionIntervationIsOpen}
+            priorityOptions={priorityOptions}
+            paymentMethodsOptions={paymentMethodsOptions}
+            areasOptions={areasOptions}
+            typesOptions={maintenancesTypes}
+            statusOptions={maintenancesStatusOptions}
+            interventionSelected={interventionSelected}
+            setInterventionSelected={setInterventionSelected}
+            type={modalTypeAction}
+            setModalTypeAction={setModalTypeAction}
+          />
         </div>
 
         <div className="max-h-[70vh] overflow-y-auto border border-gray-300 rounded">
@@ -166,53 +214,113 @@ export default function MaintenanceBacklog() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {MOCK_DATA.map((item, index) => (
-                <TableRow key={index}>
-                  <TableCell>
-                    <span
-                      className={`px-2 py-1 rounded text-xs font-semibold ${
-                        item.prioridade === "Alta"
-                          ? "text-red-500 bg-red-100"
-                          : item.prioridade === "Média"
-                          ? "text-yellow-600 bg-yellow-100"
-                          : "text-green-600 bg-green-100"
-                      }`}
-                    >
-                      {item.prioridade}
-                    </span>
-                  </TableCell>
+              {interventions && interventions.length > 0 ? (
+                interventions
+                  .filter((intervention) => {
+                    const statusMatch =
+                      statusSelected === "-1"
+                        ? true
+                        : statusSelected === String(intervention.statusId);
+                    const typeMatch =
+                      typeSelected === "-1"
+                        ? true
+                        : typeSelected === String(intervention.typeId);
+                    return statusMatch && typeMatch;
+                  })
+                  .map((item) => {
+                    return (
+                      <TableRow key={item.id}>
+                        <TableCell>
+                          <span
+                            className="px-2 py-1 rounded text-xs font-semibold"
+                            style={{
+                              backgroundColor: `${item.prioritiesColor}`,
+                            }}
+                          >
+                            {item.prioritiesName}
+                          </span>
+                        </TableCell>
 
-                  <TableCell>{item.tipo}</TableCell>
-                  <TableCell>{item.descricao}</TableCell>
-                  <TableCell>{item.fornecedor}</TableCell>
+                        <TableCell>{item.maintenanceTypesName}</TableCell>
 
-                  <TableCell className="text-left">
-                    {item.valor.toLocaleString("pt-br", {
-                      style: "currency",
-                      currency: "BRL",
-                    })}
-                  </TableCell>
+                        <TableCell>{item.description}</TableCell>
 
-                  <TableCell>{item.formaPagamento}</TableCell>
-                  <TableCell>{item.dataPagamento}</TableCell>
-                  <TableCell>{item.conclusaoPagamento || "-"}</TableCell>
+                        <TableCell>{item.supplier}</TableCell>
 
-                  <TableCell>{item.status}</TableCell>
+                        <TableCell className="text-left">
+                          {item.amount.toLocaleString("pt-BR", {
+                            style: "currency",
+                            currency: "BRL",
+                          })}
+                        </TableCell>
 
-                  <TableCell className="text-center">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger className="outline-none ring-0 focus:outline-none focus:ring-0 cursor-pointer">
-                        <Pencil className="w-4 h-4 text-gray-700" />
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        {item.acoes.map((acao, i) => (
-                          <DropdownMenuItem key={i}>{acao}</DropdownMenuItem>
-                        ))}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                        <TableCell>{item.paymentMethodsName}</TableCell>
+
+                        <TableCell>
+                          {item.paymentDate
+                            ? new Date(item.paymentDate).toLocaleDateString(
+                                "pt-BR"
+                              )
+                            : "-"}
+                        </TableCell>
+
+                        <TableCell>
+                          {item.paymentCompletionDate
+                            ? new Date(
+                                item.paymentCompletionDate
+                              ).toLocaleDateString("pt-BR")
+                            : "-"}
+                        </TableCell>
+
+                        <TableCell>{item.maintenanceStatusesName}</TableCell>
+
+                        <TableCell className="text-center">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger className="outline-none ring-0 focus:outline-none focus:ring-0 cursor-pointer">
+                              <Pencil className="w-4 h-4 text-gray-700" />
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  setModalTypeAction("edit");
+                                  setInterventionSelected(item);
+                                  setModalActionIntervationIsOpen(true);
+                                }}
+                              >
+                                Edit
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  setModalTypeAction("view");
+                                  setInterventionSelected(item);
+                                  setModalActionIntervationIsOpen(true);
+                                }}
+                              >
+                                View
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  handleDeleteIntervention(item.id);
+                                }}
+                              >
+                                Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={10}
+                    className="text-center py-4 text-gray-500"
+                  >
+                    No interventions found.
                   </TableCell>
                 </TableRow>
-              ))}
+              )}
             </TableBody>
           </Table>
         </div>

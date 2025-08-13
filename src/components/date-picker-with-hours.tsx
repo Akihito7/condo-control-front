@@ -15,11 +15,13 @@ import {
 interface DatePickerWithHoursProps {
   date: Date | undefined;
   setDate: React.Dispatch<React.SetStateAction<Date | undefined>>;
+  isDisabled?: boolean;
 }
 
 export function DatePickerWithHours({
   date,
   setDate,
+  isDisabled = false,
 }: DatePickerWithHoursProps) {
   const [open, setOpen] = React.useState(false);
   const [time, setTime] = React.useState("00:00:00");
@@ -63,6 +65,7 @@ export function DatePickerWithHours({
               variant="outline"
               id="date-picker"
               className="w-32 justify-between font-normal"
+              disabled={isDisabled}
             >
               {date ? date.toLocaleDateString() : "Select date"}
               <ChevronDownIcon />
@@ -87,6 +90,7 @@ export function DatePickerWithHours({
           value={time}
           onChange={handleTimeChange}
           className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden"
+          disabled={isDisabled}
         />
       </div>
     </div>
