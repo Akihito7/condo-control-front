@@ -1,10 +1,8 @@
 import { getCookies } from "@/actions/cookies";
 import axios from "axios"
 
-import { cookies } from "next/headers";
-
 export const api = axios.create({
-  baseURL: 'https://backend-condo-control-x2yd.vercel.app',
+  baseURL: process.env.NEXT_PUBLIC_APIURL,
 });
 
 api.interceptors.request.use(async (config) => {
