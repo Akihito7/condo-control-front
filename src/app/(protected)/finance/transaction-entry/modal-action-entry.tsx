@@ -57,6 +57,7 @@ interface ModalCreateEntryProps {
   setTransacationSelected: (value: FinancialRecord | undefined) => void;
   transactionSelected: FinancialRecord | undefined;
   condominiumId: number;
+  userCanManage: boolean;
 }
 
 const SchemaCreateEntry = z.object({
@@ -71,7 +72,7 @@ const SchemaCreateEntry = z.object({
   apartmentId: z.coerce
     .number()
     .min(-1, { message: "Apartamento inválido" })
-    .optional(),
+    .optional().nullable(),
   paymentMethodId: z.coerce
     .number()
     .min(0, { message: "Forma de pagamento inválida" }),
@@ -96,6 +97,7 @@ export function ModalActionEntry({
   setTransacationSelected,
   transactionSelected,
   condominiumId,
+  userCanManage,
 }: ModalCreateEntryProps) {
   const {
     control,
@@ -234,19 +236,25 @@ export function ModalActionEntry({
       }}
       open={isOpen}
     >
-      <DialogTrigger asChild>
-        <Button variant="outline" onClick={() => setIsOpen(true)}>
-          Adicionar registro
-        </Button>
-      </DialogTrigger>
+      {userCanManage && (
+        <DialogTrigger asChild>
+          <Button variant="outline" onClick={() => setIsOpen(true)}>
+            Adicionar registro
+          </Button>
+        </DialogTrigger>
+      )}
 
       <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-3xl">
-            Adicionar registro financeiro
+            {type === "create"
+              ? "Adicionar Registro Financeiro"
+              : "Editar Registro Financeiro"}
           </DialogTitle>
           <DialogDescription>
-            Preencha o formulário para adicionar uma nova movimentação.
+            {type === "create"
+              ? "Preencha o formulário para adicionar uma nova movimentação."
+              : "Preencha o formulário para editar uma movimentação."}
           </DialogDescription>
         </DialogHeader>
 
@@ -262,7 +270,6 @@ export function ModalActionEntry({
           })}
           className="space-y-6 py-4"
         >
-  
           <fieldset className="border border-gray-200 rounded-md p-4">
             <legend className="text-sm font-semibold mb-2">
               Informações básicas
@@ -327,7 +334,6 @@ export function ModalActionEntry({
             </div>
           </fieldset>
 
-        
           <fieldset className="border border-gray-200 rounded-md p-4">
             <legend className="text-sm font-semibold mb-2">
               Categoria e Apartamento
@@ -411,7 +417,6 @@ export function ModalActionEntry({
             </div>
           </fieldset>
 
-      
           <fieldset className="border border-gray-200 rounded-md p-4">
             <legend className="text-sm font-semibold mb-2">
               Tipo e Pagamento
@@ -425,7 +430,7 @@ export function ModalActionEntry({
                   control={control}
                   render={({ field: { onChange, value } }: any) => (
                     <div className="w-[250px]">
-                      <CurrencyInput value={value} onChange={onChange} />{" "}
+                      <CurrencyInput value={value} onChange={onChange} />
                     </div>
                   )}
                 />
@@ -606,7 +611,6 @@ export function ModalActionEntry({
             </div>
           </fieldset>
 
-  
           <fieldset className="border border-gray-200 rounded-md p-4">
             <legend className="text-sm font-semibold mb-2">
               Informações adicionais

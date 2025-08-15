@@ -34,8 +34,16 @@ import { MonthYearPicker } from "@/components/month-year-select";
 import { ButtonOpenSidebar } from "@/components/button-open-sidebar";
 import { useDelinquencyControl } from "./use-delinquency-control";
 import { Delinquency } from "@/api/fetch-delinquency-registers";
+import { userPermission } from "@/utils/user-permission";
+import { redirect } from "next/navigation";
 
 export default function DelinquencyControl() {
+  const { edit, read } = userPermission({ pageId: 2 });
+
+  if (!read) {
+    redirect("/home");
+  }
+
   const [delinquencySelected, setDelinquencySelected] = useState<Delinquency>();
 
   const [modalIsOpen, setModalIsOpen] = useState(false);

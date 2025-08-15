@@ -2,7 +2,7 @@ import { getCookies } from "@/actions/cookies";
 import axios from "axios"
 
 export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_APIURL,
+  baseURL: 'http://localhost:3030',
 });
 
 api.interceptors.request.use(async (config) => {

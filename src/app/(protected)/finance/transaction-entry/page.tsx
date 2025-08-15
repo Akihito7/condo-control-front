@@ -39,6 +39,8 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import { useIsMobile } from "@/lib/use-is-mobile";
 import { ButtonOpenSidebar } from "@/components/button-open-sidebar";
+import { redirect } from "next/navigation";
+import { userPermission } from "@/utils/user-permission";
 
 export type OptionType = {
   value: number;
@@ -46,6 +48,11 @@ export type OptionType = {
 };
 
 export default function Finance() {
+  const { read, edit } = userPermission({ pageId: 1 });
+  if (!read) {
+    redirect("/home");
+  }
+
   const [range, setRange] = useState({
     from: new Date(),
     to: new Date(),
@@ -271,6 +278,7 @@ export default function Finance() {
                 setTransacationSelected={setTransacationSelected}
                 transactionSelected={transactionSelected}
                 condominiumId={condominiumId}
+                userCanManage={edit}
               />
             )}
         </div>
