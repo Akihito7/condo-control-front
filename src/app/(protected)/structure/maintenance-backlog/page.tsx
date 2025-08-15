@@ -39,8 +39,17 @@ import { useMaintenanceBacklog } from "./use-maintenance-backlog";
 import { ModalActionIntervention } from "./modal-action-intervation";
 import { Intervention } from "@/api/fetch-interventions";
 import { Label } from "@radix-ui/react-label";
+import { userPagePermission } from "@/utils/user-page-permission";
+import { redirect } from "next/navigation";
 
 export default function MaintenanceBacklog() {
+  
+  const { read, edit } = userPagePermission({ pageId: 4 });
+
+  if (!read) {
+    redirect("/home");
+  }
+
   const [date, setDate] = useState(new Date());
   const [typeSelected, setTypeSelected] = useState("-1");
   const [statusSelected, setStatusSelected] = useState("-1");

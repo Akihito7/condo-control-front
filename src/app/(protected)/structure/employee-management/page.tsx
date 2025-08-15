@@ -36,6 +36,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { DatePicker } from "@/components/date-picker";
 import { QueryClient, useQueryClient } from "@tanstack/react-query";
+import { redirect } from "next/navigation";
+import { userPagePermission } from "@/utils/user-page-permission";
 
 const scheduleItemSchema = z.object({
   id: z.number(),
@@ -58,6 +60,13 @@ const scheduleSchema = z.object({
 });
 
 export default function EmployeeManagement() {
+  
+  const { read, edit } = userPagePermission({ pageId: 5 });
+
+  if (!read) {
+    redirect("/home");
+  }
+
   const [employeeStatusSelected, setEmployeeStatusSelected] = useState("1");
   const [modalActionEmployeeIsOpen, setModalActionEmployeeIsOpen] =
     useState(false);

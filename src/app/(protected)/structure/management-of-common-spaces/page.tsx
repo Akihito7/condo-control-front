@@ -17,8 +17,16 @@ import { parse, format } from "date-fns";
 import { ModalAddEvent } from "./modal-add-event";
 import { DayWithEvents, Event } from "@/api/fetch-events-by-condominium-area";
 import { ModalAddGuests } from "./moda-action-event";
+import { userPagePermission } from "@/utils/user-page-permission";
+import { redirect } from "next/navigation";
 
 export default function ManagementOfCommonSpaces() {
+  const { read, edit } = userPagePermission({ pageId: 6 });
+
+  if (!read) {
+    redirect("/home");
+  }
+
   const [date, setDate] = useState(new Date());
   const [modalAddEventIsOpen, setModalAddEventIsOpen] = useState(false);
   const [modalActionIsOpen, setModalActionIsOpen] = useState(false);
