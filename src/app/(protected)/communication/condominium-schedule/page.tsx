@@ -8,8 +8,16 @@ import { format, addMonths, subMonths } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { EventDetailsModal } from "./event-details-modal";
 import { AddEventModal } from "./add-event-modal";
+import { userPagePermission } from "@/utils/user-page-permission";
+import { redirect } from "next/navigation";
 
 export default function CondominiumSchedule() {
+  const { read, edit } = userPagePermission({ pageId: 9 });
+
+  if (!read) {
+    redirect("/home");
+  }
+
   const [modalEventDetailsIsOpen, setModalEventDetailsIsOpen] = useState(false);
   const [eventSelected, setEventSelected] = useState();
   const [dateSelected, setDateSelected] = useState(new Date());
@@ -31,7 +39,6 @@ export default function CondominiumSchedule() {
         setModalIsOpen={setModalEventDetailsIsOpen}
       />
 
-
       <div className="space-y-2">
         <div className="flex items-center gap-4">
           <ButtonOpenSidebar />
@@ -43,7 +50,6 @@ export default function CondominiumSchedule() {
       </div>
 
       <div className="bg-white shadow-md rounded-xl border border-gray-200 overflow-hidden">
-     
         <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200">
           <div className="flex items-center gap-3">
             <div
@@ -68,7 +74,6 @@ export default function CondominiumSchedule() {
           <AddEventModal />
         </div>
 
-        
         <div className="grid grid-cols-7 bg-gray-100 text-center text-sm font-medium text-gray-700 border-b border-gray-200">
           {["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"].map((day, i) => (
             <div key={i} className="py-2">
@@ -77,7 +82,6 @@ export default function CondominiumSchedule() {
           ))}
         </div>
 
-     
         <div className="grid grid-cols-7">
           {Array.from({ length: 31 }).map((_, index) => (
             <div
@@ -88,7 +92,6 @@ export default function CondominiumSchedule() {
                 {index + 1}
               </span>
 
-        
               <div className="flex flex-col gap-2">
                 <div
                   onClick={() => setModalEventDetailsIsOpen(true)}

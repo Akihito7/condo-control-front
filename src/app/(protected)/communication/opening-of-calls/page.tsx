@@ -43,8 +43,16 @@ import { OpeningCall } from "@/api/get-opening-calls-records";
 import { ModalAttachments } from "./modal-attachments";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteOpeningCallRecord } from "@/api/delete-opening-call-record";
+import { userPagePermission } from "@/utils/user-page-permission";
+import { redirect } from "next/navigation";
 
 export default function OpeningOfCalls() {
+  const { read, edit } = userPagePermission({ pageId: 8 });
+
+  if (!read) {
+    redirect("/home");
+  }
+  
   const [rangeDate, setRangeDate] = useState({
     from: new Date(),
     to: new Date(),

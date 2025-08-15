@@ -27,8 +27,16 @@ import { useVirtualAssembly } from "./use-virtual-assembly";
 import { PollWithStats } from "@/api/fetch-assembly-polls";
 import { VotePollModal } from "./vote-poll-modal";
 import { ActionPollModal } from "./action-poll-modal";
+import { userPagePermission } from "@/utils/user-page-permission";
+import { redirect } from "next/navigation";
 
 export default function VirtualAssembly() {
+  const { read, edit } = userPagePermission({ pageId: 11 });
+
+  if (!read) {
+    redirect("/home");
+  }
+
   const [date, setDate] = useState(new Date());
   const [pollSelected, setPollSelected] = useState<PollWithStats | undefined>();
   const [voteModalIsOpen, setVoteModalIsOpen] = useState(false);
@@ -129,7 +137,7 @@ export default function VirtualAssembly() {
           </CardContent>
         </Card>
       </div>
-  
+
       <section className="rounded-xl overflow-auto border">
         <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200">
           <h2 className="font-medium text-gray-800 text-lg">Enquetes</h2>

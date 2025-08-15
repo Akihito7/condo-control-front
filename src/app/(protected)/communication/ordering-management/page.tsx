@@ -39,8 +39,16 @@ import { Delivery } from "@/api/fetch-deliveries";
 import { markAsDelivered } from "@/api/mark-as-delivered";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteDelivery } from "@/api/delete-delivery";
+import { userPagePermission } from "@/utils/user-page-permission";
+import { redirect } from "next/navigation";
 
 export default function OrderingManagement() {
+  const { read, edit } = userPagePermission({ pageId: 10 });
+
+  if (!read) {
+    redirect("/home");
+  }
+
   const [rangeDate, setRangeDate] = useState({
     from: new Date(),
     to: new Date(),
