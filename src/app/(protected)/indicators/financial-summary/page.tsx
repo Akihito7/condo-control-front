@@ -23,11 +23,19 @@ import {
 } from "recharts";
 import { useFinancialSummary } from "./use-financial-summary";
 import { Skeleton } from "@/components/ui/skeleton";
+import { userPagePermission } from "@/utils/user-page-permission";
+import { redirect } from "next/navigation";
 
 const COLORS_INCOME = ["#4ade80", "#bbf7d0"];
-const COLORS_EXPENSE = ["#f87171", "#fca5a5"]; // vermelho suave (Tailwind red-400 e red-300)
+const COLORS_EXPENSE = ["#f87171", "#fca5a5"];
 
 export default function FinancialSummary() {
+  const { read, edit } = userPagePermission({ pageId: 7 });
+
+  if (!read) {
+    redirect("/home");
+  }
+
   const [range, setRange] = useState({
     from: new Date(),
     to: new Date(),
@@ -79,7 +87,6 @@ export default function FinancialSummary() {
       </div>
 
       <section className="grid grid-cols-2 grid-rows-3 gap-2">
-  
         <div className="w-full  bg-white rounded-xl shadow-md p-4">
           <div className="mb-4 border-b pb-2">
             <h2 className="text-gray-800 font-semibold text-lg">
@@ -133,7 +140,6 @@ export default function FinancialSummary() {
           </div>
         </div>
 
-     
         <div className="w-full  bg-white rounded-xl shadow-md p-4">
           <div className="mb-4 border-b pb-2">
             <h2 className="text-gray-800 font-semibold text-lg">
@@ -187,7 +193,6 @@ export default function FinancialSummary() {
           </div>
         </div>
 
-  
         <div className="w-full l bg-white rounded-xl shadow-md p-4">
           <div className="mb-4 border-b pb-2">
             <h2 className="text-gray-800 font-semibold text-lg">
@@ -256,7 +261,6 @@ export default function FinancialSummary() {
           </div>
         </div>
 
-    
         <div className="w-full  bg-white rounded-xl shadow-md p-4">
           <div className="mb-4 border-b pb-2">
             <h2 className="text-gray-800 font-semibold text-lg">
