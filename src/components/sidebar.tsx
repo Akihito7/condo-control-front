@@ -26,9 +26,23 @@ import {
   Wrench,
   MapPin,
   Home,
+  MoreHorizontal,
+  LogOut,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
+import { redirect } from "next/navigation";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@radix-ui/react-dropdown-menu";
+import { Button } from "./ui/button";
+import { deleteCookies, setCookies } from "@/actions/cookies";
+import { useRouter } from "next/router";
 
 export function Sidebar() {
   const { isOpen, setIsOpen } = useSidebarContext();
@@ -50,6 +64,11 @@ export function Sidebar() {
 
   const isMobile = useIsMobile();
   const sidebarRef = useRef<HTMLDivElement>(null);
+
+  async function handleLogout() {
+    deleteCookies("@smartCondo:token");
+    redirect("/signin");
+  }
 
   // Atualiza permissões
   useEffect(() => {
@@ -136,6 +155,7 @@ export function Sidebar() {
           <button
             onClick={() => {
               setIsOpen(true);
+              redirect("/home");
             }}
             className="w-full flex items-center justify-between px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700 font-medium transition"
           >
@@ -144,7 +164,7 @@ export function Sidebar() {
               {isOpen && (
                 <Link
                   href="/home"
-                  className="flex items-center px-3  rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition"
+                  className="flex items-center px-3 rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition"
                 >
                   Home
                 </Link>
@@ -313,12 +333,35 @@ export function Sidebar() {
         {isOpen ? (
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center">
-              <span className="text-gray-700 font-semibold">AD</span>
+              <span className="text-gray-700 font-semibold">
+                {user.name.slice(0, 2)}
+              </span>
             </div>
             <div className="flex-1 transition-opacity duration-300">
-              <p className="text-sm font-medium">Admin User</p>
-              <p className="text-xs text-gray-500">admin@example.com</p>
+              <p className="text-sm font-medium">{user.name}</p>
+              <p className="text-xs text-gray-500">{user.email}</p>
             </div>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline">
+                  <MoreHorizontal className="w-5 h-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                side="right"
+                sideOffset={8}
+                className="w-48 bg-white rounded-md shadow-md border border-gray-200 p-1"
+              >
+                <DropdownMenuItem
+                  className="px-2 py-2 text-sm hover:bg-gray-100 rounded-md cursor-pointer flex items-center"
+                  onClick={() => handleLogout()}
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Deslogar
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         ) : (
           <UserCircle className="w-6 h-6" />
