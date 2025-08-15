@@ -25,8 +25,16 @@ import {
 import { ModalRegisterVisitor } from "./modal-register-visitor";
 import { useVisitorRegistration } from "./use-visitor-registration";
 import { format, parseISO } from "date-fns";
+import { userPagePermission } from "@/utils/user-page-permission";
+import { redirect } from "next/navigation";
 
 export default function VistitorRegistration() {
+  const { read, edit } = userPagePermission({ pageId: 12 });
+
+  if (!read) {
+    redirect("/home");
+  }
+
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [range, setRange] = useState({
     from: new Date(),
