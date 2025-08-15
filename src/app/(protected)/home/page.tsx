@@ -1,11 +1,28 @@
 "use client";
-import { useQuery } from "@tanstack/react-query";
-import { Building, Users, Bell, ClipboardList } from "lucide-react";
+import { Breadcrumb } from "@/components/breadcrumb";
+import { ButtonOpenSidebar } from "@/components/button-open-sidebar";
+import {
+  Building,
+  Users,
+  ClipboardList,
+  Phone,
+  Mail,
+  ChevronDown,
+  ChevronLeft,
+} from "lucide-react";
 
 export default function HomePage() {
   return (
     <main className="bg-gray-50 min-h-screen w-full p-0 py-8 px-2 sm:p-8 flex flex-col gap-6 overflow-x-auto">
-      <section className="bg-white shadow-sm">
+      <div className="space-y-2">
+        <div className="flex items-center mb-8 gap-2">
+          <ButtonOpenSidebar />
+          <Breadcrumb paths={["Início", "Home"]} />
+        </div>
+      </div>
+
+      {/* Seção de boas-vindas */}
+      <section className="bg-white shadow-sm relative">
         <div className="max-w-7xl mx-auto px-6 py-16 flex flex-col md:flex-row items-center gap-10">
           <div className="flex-1">
             <h1 className="text-4xl font-bold text-gray-800 mb-4">
@@ -17,22 +34,27 @@ export default function HomePage() {
               Acesse informações, registre eventos e acompanhe tudo em tempo
               real.
             </p>
-            <button className="px-6 py-3 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition">
-              Começar agora
+            <button className="group flex px-6 py-3 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition items-center gap-2">
+              <ChevronLeft className="w-6 h-6 text-white animate-[bounceLeft_1s_infinite]" />
+              Comece agora
             </button>
           </div>
           <div className="flex-1">
             <img
-              src="https://cdn-icons-png.flaticon.com/512/3209/3209265.png"
+              src="ilustration.svg"
               alt="Condomínio"
-              width={450}
-              height={450}
               className="drop-shadow-lg"
             />
           </div>
         </div>
+
+        {/* Seta animada para baixo */}
+        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 animate-bounce cursor-pointer">
+          <ChevronDown className="w-10 h-10 text-blue-600" />
+        </div>
       </section>
 
+      {/* Funcionalidades */}
       <section className="max-w-7xl mx-auto px-6 py-20">
         <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">
           Principais Funcionalidades
@@ -67,17 +89,29 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="bg-blue-50 py-12">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center gap-10">
-          <Bell className="w-20 h-20 text-blue-600" />
-          <div>
-            <h3 className="text-2xl font-bold text-gray-800 mb-2">
-              Receba notificações instantâneas
-            </h3>
-            <p className="text-gray-600">
-              Fique por dentro de tudo que acontece no condomínio com alertas e
-              lembretes em tempo real.
-            </p>
+      {/* Contato mais atrativo */}
+      <section className="bg-gradient-to-r from-blue-600 to-blue-800 py-16 text-white">
+        <div className="max-w-7xl mx-auto px-6 text-center">
+          <h3 className="text-3xl font-bold mb-4">
+            🚀 Vamos transformar sua ideia em realidade!
+          </h3>
+          <p className="text-lg mb-8">
+            Se você tem um projeto ou ideia inovadora, entre em contato e vamos
+            conversar sobre como podemos desenvolvê-lo juntos.
+          </p>
+          <div className="flex flex-col md:flex-row justify-center items-center gap-6">
+            <a
+              href="tel:13981057505"
+              className="flex items-center gap-3 bg-white text-blue-700 px-6 py-3 rounded-lg shadow hover:bg-gray-100 transition"
+            >
+              <Phone className="w-5 h-5" /> (13) 98105-7505
+            </a>
+            <a
+              href="mailto:akihitopro7@gmail.com"
+              className="flex items-center gap-3 bg-white text-blue-700 px-6 py-3 rounded-lg shadow hover:bg-gray-100 transition"
+            >
+              <Mail className="w-5 h-5" /> akihitopro7@gmail.com
+            </a>
           </div>
         </div>
       </section>
