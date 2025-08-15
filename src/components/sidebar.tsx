@@ -137,14 +137,14 @@ export function Sidebar() {
             onClick={() => {
               setIsOpen(true);
             }}
-            className="w-full flex items-center justify-between px-3 py-0.5 rounded-md hover:bg-gray-100 text-gray-700 font-medium transition"
+            className="w-full flex items-center justify-between px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700 font-medium transition"
           >
             <span className="flex items-center">
               <Home className="w-4 h-4 text-gray-700" />
               {isOpen && (
                 <Link
                   href="/home"
-                  className="flex items-center px-3 py-1.5 rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition"
+                  className="flex items-center px-3  rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition"
                 >
                   Home
                 </Link>
