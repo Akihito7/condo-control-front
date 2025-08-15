@@ -19,6 +19,7 @@ export type User = {
   userAssociationCondominiumId: number;
   condominiumId: number;
   pagesWithPermissionByRole: RolePageRelation[]
+  modulesWithPermissionByRole: ModulePermissionByRole[]
 };
 
 export type RolePageRelation = {
@@ -30,13 +31,20 @@ export type RolePageRelation = {
   delete: boolean;
   pageName: string;
   pageModuleId: number | null;
-  pageCreatedAt: string;  
+  pageCreatedAt: string;
   pageRoutePath: string;
-  pageUpdatedAt: string | null; 
+  pageUpdatedAt: string | null;
 };
+
+export type ModulePermissionByRole = {
+  moduleId: number;
+  read: boolean;
+  roleName: string;
+};
+
+
 
 export async function fetchMe(): Promise<User> {
   const response = await api.get("auth/me");
-  console.log("me", response.data)
   return response.data
 }

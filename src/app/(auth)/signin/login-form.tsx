@@ -45,7 +45,7 @@ export function LoginForm() {
           },
         });
 
-        router.push("/finance/transaction-entry");
+        router.push("/home");
       }
     } catch (error) {
       console.error("Erro ao fazer login:", error);
@@ -54,7 +54,6 @@ export function LoginForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      
       <div className="space-y-2">
         <Label htmlFor="email" className="text-gray-700">
           E-mail ou Usuário
@@ -75,7 +74,6 @@ export function LoginForm() {
           <p className="text-sm text-red-500">{errors.email.message}</p>
         )}
       </div>
-
 
       <div className="space-y-2">
         <Label htmlFor="password" className="text-gray-700">
@@ -105,19 +103,26 @@ export function LoginForm() {
         )}
       </div>
 
-
       <div className="flex items-center justify-between mt-6 mb-6">
         <div className="flex items-center space-x-2">
           <Checkbox id="remember" />
-          <Label htmlFor="remember" className="text-gray-700">Lembrar-me</Label>
+          <Label htmlFor="remember" className="text-gray-700">
+            Lembrar-me
+          </Label>
         </div>
-        <a href="#" className="text-sm text-blue-600 font-semibold hover:underline">
+        <a
+          href="#"
+          className="text-sm text-blue-600 font-semibold hover:underline"
+        >
           Esqueci minha senha
         </a>
       </div>
 
-
-      <Button type="submit" className="w-full h-12 bg-blue-600 hover:bg-blue-700" disabled={isSubmitting}>
+      <Button
+        type="submit"
+        className="w-full h-12 bg-blue-600 hover:bg-blue-700"
+        disabled={isSubmitting}
+      >
         {isSubmitting ? "Entrando..." : "Entrar"}
       </Button>
     </form>

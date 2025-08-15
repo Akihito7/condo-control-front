@@ -1,9 +1,7 @@
 import { useUserContext } from "@/providers/use-user-context";
 
-export function userPermission({ pageId }: { pageId: number }) {
-
+export function userPagePermission({ pageId }: { pageId: number }) {
   const { user } = useUserContext();
-  console.log("its me user", user)
   const userPermissionToThisPage = user.pagesWithPermissionByRole?.find(
     (page) => page.pageId === pageId
   );

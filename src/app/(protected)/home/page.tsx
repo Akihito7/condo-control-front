@@ -1,10 +1,10 @@
 "use client";
+import { useQuery } from "@tanstack/react-query";
 import { Building, Users, Bell, ClipboardList } from "lucide-react";
 
 export default function HomePage() {
   return (
     <main className="bg-gray-50 min-h-screen w-full p-0 py-8 px-2 sm:p-8 flex flex-col gap-6 overflow-x-auto">
-
       <section className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-16 flex flex-col md:flex-row items-center gap-10">
           <div className="flex-1">

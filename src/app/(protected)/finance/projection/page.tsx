@@ -29,8 +29,19 @@ import { ButtonOpenSidebar } from "@/components/button-open-sidebar";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import { useIsMobile } from "@/lib/use-is-mobile";
+import { userPagePermission } from "@/utils/user-page-permission";
+import { redirect } from "next/navigation";
 
 export default function FinancialForecast() {
+
+  const { read, edit } = userPagePermission({
+    pageId: 3,
+  });
+
+  if (!read) {
+    redirect("/home");
+  }
+
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
   const {

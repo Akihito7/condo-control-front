@@ -34,11 +34,11 @@ import { MonthYearPicker } from "@/components/month-year-select";
 import { ButtonOpenSidebar } from "@/components/button-open-sidebar";
 import { useDelinquencyControl } from "./use-delinquency-control";
 import { Delinquency } from "@/api/fetch-delinquency-registers";
-import { userPermission } from "@/utils/user-permission";
+import { userPagePermission } from "@/utils/user-page-permission";
 import { redirect } from "next/navigation";
 
 export default function DelinquencyControl() {
-  const { edit, read } = userPermission({ pageId: 2 });
+  const { edit, read } = userPagePermission({ pageId: 2 });
 
   if (!read) {
     redirect("/home");

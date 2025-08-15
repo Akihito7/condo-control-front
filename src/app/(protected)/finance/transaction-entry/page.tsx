@@ -40,7 +40,7 @@ import "swiper/css";
 import { useIsMobile } from "@/lib/use-is-mobile";
 import { ButtonOpenSidebar } from "@/components/button-open-sidebar";
 import { redirect } from "next/navigation";
-import { userPermission } from "@/utils/user-permission";
+import { userPagePermission } from "@/utils/user-page-permission";
 
 export type OptionType = {
   value: number;
@@ -48,7 +48,12 @@ export type OptionType = {
 };
 
 export default function Finance() {
-  const { read, edit } = userPermission({ pageId: 1 });
+  const { user } = useUserContext();
+
+  const { read, edit } = userPagePermission({
+    pageId: 1,
+  });
+
   if (!read) {
     redirect("/home");
   }
@@ -65,7 +70,6 @@ export default function Finance() {
   const [transactionSelected, setTransacationSelected] = useState<
     FinancialRecord | undefined
   >();
-  const { user } = useUserContext();
   const condominiumId = user.condominiumId;
 
   const isMobile = useIsMobile();
