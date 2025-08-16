@@ -4,6 +4,7 @@ import React, { createContext, useEffect, useState } from "react";
 
 interface UserContextProps {
   user: User;
+  userIsLoading: boolean;
 }
 
 export const UserContext = createContext({} as UserContextProps);
@@ -14,10 +15,13 @@ interface UserContextProviderProps {
 
 export function UserContextProvider({ children }: UserContextProviderProps) {
   const [user, setUser] = useState<User>({} as User);
+  const [userIsLoading, setUserIsLoading] = useState(true);
 
   async function handleFetchUserAndSetUser() {
+    setUserIsLoading(true);
     const user = await fetchMe();
     setUser(user);
+    setUserIsLoading(false);
   }
 
   useEffect(() => {
@@ -28,6 +32,7 @@ export function UserContextProvider({ children }: UserContextProviderProps) {
     <UserContext.Provider
       value={{
         user,
+        userIsLoading,
       }}
     >
       {children}

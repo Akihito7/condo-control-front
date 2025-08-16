@@ -1,6 +1,7 @@
 "use client";
 import { Breadcrumb } from "@/components/breadcrumb";
 import { ButtonOpenSidebar } from "@/components/button-open-sidebar";
+import { useUserContext } from "@/providers/use-user-context";
 import {
   Building,
   Users,
@@ -10,8 +11,13 @@ import {
   ChevronDown,
   ChevronLeft,
 } from "lucide-react";
+import { useEffect } from "react";
 
 export default function HomePage() {
+  const { user } = useUserContext();
+  useEffect(() => {
+    console.log("HOME USER => ", user);
+  }, [user]);
   return (
     <main className="bg-gray-50 min-h-screen w-full p-0 py-8 px-2 sm:p-8 flex flex-col gap-6 overflow-x-auto">
       <div className="space-y-2">

@@ -49,7 +49,9 @@ import { redirect } from "next/navigation";
 export default function OpeningOfCalls() {
   const { read, edit } = userPagePermission({ pageId: 8 });
 
-  if (!read) {
+  const { userIsLoading } = useUserContext();
+
+  if (!read && !userIsLoading) {
     redirect("/home");
   }
   

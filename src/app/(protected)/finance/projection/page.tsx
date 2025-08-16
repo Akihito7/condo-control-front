@@ -31,14 +31,15 @@ import "swiper/css";
 import { useIsMobile } from "@/lib/use-is-mobile";
 import { userPagePermission } from "@/utils/user-page-permission";
 import { redirect } from "next/navigation";
+import { useUserContext } from "@/providers/use-user-context";
 
 export default function FinancialForecast() {
-
   const { read, edit } = userPagePermission({
     pageId: 3,
   });
+  const { userIsLoading } = useUserContext();
 
-  if (!read) {
+  if (!read && !userIsLoading) {
     redirect("/home");
   }
 

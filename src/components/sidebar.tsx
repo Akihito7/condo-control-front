@@ -72,7 +72,7 @@ export function Sidebar() {
 
   // Atualiza permissões
   useEffect(() => {
-    if (user) {
+    if (user?.id) {
       setUserModulesCanRead({
         finance: userModulePermission({
           moduleId: 1,
@@ -334,7 +334,7 @@ export function Sidebar() {
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center">
               <span className="text-gray-700 font-semibold">
-                {user.name.slice(0, 2)}
+                {user?.name?.slice(0, 2)}
               </span>
             </div>
             <div className="flex-1 transition-opacity duration-300">

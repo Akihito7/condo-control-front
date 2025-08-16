@@ -41,15 +41,16 @@ import { Intervention } from "@/api/fetch-interventions";
 import { Label } from "@radix-ui/react-label";
 import { userPagePermission } from "@/utils/user-page-permission";
 import { redirect } from "next/navigation";
+import { useUserContext } from "@/providers/use-user-context";
 
 export default function MaintenanceBacklog() {
-  
   const { read, edit } = userPagePermission({ pageId: 4 });
+  
+  const { userIsLoading } = useUserContext();
 
-  if (!read) {
+  if (!read && !userIsLoading) {
     redirect("/home");
   }
-
   const [date, setDate] = useState(new Date());
   const [typeSelected, setTypeSelected] = useState("-1");
   const [statusSelected, setStatusSelected] = useState("-1");

@@ -29,11 +29,13 @@ import { VotePollModal } from "./vote-poll-modal";
 import { ActionPollModal } from "./action-poll-modal";
 import { userPagePermission } from "@/utils/user-page-permission";
 import { redirect } from "next/navigation";
+import { useUserContext } from "@/providers/use-user-context";
 
 export default function VirtualAssembly() {
   const { read, edit } = userPagePermission({ pageId: 11 });
+  const { userIsLoading } = useUserContext();
 
-  if (!read) {
+  if (!read && !userIsLoading) {
     redirect("/home");
   }
 

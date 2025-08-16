@@ -25,6 +25,7 @@ import { useFinancialSummary } from "./use-financial-summary";
 import { Skeleton } from "@/components/ui/skeleton";
 import { userPagePermission } from "@/utils/user-page-permission";
 import { redirect } from "next/navigation";
+import { useUserContext } from "@/providers/use-user-context";
 
 const COLORS_INCOME = ["#4ade80", "#bbf7d0"];
 const COLORS_EXPENSE = ["#f87171", "#fca5a5"];
@@ -32,10 +33,11 @@ const COLORS_EXPENSE = ["#f87171", "#fca5a5"];
 export default function FinancialSummary() {
   const { read, edit } = userPagePermission({ pageId: 7 });
 
-  if (!read) {
+  const { userIsLoading } = useUserContext();
+
+  if (!read && !userIsLoading) {
     redirect("/home");
   }
-
   const [range, setRange] = useState({
     from: new Date(),
     to: new Date(),

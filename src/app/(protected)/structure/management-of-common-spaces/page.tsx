@@ -19,11 +19,13 @@ import { DayWithEvents, Event } from "@/api/fetch-events-by-condominium-area";
 import { ModalAddGuests } from "./moda-action-event";
 import { userPagePermission } from "@/utils/user-page-permission";
 import { redirect } from "next/navigation";
+import { useUserContext } from "@/providers/use-user-context";
 
 export default function ManagementOfCommonSpaces() {
   const { read, edit } = userPagePermission({ pageId: 6 });
+  const { userIsLoading } = useUserContext();
 
-  if (!read) {
+  if (!read && !userIsLoading) {
     redirect("/home");
   }
 

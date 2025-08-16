@@ -10,11 +10,14 @@ import { EventDetailsModal } from "./event-details-modal";
 import { AddEventModal } from "./add-event-modal";
 import { userPagePermission } from "@/utils/user-page-permission";
 import { redirect } from "next/navigation";
+import { useUserContext } from "@/providers/use-user-context";
 
 export default function CondominiumSchedule() {
   const { read, edit } = userPagePermission({ pageId: 9 });
 
-  if (!read) {
+  const { userIsLoading } = useUserContext();
+
+  if (!read && !userIsLoading) {
     redirect("/home");
   }
 

@@ -54,10 +54,11 @@ export default function Finance() {
     pageId: 1,
   });
 
-  if (!read) {
+  const { userIsLoading } = useUserContext();
+
+  if (!read && !userIsLoading) {
     redirect("/home");
   }
-
   const [range, setRange] = useState({
     from: new Date(),
     to: new Date(),

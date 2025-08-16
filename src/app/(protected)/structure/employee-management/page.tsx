@@ -38,6 +38,7 @@ import { DatePicker } from "@/components/date-picker";
 import { QueryClient, useQueryClient } from "@tanstack/react-query";
 import { redirect } from "next/navigation";
 import { userPagePermission } from "@/utils/user-page-permission";
+import { useUserContext } from "@/providers/use-user-context";
 
 const scheduleItemSchema = z.object({
   id: z.number(),
@@ -60,13 +61,12 @@ const scheduleSchema = z.object({
 });
 
 export default function EmployeeManagement() {
-  
   const { read, edit } = userPagePermission({ pageId: 5 });
+  const { userIsLoading } = useUserContext();
 
-  if (!read) {
+  if (!read && !userIsLoading) {
     redirect("/home");
   }
-
   const [employeeStatusSelected, setEmployeeStatusSelected] = useState("1");
   const [modalActionEmployeeIsOpen, setModalActionEmployeeIsOpen] =
     useState(false);

@@ -41,14 +41,16 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteDelivery } from "@/api/delete-delivery";
 import { userPagePermission } from "@/utils/user-page-permission";
 import { redirect } from "next/navigation";
+import { useUserContext } from "@/providers/use-user-context";
 
 export default function OrderingManagement() {
   const { read, edit } = userPagePermission({ pageId: 10 });
 
-  if (!read) {
+  const { userIsLoading } = useUserContext();
+
+  if (!read && !userIsLoading) {
     redirect("/home");
   }
-
   const [rangeDate, setRangeDate] = useState({
     from: new Date(),
     to: new Date(),

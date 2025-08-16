@@ -27,11 +27,13 @@ import { useVisitorRegistration } from "./use-visitor-registration";
 import { format, parseISO } from "date-fns";
 import { userPagePermission } from "@/utils/user-page-permission";
 import { redirect } from "next/navigation";
+import { useUserContext } from "@/providers/use-user-context";
 
 export default function VistitorRegistration() {
   const { read, edit } = userPagePermission({ pageId: 12 });
+  const { userIsLoading } = useUserContext();
 
-  if (!read) {
+  if (!read && !userIsLoading) {
     redirect("/home");
   }
 

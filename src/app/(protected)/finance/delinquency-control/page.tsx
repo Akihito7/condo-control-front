@@ -36,11 +36,13 @@ import { useDelinquencyControl } from "./use-delinquency-control";
 import { Delinquency } from "@/api/fetch-delinquency-registers";
 import { userPagePermission } from "@/utils/user-page-permission";
 import { redirect } from "next/navigation";
+import { useUserContext } from "@/providers/use-user-context";
 
 export default function DelinquencyControl() {
   const { edit, read } = userPagePermission({ pageId: 2 });
+  const { userIsLoading } = useUserContext();
 
-  if (!read) {
+  if (!read && !userIsLoading) {
     redirect("/home");
   }
 
