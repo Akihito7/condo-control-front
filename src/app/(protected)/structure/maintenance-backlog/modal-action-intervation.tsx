@@ -38,13 +38,13 @@ import { updateIntervention } from "@/api/update-intervention";
 
 // Atualiza o schema adicionando isInstallment (boolean) e numberOfInstallments (number)
 const interventionSchema = z.object({
-  priority: z.string().min(1, "Please select a priority"),
-  type: z.string().min(1, "Please select a type"),
-  area: z.string().min(1, "Please select an area"),
-  description: z.string().min(3, "Please enter a description"),
+  priority: z.string().min(1, "Por favor, selecione uma prioridade"),
+  type: z.string().min(1, "Por favor, selecione um tipo"),
+  area: z.string().min(1, "Por favor, selecione uma área"),
+  description: z.string().min(3, "Por favor, insira uma descrição"),
   provider: z.string().optional(),
-  value: z.string().regex(/^\d+(\.\d{1,2})?$/, "Please enter a valid amount"),
-  paymentMethod: z.string().min(1, "Please select a payment method"),
+  value: z.string().regex(/^\d+(\.\d{1,2})?$/, "Por favor, insira um valor válido"),
+  paymentMethod: z.string().min(1, "Por favor, selecione um método de pagamento"),
   paymentDate: z.date().optional().nullable(),
   paymentCompletionDate: z.date().optional().nullable(),
   duration: z.string().optional(),
@@ -52,7 +52,7 @@ const interventionSchema = z.object({
   plannedEnd: z.date().optional().nullable(),
   actualStart: z.date().optional().nullable(),
   actualEnd: z.date().optional().nullable(),
-  status: z.string().min(1, "Please select a status"),
+  status: z.string().min(1, "Por favor, selecione um status"),
   isInstallment: z.boolean().optional(),
   numberOfInstallments: z.number().int().positive().optional(),
 });
@@ -123,7 +123,7 @@ export function ModalActionIntervention({
       numberOfInstallments: undefined,
     },
   });
-  
+
   const isInstallment = useWatch({
     control,
     name: "isInstallment",
@@ -169,23 +169,23 @@ export function ModalActionIntervention({
 
   const modalTitle =
     type === "create"
-      ? "Add Intervention"
+      ? "Adicionar Intervenção"
       : type === "edit"
-      ? "Edit Intervention"
-      : "View Intervention";
+      ? "Editar Intervenção"
+      : "Visualizar Intervenção";
   const modalDescription =
     type === "create"
-      ? "Fill out the form below to add a new intervention."
+      ? "Preencha o formulário abaixo para adicionar uma nova intervenção."
       : type === "edit"
-      ? "Update the fields below to edit the intervention."
-      : "View the details of the intervention.";
+      ? "Atualize os campos abaixo para editar a intervenção."
+      : "Visualize os detalhes da intervenção.";
 
   const triggerButtonText =
     type === "create"
-      ? "Add Intervention"
+      ? "Adicionar Intervenção"
       : type === "edit"
-      ? "Edit Intervention"
-      : "View Intervention";
+      ? "Editar Intervenção"
+      : "Visualizar Intervenção";
 
   useEffect(() => {
     if (interventionSelected && (type === "edit" || type === "view")) {
@@ -261,11 +261,10 @@ export function ModalActionIntervention({
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="space-y-4 py-4"
-          // prevent submit on view mode if needed
         >
           {/* Priority */}
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Priority</Label>
+            <Label className="text-right">Prioridade</Label>
             <div className="col-span-3">
               <Controller
                 name="priority"
@@ -277,7 +276,7 @@ export function ModalActionIntervention({
                     disabled={isDisabled}
                   >
                     <SelectTrigger className="min-w-[200px]">
-                      <SelectValue placeholder="Select priority" />
+                      <SelectValue placeholder="Selecione a prioridade" />
                     </SelectTrigger>
                     <SelectContent>
                       {priorityOptions.map(({ id, name }) => (
@@ -299,7 +298,7 @@ export function ModalActionIntervention({
 
           {/* Type */}
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Type</Label>
+            <Label className="text-right">Tipo</Label>
             <div className="col-span-3">
               <Controller
                 name="type"
@@ -311,7 +310,7 @@ export function ModalActionIntervention({
                     disabled={isDisabled}
                   >
                     <SelectTrigger className="min-w-[200px]">
-                      <SelectValue placeholder="Select type" />
+                      <SelectValue placeholder="Selecione o tipo" />
                     </SelectTrigger>
                     <SelectContent>
                       {typesOptions.map(({ id, name }) => (
@@ -333,7 +332,7 @@ export function ModalActionIntervention({
 
           {/* Area */}
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Area</Label>
+            <Label className="text-right">Área</Label>
             <div className="col-span-3">
               <Controller
                 name="area"
@@ -345,7 +344,7 @@ export function ModalActionIntervention({
                     disabled={isDisabled}
                   >
                     <SelectTrigger className="min-w-[200px]">
-                      <SelectValue placeholder="Select area" />
+                      <SelectValue placeholder="Selecione a área" />
                     </SelectTrigger>
                     <SelectContent>
                       {areasOptions.map(({ id, name }) => (
@@ -367,7 +366,7 @@ export function ModalActionIntervention({
 
           {/* Description */}
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Description</Label>
+            <Label className="text-right">Descrição</Label>
             <textarea
               {...register("description")}
               className="col-span-3 border rounded-md p-2"
@@ -383,7 +382,7 @@ export function ModalActionIntervention({
 
           {/* Provider */}
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Provider</Label>
+            <Label className="text-right">Fornecedor</Label>
             <Input
               {...register("provider")}
               className="col-span-3"
@@ -393,11 +392,11 @@ export function ModalActionIntervention({
 
           {/* Value */}
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Value</Label>
+            <Label className="text-right">Valor</Label>
             <Input
               {...register("value")}
               className="col-span-3"
-              placeholder="E.g. 1000.00"
+              placeholder="Ex: 1000,00"
               disabled={isDisabled}
             />
           </div>
@@ -409,7 +408,7 @@ export function ModalActionIntervention({
 
           {/* Payment Method */}
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Payment Method</Label>
+            <Label className="text-right">Método de Pagamento</Label>
             <div className="col-span-3">
               <Controller
                 name="paymentMethod"
@@ -421,7 +420,7 @@ export function ModalActionIntervention({
                     disabled={isDisabled}
                   >
                     <SelectTrigger className="min-w-[200px]">
-                      <SelectValue placeholder="Select payment method" />
+                      <SelectValue placeholder="Selecione o método de pagamento" />
                     </SelectTrigger>
                     <SelectContent>
                       {paymentMethodsOptions.map(({ id, name }) => (
@@ -443,7 +442,7 @@ export function ModalActionIntervention({
 
           {/* Payment Date */}
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Payment Date</Label>
+            <Label className="text-right">Data do Pagamento</Label>
             <div className="col-span-3">
               <Controller
                 name="paymentDate"
@@ -461,7 +460,7 @@ export function ModalActionIntervention({
 
           {/* Payment Completion Date */}
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Payment Completion Date</Label>
+            <Label className="text-right">Data de Conclusão do Pagamento</Label>
             <div className="col-span-3">
               <Controller
                 name="paymentCompletionDate"
@@ -479,7 +478,7 @@ export function ModalActionIntervention({
 
           {/* Checkbox isInstallment */}
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Is Installment</Label>
+            <Label className="text-right">É Parcelado</Label>
             <div className="col-span-3 flex items-center">
               <input
                 type="checkbox"
@@ -493,7 +492,7 @@ export function ModalActionIntervention({
           {/* Number of Installments */}
           {isInstallment && (
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label className="text-right">Number of Installments</Label>
+              <Label className="text-right">Número de Parcelas</Label>
               <div className="col-span-3">
                 <Input
                   type="number"
@@ -502,7 +501,7 @@ export function ModalActionIntervention({
                   disabled={isDisabled}
                   min={1}
                   step={1}
-                  placeholder="Enter number of installments"
+                  placeholder="Insira o número de parcelas"
                 />
                 {errors.numberOfInstallments && !isDisabled && (
                   <p className="text-red-500 text-sm -mt-2 ml-[145px]">
@@ -515,18 +514,18 @@ export function ModalActionIntervention({
 
           {/* Duration */}
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Duration</Label>
+            <Label className="text-right">Duração</Label>
             <Input
               {...register("duration")}
               className="col-span-3"
-              placeholder="E.g. 3 days"
+              placeholder="Ex: 3 dias"
               disabled={isDisabled}
             />
           </div>
 
           {/* Planned Start */}
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Planned Start</Label>
+            <Label className="text-right">Início Planejado</Label>
             <div className="col-span-3">
               <Controller
                 name="plannedStart"
@@ -544,7 +543,7 @@ export function ModalActionIntervention({
 
           {/* Planned End */}
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Planned End</Label>
+            <Label className="text-right">Término Planejado</Label>
             <div className="col-span-3">
               <Controller
                 name="plannedEnd"
@@ -562,7 +561,7 @@ export function ModalActionIntervention({
 
           {/* Actual Start */}
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Actual Start</Label>
+            <Label className="text-right">Início Real</Label>
             <div className="col-span-3">
               <Controller
                 name="actualStart"
@@ -580,7 +579,7 @@ export function ModalActionIntervention({
 
           {/* Actual End */}
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Actual End</Label>
+            <Label className="text-right">Término Real</Label>
             <div className="col-span-3">
               <Controller
                 name="actualEnd"
@@ -610,7 +609,7 @@ export function ModalActionIntervention({
                     disabled={isDisabled}
                   >
                     <SelectTrigger className="min-w-[200px]">
-                      <SelectValue placeholder="Select status" />
+                      <SelectValue placeholder="Selecione o status" />
                     </SelectTrigger>
                     <SelectContent>
                       {statusOptions.map(({ id, name }) => (
@@ -633,12 +632,12 @@ export function ModalActionIntervention({
           <DialogFooter className="pt-4">
             <DialogClose asChild>
               <Button ref={closeButtonRef} variant="ghost">
-                {type === "view" ? "Close" : "Cancel"}
+                {type === "view" ? "Fechar" : "Cancelar"}
               </Button>
             </DialogClose>
             {type !== "view" && (
               <Button type="submit">
-                {type === "create" ? "Save" : "Update"}
+                {type === "create" ? "Salvar" : "Atualizar"}
               </Button>
             )}
           </DialogFooter>
