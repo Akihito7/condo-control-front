@@ -87,7 +87,6 @@ export default function MaintenanceBacklog() {
 
   return (
     <main className="bg-gray-50 min-h-screen w-full p-0 py-8 px-2 sm:p-8 flex flex-col gap-6">
-      <Button onClick={() => alert("vai se foder")}>Clique em mim</Button>
       <div className="space-y-2">
         <div className="flex items-center mb-8 gap-2">
           <ButtonOpenSidebar />
