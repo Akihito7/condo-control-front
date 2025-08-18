@@ -203,7 +203,7 @@ export function CardFinance({
 
             {type != "balance" && isSameMonth && target && target > 0 && (
               <span className="text-sm font-medium text-zinc-600 dark:text-foreground">
-                Meta
+                Meta{" "}
                 {target?.toLocaleString("pt-br", {
                   currency: "BRL",
                   style: "currency",
