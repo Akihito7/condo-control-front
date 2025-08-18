@@ -67,6 +67,7 @@ export default function Finance() {
     useState<MultiValue<OptionType>>([]);
 
   const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const [transactionSelected, setTransacationSelected] = useState<
     FinancialRecord | undefined
   >();
@@ -361,13 +362,17 @@ export default function Finance() {
                       </TableCell>
                       <TableCell>{transaction.observation}</TableCell>
                       <TableCell>
-                        <DropdownMenu>
+                        <DropdownMenu
+                          open={dropdownOpen}
+                          onOpenChange={(open) => setDropdownOpen(open)}
+                        >
                           <DropdownMenuTrigger className="outline-none ring-0 focus:outline-none focus:ring-0 cursor-pointer">
                             <Pencil className="w-4 h-4 text-gray-700" />
                           </DropdownMenuTrigger>
                           <DropdownMenuContent>
                             <DropdownMenuItem
                               onClick={() => {
+                                setDropdownOpen(false)
                                 setTransacationSelected(transaction);
                                 setModalIsOpen(true);
                               }}

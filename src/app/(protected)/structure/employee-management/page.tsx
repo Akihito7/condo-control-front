@@ -73,6 +73,7 @@ export default function EmployeeManagement() {
   const [employeeSelected, setEmployeeSelected] = useState<Employee>();
   const [date, setDate] = useState(new Date());
   const [isEditingSchedule, setIsEditingSchedule] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const {
     employeeRoles,
@@ -252,13 +253,17 @@ export default function EmployeeManagement() {
                           )?.name ?? "-"}
                         </TableCell>
                         <TableCell className="text-center">
-                          <DropdownMenu>
+                          <DropdownMenu
+                            open={dropdownOpen}
+                            onOpenChange={(open) => setDropdownOpen(open)}
+                          >
                             <DropdownMenuTrigger className="outline-none ring-0 focus:outline-none focus:ring-0 cursor-pointer">
                               <Pencil className="w-4 h-4 text-gray-700" />
                             </DropdownMenuTrigger>
                             <DropdownMenuContent>
                               <DropdownMenuItem
                                 onClick={() => {
+                                  setDropdownOpen(false);
                                   setEmployeeSelected(employee);
                                   setModalActionEmployeeIsOpen(true);
                                 }}

@@ -54,6 +54,7 @@ export default function MaintenanceBacklog() {
   const [date, setDate] = useState(new Date());
   const [typeSelected, setTypeSelected] = useState("-1");
   const [statusSelected, setStatusSelected] = useState("-1");
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const [interventionSelected, setInterventionSelected] =
     useState<Intervention>();
@@ -285,35 +286,43 @@ export default function MaintenanceBacklog() {
                         <TableCell>{item.maintenanceStatusesName}</TableCell>
 
                         <TableCell className="text-center">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger className="outline-none ring-0 focus:outline-none focus:ring-0 cursor-pointer">
+                          <DropdownMenu
+                            open={dropdownOpen}
+                            onOpenChange={(open) => setDropdownOpen(open)}
+                          >
+                            <DropdownMenuTrigger
+                              asChild
+                              className="outline-none ring-0 focus:outline-none focus:ring-0 cursor-pointer"
+                            >
                               <Pencil className="w-4 h-4 text-gray-700" />
                             </DropdownMenuTrigger>
                             <DropdownMenuContent>
                               <DropdownMenuItem
                                 onClick={() => {
+                                  setDropdownOpen(false);
                                   setModalTypeAction("edit");
                                   setInterventionSelected(item);
                                   setModalActionIntervationIsOpen(true);
                                 }}
                               >
-                                Edit
+                                Editar
                               </DropdownMenuItem>
                               <DropdownMenuItem
                                 onClick={() => {
+                                  setDropdownOpen(false);
                                   setModalTypeAction("view");
                                   setInterventionSelected(item);
                                   setModalActionIntervationIsOpen(true);
                                 }}
                               >
-                                View
+                                Visualizar
                               </DropdownMenuItem>
                               <DropdownMenuItem
                                 onClick={() => {
                                   handleDeleteIntervention(item.id);
                                 }}
                               >
-                                Delete
+                                Deletar
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>

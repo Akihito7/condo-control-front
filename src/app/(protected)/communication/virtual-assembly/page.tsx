@@ -42,6 +42,7 @@ export default function VirtualAssembly() {
   const [date, setDate] = useState(new Date());
   const [pollSelected, setPollSelected] = useState<PollWithStats | undefined>();
   const [voteModalIsOpen, setVoteModalIsOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const [actionPollModalIsOpen, setActionPollModalActionIsOpen] =
     useState(false);
 
@@ -192,13 +193,17 @@ export default function VirtualAssembly() {
                   <TableCell>{renderYesNoBar(poll)}</TableCell>
                   <TableCell>{poll.finalResult ?? "-"}</TableCell>
                   <TableCell className="text-center">
-                    <DropdownMenu>
+                    <DropdownMenu
+                      open={dropdownOpen}
+                      onOpenChange={(open) => setDropdownOpen(open)}
+                    >
                       <DropdownMenuTrigger className="outline-none">
                         <MoreHorizontal className="w-5 h-5 cursor-pointer text-gray-600" />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent>
                         <DropdownMenuItem
                           onClick={() => {
+                            setDropdownOpen(false);
                             setPollSelected(poll);
                             setVoteModalIsOpen(true);
                           }}
@@ -207,6 +212,7 @@ export default function VirtualAssembly() {
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => {
+                            setDropdownOpen(false);
                             setPollSelected(poll);
                             setActionPollModalActionIsOpen(true);
                           }}

@@ -54,7 +54,7 @@ export default function OpeningOfCalls() {
   if (!read && !userIsLoading) {
     redirect("/home");
   }
-  
+
   const [rangeDate, setRangeDate] = useState({
     from: new Date(),
     to: new Date(),
@@ -65,6 +65,7 @@ export default function OpeningOfCalls() {
     useState<OpeningCall | null>(null);
   const [modalActionIsOpen, setModalActionIsOpen] = useState(false);
   const [modalDocumentsIsOpen, setModalDocumentsIsOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const { user } = useUserContext();
 
   const condominiumId = user.condominiumId;
@@ -331,13 +332,17 @@ export default function OpeningOfCalls() {
                         </button>
                       </TableCell>
                       <TableCell className="text-center">
-                        <DropdownMenu>
+                        <DropdownMenu
+                          open={dropdownOpen}
+                          onOpenChange={(open) => setDropdownOpen(open)}
+                        >
                           <DropdownMenuTrigger className="outline-none ring-0 focus:outline-none focus:ring-0 cursor-pointer">
                             <Pencil className="w-4 h-4 text-gray-700" />
                           </DropdownMenuTrigger>
                           <DropdownMenuContent>
                             <DropdownMenuItem
                               onClick={() => {
+                                setDropdownOpen(false);
                                 setOpeningRecordSelected(openingRecord);
                                 setModalActionIsOpen(true);
                               }}
