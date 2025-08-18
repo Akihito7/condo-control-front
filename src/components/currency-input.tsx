@@ -1,7 +1,8 @@
 "use client";
 
 import Cleave from "cleave.js/react";
-import "cleave.js/dist/addons/cleave-phone.br"; // caso queira outros formatos no futu
+import "cleave.js/dist/addons/cleave-phone.br";
+
 
 export function CurrencyInput({
   value,
@@ -10,6 +11,10 @@ export function CurrencyInput({
   value: string | undefined;
   onChange: (value: string | undefined) => void;
 }) {
+
+  const displayValue =
+    value && value.includes(".") ? value.replace(".", ",") : value;
+
   return (
     <div className="flex flex-col gap-1">
       <div className="relative">
@@ -18,16 +23,15 @@ export function CurrencyInput({
         </span>
         <Cleave
           onChange={(event) => {
-            const value = event.target.value;
-            onChange(value);
+            const rawValue = event.target.rawValue; // sempre número puro → "24956.35"
+            onChange(rawValue); // salva cru no estado/banco
           }}
-          value={value}
+          value={displayValue} // mostra formatado no input
           options={{
             numeral: true,
             numeralThousandsGroupStyle: "thousand",
-            numeralDecimalMark: ",",
-            delimiter: ".",
-            rawValueTrimPrefix: true,
+            numeralDecimalMark: ",", // vírgula como decimal
+            delimiter: ".", // ponto como separador de milhar
             numeralDecimalScale: 2,
           }}
           className="pl-10 pr-3 py-2 w-full border-2 h-10 rounded-lg focus:outline-none text-right focus:border-blue-500"

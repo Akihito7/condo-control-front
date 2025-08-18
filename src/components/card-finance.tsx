@@ -112,12 +112,17 @@ export function CardFinance({
   });
 
   async function handleUpdate(data: FormFinanceData) {
+    const isNewValue = Number(data.value) !== value;
+    const dataToUpdate = {
+      ...data,
+      value: isNewValue ? data.value : undefined,
+    };
     if (type === "income") {
-      handleUpdateCondominiumIncomes(data);
+      handleUpdateCondominiumIncomes(dataToUpdate);
     }
 
     if (type === "expensive") {
-      handleUpdateCondominiumExpenses(data);
+      handleUpdateCondominiumExpenses(dataToUpdate);
     }
   }
 
