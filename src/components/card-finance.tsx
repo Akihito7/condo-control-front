@@ -216,6 +216,10 @@ export function CardFinance({
                 Sem metas para este mês
               </span>
             )}
+
+            {type === "balance" && (
+              <span className="text-sm font-medium text-transparent">*</span>
+            )}
           </CardContent>
         </Card>
       </DialogTrigger>
