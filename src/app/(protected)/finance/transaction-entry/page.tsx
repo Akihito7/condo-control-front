@@ -41,6 +41,8 @@ import { useIsMobile } from "@/lib/use-is-mobile";
 import { ButtonOpenSidebar } from "@/components/button-open-sidebar";
 import { redirect } from "next/navigation";
 import { userPagePermission } from "@/utils/user-page-permission";
+import { DatePicker } from "@/components/date-picker";
+import { MonthYearPicker } from "@/components/month-year-select";
 
 export type OptionType = {
   value: number;
@@ -59,10 +61,7 @@ export default function Finance() {
   if (!read && !userIsLoading) {
     redirect("/home");
   }
-  const [range, setRange] = useState({
-    from: new Date(),
-    to: new Date(),
-  });
+  const [selectedDate, setSelectedDate] = useState(new Date());
 
   const [incomeExpenseOptionsSelected, setIncomeExpenseOptionSelected] =
     useState<MultiValue<OptionType>>([]);
@@ -87,8 +86,7 @@ export default function Finance() {
     cardsTransactionStatus,
     transactionsStatus,
   } = useTransaction({
-    startDate: range.from,
-    endDate: range.to,
+    selectedDate,
     incomeExpenseOptionsSelected,
     condominiumId,
   });
@@ -127,9 +125,13 @@ export default function Finance() {
       <div className="flex  flex-col gap-4 md:items-end md:flex-row ">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Selecione o período
+            Mês e ano de referência
           </label>
-          <DatePickRange range={range} setRange={setRange} />
+          <MonthYearPicker
+            selectedDate={selectedDate}
+            onChange={setSelectedDate}
+            justFutureMonths={false}
+          />
         </div>
         <div className="max-w-[300px]">
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -174,7 +176,7 @@ export default function Finance() {
                     target={cardsTransaction?.incomeTarget}
                     icon={<TrendingUp color="#22c55e" />}
                     isSameMonth={cardsTransaction?.isSameMonth ?? false}
-                    date={range.from}
+                    date={selectedDate}
                   />
                 </SwiperSlide>
 
@@ -186,7 +188,7 @@ export default function Finance() {
                     icon={<TrendingDown color="#ef4444" />}
                     type="expensive"
                     isSameMonth={cardsTransaction?.isSameMonth ?? false}
-                    date={range.from}
+                    date={selectedDate}
                   />
                 </SwiperSlide>
 
@@ -207,7 +209,7 @@ export default function Finance() {
                         }
                       />
                     }
-                    date={range.from}
+                    date={selectedDate}
                   />
                 </SwiperSlide>
               </Swiper>
@@ -221,7 +223,7 @@ export default function Finance() {
                 target={cardsTransaction?.incomeTarget}
                 icon={<TrendingUp color="#22c55e" />}
                 isSameMonth={cardsTransaction?.isSameMonth ?? false}
-                date={range.from}
+                date={selectedDate}
               />
 
               <CardFinance
@@ -231,7 +233,7 @@ export default function Finance() {
                 icon={<TrendingDown color="#ef4444" />}
                 type="expensive"
                 isSameMonth={cardsTransaction?.isSameMonth ?? false}
-                date={range.from}
+                date={selectedDate}
               />
 
               <CardFinance
@@ -250,7 +252,7 @@ export default function Finance() {
                     }
                   />
                 }
-                date={range.from}
+                date={selectedDate}
               />
             </>
           )

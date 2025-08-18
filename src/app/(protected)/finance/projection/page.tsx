@@ -74,7 +74,7 @@ export default function FinancialForecast() {
       <div className="flex flex-row gap-4 items-end">
         <div className="">
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Mês de referência
+            Mês e ano de referência
           </label>
           <MonthYearPicker
             selectedDate={selectedDate}

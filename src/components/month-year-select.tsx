@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useEffect, useState } from "react";
-import { format, parse, startOfMonth } from "date-fns";
+import { format, parse, startOfMonth, addYears } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 const months = Array.from({ length: 12 }, (_, i) =>
@@ -22,7 +22,7 @@ const months = Array.from({ length: 12 }, (_, i) =>
 );
 
 const currentYear = new Date().getFullYear();
-const years = Array.from({ length: 1 }, (_, i) => currentYear - i);
+const years = Array.from({ length: 11 }, (_, i) => currentYear - 5 + i);
 
 interface MonthYearPickerProps {
   selectedDate: Date;

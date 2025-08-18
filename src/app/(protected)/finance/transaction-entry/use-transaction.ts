@@ -9,25 +9,28 @@ import { fetchPaymentStatusOptions } from "@/api/fetch-payment-status.options";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { MultiValue } from "react-select";
 import { OptionType } from "./page";
+import { format } from "date-fns";
+import { getFullMonthInterval } from "@/utils/get-full-month-interval";
 
 
 
 interface UseTransactionProps {
-  startDate: Date;
-  endDate: Date
+  selectedDate: Date;
   incomeExpenseOptionsSelected: MultiValue<OptionType>
   condominiumId: number
 }
-export function useTransaction({ startDate, endDate, incomeExpenseOptionsSelected, condominiumId }: UseTransactionProps) {
+export function useTransaction({ selectedDate, incomeExpenseOptionsSelected, condominiumId }: UseTransactionProps) {
 
   const queryClient = useQueryClient()
-  const startDateFormmated = startDate.toISOString().slice(0, 10);
-  const endDateFormmated = endDate.toISOString().slice(0, 10);
+  const selectedDateFormatted = format(selectedDate, 'yyyy-MM-dd');
+  const {
+    startDate, endDate
+  } = getFullMonthInterval(selectedDateFormatted)
 
   const incomeExpenseOptionsSelectedId = incomeExpenseOptionsSelected?.map((option: any) => option.value)
   const { data: transactions, error: errorTransactions, status: transactionsStatus } = useQuery({
-    queryKey: ["transactions", startDate, endDate, incomeExpenseOptionsSelected, condominiumId],
-    queryFn: () => fetchFinancialRecords({ condominiumId, startDate: startDateFormmated, endDate: endDateFormmated, incomeExpenseOptionsSelectedId }),
+    queryKey: ["transactions", selectedDateFormatted, incomeExpenseOptionsSelected, condominiumId],
+    queryFn: () => fetchFinancialRecords({ condominiumId, selectedDate: selectedDateFormatted, incomeExpenseOptionsSelectedId }),
     enabled: incomeExpenseOptionsSelectedId ? incomeExpenseOptionsSelectedId.length > 0 && !!condominiumId : false
   });
 
@@ -60,8 +63,8 @@ export function useTransaction({ startDate, endDate, incomeExpenseOptionsSelecte
     queryKey: ['revenueTotal', startDate, endDate, condominiumId],
     queryFn: async () => fetchCardsTransactionEntry({
       condominiumId,
-      startDate: startDateFormmated,
-      endDate: endDateFormmated
+      startDate,
+      endDate,
     }),
     enabled: !!condominiumId
   })

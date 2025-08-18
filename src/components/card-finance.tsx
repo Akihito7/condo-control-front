@@ -59,7 +59,7 @@ export function CardFinance({
   const { user } = useUserContext();
   const queryClient = useQueryClient();
 
-  const dateFormmated = format(date, '"yyyy-MM"');
+  const dateFormmated = format(date, "yyyy-MM");
 
   const { mutateAsync: handleUpdateCondominiumIncomes } = useMutation({
     mutationFn: (data: FormFinanceData) =>
@@ -201,9 +201,9 @@ export function CardFinance({
               {moneyFormmated}
             </span>
 
-            {isSameMonth && target && target > 0 && (
+            {type != "balance" && isSameMonth && target && target > 0 && (
               <span className="text-sm font-medium text-zinc-600 dark:text-foreground">
-                Meta{" "}
+                Meta
                 {target?.toLocaleString("pt-br", {
                   currency: "BRL",
                   style: "currency",
@@ -211,7 +211,7 @@ export function CardFinance({
               </span>
             )}
 
-            {isSameMonth && !target && (
+            {type != "balance" && isSameMonth && !target && (
               <span className="text-sm font-medium text-zinc-600 dark:text-foreground">
                 Sem metas para este mês
               </span>

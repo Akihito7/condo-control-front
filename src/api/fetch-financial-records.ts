@@ -1,8 +1,7 @@
 import { api } from "@/services/api";
 
 interface FetchFinancialRecordsProps {
-  startDate: string;
-  endDate: string;
+  selectedDate: string;
   condominiumId: number;
   incomeExpenseOptionsSelectedId: string[] | undefined
 }
@@ -39,10 +38,10 @@ export type FinancialRecord = {
 };
 
 export async function fetchFinancialRecords(
-  { condominiumId, startDate, endDate, incomeExpenseOptionsSelectedId }: FetchFinancialRecordsProps)
+  { condominiumId, selectedDate, incomeExpenseOptionsSelectedId }: FetchFinancialRecordsProps)
   : Promise<FinancialRecord[]> {
   const response = await api.get(
-    `/finance/registers/${condominiumId}/${startDate}/${endDate}`, {
+    `/finance/registers/${condominiumId}/${selectedDate}`, {
     params: {
       incomeExpenseOptionsSelectedId
     }
