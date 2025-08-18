@@ -52,7 +52,7 @@ export default function DelinquencyControl() {
 
   const [date, setDate] = useState<Date>(new Date());
 
-  const [paymentStatus, setStatusPayment] = useState<string>("1");
+  const [paymentStatus, setStatusPayment] = useState<string>("-1");
 
   const {
     categoriesOptions,
@@ -64,6 +64,8 @@ export default function DelinquencyControl() {
 
   const delinquencyRegistersFiltered = delinequencyRegisters?.filter(
     (delinquencyRegister) => {
+      if (paymentStatus === "-1") return true;
+
       if (paymentStatus === "2") {
         return delinquencyRegister.paymentDate;
       }
@@ -110,6 +112,7 @@ export default function DelinquencyControl() {
               <SelectValue placeholder="Selecione o status" />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="-1">Todos</SelectItem>
               <SelectItem value="2">Pago</SelectItem>
               <SelectItem value="1">Pendente</SelectItem>
             </SelectContent>
