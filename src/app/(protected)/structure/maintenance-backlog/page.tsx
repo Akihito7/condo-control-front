@@ -55,6 +55,9 @@ export default function MaintenanceBacklog() {
   const [typeSelected, setTypeSelected] = useState("-1");
   const [statusSelected, setStatusSelected] = useState("-1");
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [dropdownOpenToThisItem, setDropdownOpenToThisItem] = useState<
+    number | undefined
+  >();
 
   const [interventionSelected, setInterventionSelected] =
     useState<Intervention>();
@@ -287,8 +290,18 @@ export default function MaintenanceBacklog() {
 
                         <TableCell className="text-center">
                           <DropdownMenu
-                            open={dropdownOpen}
-                            onOpenChange={(open) => setDropdownOpen(open)}
+                            open={
+                              dropdownOpen &&
+                              dropdownOpenToThisItem === item.id
+                            }
+                            onOpenChange={(open) => {
+                              if (!open) {
+                                setDropdownOpenToThisItem(undefined);
+                              } else {
+                                setDropdownOpenToThisItem(item.id);
+                              }
+                              setDropdownOpen(open);
+                            }}
                           >
                             <DropdownMenuTrigger
                               asChild

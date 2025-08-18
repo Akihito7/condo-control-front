@@ -66,6 +66,9 @@ export default function OpeningOfCalls() {
   const [modalActionIsOpen, setModalActionIsOpen] = useState(false);
   const [modalDocumentsIsOpen, setModalDocumentsIsOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [dropdownOpenToThisItem, setDropdownOpenToThisItem] = useState<
+    number | undefined
+  >();
   const { user } = useUserContext();
 
   const condominiumId = user.condominiumId;
@@ -333,8 +336,18 @@ export default function OpeningOfCalls() {
                       </TableCell>
                       <TableCell className="text-center">
                         <DropdownMenu
-                          open={dropdownOpen}
-                          onOpenChange={(open) => setDropdownOpen(open)}
+                          open={
+                            dropdownOpen &&
+                            dropdownOpenToThisItem === openingRecord.id
+                          }
+                          onOpenChange={(open) => {
+                            if (!open) {
+                              setDropdownOpenToThisItem(undefined);
+                            } else {
+                              setDropdownOpenToThisItem(openingRecord.id);
+                            }
+                            setDropdownOpen(open);
+                          }}
                         >
                           <DropdownMenuTrigger className="outline-none ring-0 focus:outline-none focus:ring-0 cursor-pointer">
                             <Pencil className="w-4 h-4 text-gray-700" />

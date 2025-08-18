@@ -69,6 +69,9 @@ export default function OrderingManagement() {
   const [statusSelected, setStatusSelected] = useState<string>("-1");
   const [packageModalIsOpen, setPackageModalIsOpen] = useState(false);
   const [modalGalleryIsOpen, setModalGalleryIsOpen] = useState(false);
+  const [dropdownOpenToThisItem, setDropdownOpenToThisItem] = useState<
+    number | undefined
+  >();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [photosUrls, setPhotosUrl] = useState<string[]>([]);
   const [deliverySelected, setDeliverySelected] = useState<
@@ -243,8 +246,18 @@ export default function OrderingManagement() {
 
                       <TableCell className="text-center">
                         <DropdownMenu
-                          open={dropdownOpen}
-                          onOpenChange={(open) => setDropdownOpen(open)}
+                          open={
+                            dropdownOpen &&
+                            dropdownOpenToThisItem === delivery.id
+                          }
+                          onOpenChange={(open) => {
+                            if (!open) {
+                              setDropdownOpenToThisItem(undefined);
+                            } else {
+                              setDropdownOpenToThisItem(delivery.id);
+                            }
+                            setDropdownOpen(open);
+                          }}
                         >
                           <DropdownMenuTrigger className="outline-none ring-0 focus:outline-none focus:ring-0 cursor-pointer">
                             <Pencil className="w-4 h-4 text-gray-700" />

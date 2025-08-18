@@ -50,6 +50,9 @@ export default function DelinquencyControl() {
 
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [dropdownOpenToThisItem, setDropdownOpenToThisItem] = useState<
+    number | undefined
+  >();
 
   const [date, setDate] = useState<Date>(new Date());
 
@@ -203,8 +206,18 @@ export default function DelinquencyControl() {
 
                   <TableCell className="text-center">
                     <DropdownMenu
-                      open={dropdownOpen}
-                      onOpenChange={(open) => setDropdownOpen(open)}
+                      open={
+                        dropdownOpen &&
+                        dropdownOpenToThisItem === delinquencyRegister.id
+                      }
+                      onOpenChange={(open) => {
+                        if (!open) {
+                          setDropdownOpenToThisItem(undefined);
+                        } else {
+                          setDropdownOpenToThisItem(delinquencyRegister.id);
+                        }
+                        setDropdownOpen(open);
+                      }}
                     >
                       <DropdownMenuTrigger className="outline-none ring-0 focus:outline-none focus:ring-0 cursor-pointer">
                         <Pencil className="w-4 h-4 text-gray-700" />
