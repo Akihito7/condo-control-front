@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Paperclip } from "lucide-react";
 
@@ -33,8 +33,7 @@ import { ApartmentWithBlock } from "@/api/fetch-apartments";
 import { PaymentStatus } from "@/api/fetch-payment-status.options";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod/v4";
-import { useMutation } from "@tanstack/react-query";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
 
 import {
@@ -72,13 +71,10 @@ const SchemaCreateEntry = z.object({
   apartmentId: z.coerce
     .number()
     .min(-1, { message: "Apartamento inválido" })
-    .optional().nullable(),
-  paymentMethodId: z.coerce
-    .number()
-    .min(0, { message: "Forma de pagamento inválida" }),
-  paymentStatusId: z.coerce
-    .number()
-    .min(0, { message: "Status de pagamento inválido" }),
+    .optional()
+    .nullable(),
+  paymentMethodId: z.coerce.number().min(0, { message: "Forma de pagamento inválida" }),
+  paymentStatusId: z.coerce.number().min(0, { message: "Status de pagamento inválido" }),
   notes: z.string().optional(),
   recurring: z.boolean(),
   type: z.coerce.number().min(0, { message: "Tipo inválido" }),
@@ -114,7 +110,7 @@ export function ModalActionEntry({
       amountPaid: "0",
       condominiumId,
       dueDate: new Date(),
-      incomeExpenseId: incomeExpenseOptions?.[0].id,
+      incomeExpenseId: incomeExpenseOptions?.[0]?.id ?? -1,
       categoryId: -1,
       apartmentId: -1,
       paymentMethodId: -1,
@@ -135,9 +131,7 @@ export function ModalActionEntry({
   const categoriesFiltered = categoriesOptions.filter(
     (cat) => cat.incomeExpenseTypeId === recordTypeId
   );
-  const selectedCategory = categoriesFiltered.find(
-    (cat) => cat.id === categoryId
-  );
+  const selectedCategory = categoriesFiltered.find((cat) => cat.id === categoryId);
 
   function handleChangeDueDate(date: Date) {
     setValue("dueDate", date);
@@ -149,7 +143,7 @@ export function ModalActionEntry({
 
   function handleResetForm() {
     reset({
-      condominiumId: 5,
+      condominiumId,
       apartmentId: -1,
       categoryId: -1,
       dueDate: new Date(),
@@ -157,7 +151,7 @@ export function ModalActionEntry({
       paymentDate: undefined,
       paymentMethodId: -1,
       paymentStatusId: -1,
-      incomeExpenseId: incomeExpenseOptions?.[0].id,
+      incomeExpenseId: incomeExpenseOptions?.[0]?.id ?? -1,
       recurring: false,
       type: -1,
       amount: "0",
@@ -244,14 +238,14 @@ export function ModalActionEntry({
         </DialogTrigger>
       )}
 
-      <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-full sm:max-w-[700px] md:max-w-[900px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-3xl">
+          <DialogTitle className="text-2xl sm:text-3xl">
             {type === "create"
               ? "Adicionar Registro Financeiro"
               : "Editar Registro Financeiro"}
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-sm sm:text-base">
             {type === "create"
               ? "Preencha o formulário para adicionar uma nova movimentação."
               : "Preencha o formulário para editar uma movimentação."}
@@ -271,28 +265,24 @@ export function ModalActionEntry({
           className="space-y-6 py-4"
         >
           <fieldset className="border border-gray-200 rounded-md p-4">
-            <legend className="text-sm font-semibold mb-2">
-              Informações básicas
-            </legend>
-            <div className="grid grid-cols-4 items-center gap-4 mb-4">
-              <Label className="text-right">Data de Vencimento</Label>
-              <div className="col-span-3">
+            <legend className="text-sm font-semibold mb-2">Informações básicas</legend>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
+              <Label className="text-left sm:text-right">Data de Vencimento</Label>
+              <div className="sm:col-span-2 md:col-span-3">
                 <Controller
                   name="dueDate"
                   control={control}
                   render={({ field }) => (
-                    <DatePicker
-                      date={field.value}
-                      setDate={handleChangeDueDate}
-                    />
+                    <DatePicker date={field.value} setDate={handleChangeDueDate} />
                   )}
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label className="text-right">Tipo de registro</Label>
-              <div className="col-span-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 items-center">
+              <Label className="text-left sm:text-right">Tipo de registro</Label>
+              <div className="sm:col-span-2 md:col-span-3">
                 <Controller
                   name="incomeExpenseId"
                   control={control}
@@ -306,11 +296,9 @@ export function ModalActionEntry({
                       }}
                     >
                       <SelectTrigger
-                        className="w-[250px]"
+                        className="w-full max-w-xs sm:max-w-md"
                         style={{
-                          borderColor: errors.incomeExpenseId
-                            ? "#ef4444"
-                            : undefined,
+                          borderColor: errors.incomeExpenseId ? "#ef4444" : undefined,
                         }}
                       >
                         <SelectValue placeholder="Selecione o tipo" />
@@ -326,21 +314,18 @@ export function ModalActionEntry({
                   )}
                 />
                 {errors.incomeExpenseId && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.incomeExpenseId.message}
-                  </p>
+                  <p className="text-red-500 text-sm mt-1">{errors.incomeExpenseId.message}</p>
                 )}
               </div>
             </div>
           </fieldset>
 
           <fieldset className="border border-gray-200 rounded-md p-4">
-            <legend className="text-sm font-semibold mb-2">
-              Categoria e Apartamento
-            </legend>
-            <div className="grid grid-cols-4 items-center gap-4 mb-4">
-              <Label className="text-right">Categoria</Label>
-              <div className="col-span-3">
+            <legend className="text-sm font-semibold mb-2">Categoria e Apartamento</legend>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
+              <Label className="text-left sm:text-right">Categoria</Label>
+              <div className="sm:col-span-2 md:col-span-3">
                 <Controller
                   name="categoryId"
                   control={control}
@@ -350,11 +335,9 @@ export function ModalActionEntry({
                       onValueChange={(value) => field.onChange(Number(value))}
                     >
                       <SelectTrigger
-                        className="w-[250px]"
+                        className="w-full max-w-xs sm:max-w-md"
                         style={{
-                          borderColor: errors.categoryId
-                            ? "#ef4444"
-                            : undefined,
+                          borderColor: errors.categoryId ? "#ef4444" : undefined,
                         }}
                       >
                         <SelectValue placeholder="Selecione a categoria" />
@@ -370,16 +353,14 @@ export function ModalActionEntry({
                   )}
                 />
                 {errors.categoryId && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.categoryId.message}
-                  </p>
+                  <p className="text-red-500 text-sm mt-1">{errors.categoryId.message}</p>
                 )}
               </div>
             </div>
 
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label className="text-right">Apartamento</Label>
-              <div className="col-span-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 items-center">
+              <Label className="text-left sm:text-right">Apartamento</Label>
+              <div className="sm:col-span-2 md:col-span-3">
                 <Controller
                   name="apartmentId"
                   control={control}
@@ -389,11 +370,9 @@ export function ModalActionEntry({
                       onValueChange={field.onChange}
                     >
                       <SelectTrigger
-                        className="w-[100px]"
+                        className="w-full max-w-xs sm:max-w-[150px]"
                         style={{
-                          borderColor: errors.apartmentId
-                            ? "#ef4444"
-                            : undefined,
+                          borderColor: errors.apartmentId ? "#ef4444" : undefined,
                         }}
                       >
                         <SelectValue placeholder="Selecione o apartamento (opcional)" />
@@ -409,52 +388,39 @@ export function ModalActionEntry({
                   )}
                 />
                 {errors.apartmentId && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.apartmentId.message}
-                  </p>
+                  <p className="text-red-500 text-sm mt-1">{errors.apartmentId.message}</p>
                 )}
               </div>
             </div>
           </fieldset>
 
           <fieldset className="border border-gray-200 rounded-md p-4">
-            <legend className="text-sm font-semibold mb-2">
-              Tipo e Pagamento
-            </legend>
+            <legend className="text-sm font-semibold mb-2">Tipo e Pagamento</legend>
 
-            <div className="grid grid-cols-4 items-center gap-4 mb-4">
-              <Label className="text-right">Total a pagar</Label>
-              <div className="col-span-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
+              <Label className="text-left sm:text-right">Total a pagar</Label>
+              <div className="sm:col-span-2 md:col-span-3 max-w-xs">
                 <Controller
                   name="amount"
                   control={control}
                   render={({ field: { onChange, value } }: any) => (
-                    <div className="w-[250px]">
-                      <CurrencyInput value={value} onChange={onChange} />
-                    </div>
+                    <CurrencyInput value={value} onChange={onChange} />
                   )}
                 />
-
                 {errors.type && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.type.message}
-                  </p>
+                  <p className="text-red-500 text-sm mt-1">{errors.type.message}</p>
                 )}
               </div>
             </div>
 
-            <div className="grid grid-cols-4 items-center gap-4 mb-4">
-              <Label className="text-right">Tipo (Fixo ou Variável)</Label>
-              <div className="col-span-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
+              <Label className="text-left sm:text-right">Tipo (Fixo ou Variável)</Label>
+              <div className="sm:col-span-2 md:col-span-3 max-w-xs">
                 <Controller
                   name="type"
                   control={control}
                   render={({ field }) => (
-                    <Select
-                      value={String(field.value)}
-                      onValueChange={field.onChange}
-                      disabled
-                    >
+                    <Select value={String(field.value)} onValueChange={field.onChange} disabled>
                       <SelectTrigger
                         style={{
                           borderColor: errors.type ? "#ef4444" : undefined,
@@ -470,30 +436,23 @@ export function ModalActionEntry({
                   )}
                 />
                 {errors.type && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.type.message}
-                  </p>
+                  <p className="text-red-500 text-sm mt-1">{errors.type.message}</p>
                 )}
               </div>
             </div>
 
-            <div className="grid grid-cols-4 items-center gap-4 mb-4">
-              <Label className="text-right">Forma de Pagamento</Label>
-              <div className="col-span-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
+              <Label className="text-left sm:text-right">Forma de Pagamento</Label>
+              <div className="sm:col-span-2 md:col-span-3 max-w-md">
                 <Controller
                   name="paymentMethodId"
                   control={control}
                   render={({ field }) => (
-                    <Select
-                      value={String(field.value)}
-                      onValueChange={field.onChange}
-                    >
+                    <Select value={String(field.value)} onValueChange={field.onChange}>
                       <SelectTrigger
-                        className="w-[250px]"
+                        className="w-full"
                         style={{
-                          borderColor: errors.paymentMethodId
-                            ? "#ef4444"
-                            : undefined,
+                          borderColor: errors.paymentMethodId ? "#ef4444" : undefined,
                         }}
                       >
                         <SelectValue placeholder="Selecione a forma de pagamento" />
@@ -509,36 +468,30 @@ export function ModalActionEntry({
                   )}
                 />
                 {errors.paymentMethodId && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.paymentMethodId.message}
-                  </p>
+                  <p className="text-red-500 text-sm mt-1">{errors.paymentMethodId.message}</p>
                 )}
               </div>
             </div>
 
-            <div className="grid grid-cols-4 items-center gap-4 mb-4">
-              <Label className="text-right">Total pago</Label>
-              <div className="col-span-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
+              <Label className="text-left sm:text-right">Total pago</Label>
+              <div className="sm:col-span-2 md:col-span-3 max-w-xs">
                 <Controller
                   name="amountPaid"
                   control={control}
                   render={({ field: { onChange, value } }: any) => (
-                    <div className="w-[250px]">
-                      <CurrencyInput value={value} onChange={onChange} />{" "}
-                    </div>
+                    <CurrencyInput value={value} onChange={onChange} />
                   )}
                 />
                 {errors.type && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.type.message}
-                  </p>
+                  <p className="text-red-500 text-sm mt-1">{errors.type.message}</p>
                 )}
               </div>
             </div>
 
-            <div className="grid grid-cols-4 items-center gap-4 mb-4">
-              <Label className="text-right">Data do Pagamento</Label>
-              <div className="col-span-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
+              <Label className="text-left sm:text-right">Data do Pagamento</Label>
+              <div className="sm:col-span-2 md:col-span-3 max-w-xs">
                 <Controller
                   name="paymentDate"
                   control={control}
@@ -552,23 +505,18 @@ export function ModalActionEntry({
               </div>
             </div>
 
-            <div className="grid grid-cols-4 items-center gap-4 mb-4">
-              <Label className="text-right">Status do Pagamento</Label>
-              <div className="col-span-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
+              <Label className="text-left sm:text-right">Status do Pagamento</Label>
+              <div className="sm:col-span-2 md:col-span-3 max-w-xs">
                 <Controller
                   name="paymentStatusId"
                   control={control}
                   render={({ field }) => (
-                    <Select
-                      value={String(field.value)}
-                      onValueChange={field.onChange}
-                    >
+                    <Select value={String(field.value)} onValueChange={field.onChange}>
                       <SelectTrigger
-                        className="w-[200px]"
+                        className="w-full"
                         style={{
-                          borderColor: errors.paymentStatusId
-                            ? "#ef4444"
-                            : undefined,
+                          borderColor: errors.paymentStatusId ? "#ef4444" : undefined,
                         }}
                       >
                         <SelectValue placeholder="Selecione o status" />
@@ -584,16 +532,14 @@ export function ModalActionEntry({
                   )}
                 />
                 {errors.paymentStatusId && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.paymentStatusId.message}
-                  </p>
+                  <p className="text-red-500 text-sm mt-1">{errors.paymentStatusId.message}</p>
                 )}
               </div>
             </div>
 
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label className="text-right">Recorrente</Label>
-              <div className="col-span-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 items-center">
+              <Label className="text-left sm:text-right">Recorrente</Label>
+              <div className="sm:col-span-2 md:col-span-3">
                 <input
                   type="checkbox"
                   {...register("recurring")}
@@ -603,22 +549,18 @@ export function ModalActionEntry({
                   }}
                 />
                 {errors.recurring && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.recurring.message}
-                  </p>
+                  <p className="text-red-500 text-sm mt-1">{errors.recurring.message}</p>
                 )}
               </div>
             </div>
           </fieldset>
 
           <fieldset className="border border-gray-200 rounded-md p-4">
-            <legend className="text-sm font-semibold mb-2">
-              Informações adicionais
-            </legend>
+            <legend className="text-sm font-semibold mb-2">Informações adicionais</legend>
 
-            <div className="grid grid-cols-4 items-start gap-4 mb-4">
-              <Label className="text-right pt-2">Observações</Label>
-              <div className="col-span-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-start">
+              <Label className="text-left sm:text-right pt-2">Observações</Label>
+              <div className="sm:col-span-2 md:col-span-3">
                 <textarea
                   {...register("notes")}
                   className="w-full resize-none border rounded-md p-2"
@@ -627,16 +569,14 @@ export function ModalActionEntry({
                   placeholder="Escreva observações aqui..."
                 />
                 {errors.notes && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.notes.message}
-                  </p>
+                  <p className="text-red-500 text-sm mt-1">{errors.notes.message}</p>
                 )}
               </div>
             </div>
 
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label className="text-right">Anexos</Label>
-              <div className="col-span-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 items-center">
+              <Label className="text-left sm:text-right">Anexos</Label>
+              <div className="sm:col-span-2 md:col-span-3">
                 <label className="flex flex-col items-center justify-center gap-2 rounded-md border-2 border-dashed border-gray-400 text-gray-600 cursor-pointer p-8 hover:border-gray-600">
                   <Paperclip />
                   Arraste e solte arquivos ou clique para selecionar.
@@ -651,13 +591,15 @@ export function ModalActionEntry({
             </div>
           </fieldset>
 
-          <DialogFooter>
+          <DialogFooter className="flex flex-col sm:flex-row gap-2 justify-end">
             <DialogClose asChild>
-              <Button ref={buttonCloseRef} variant="ghost">
+              <Button ref={buttonCloseRef} variant="ghost" className="w-full sm:w-auto">
                 Cancelar
               </Button>
             </DialogClose>
-            <Button type="submit">Salvar</Button>
+            <Button type="submit" className="w-full sm:w-auto">
+              Salvar
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
