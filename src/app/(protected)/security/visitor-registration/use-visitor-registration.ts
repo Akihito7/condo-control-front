@@ -1,30 +1,34 @@
+import { fetchApartaments } from "@/api/fetch-apartaments";
 import { fetchVisitors } from "@/api/fetch-visitors";
 import { updateDoneCheckout } from "@/api/update-done-checkout";
 import { useUserContext } from "@/providers/use-user-context";
+import { getFullMonthInterval } from "@/utils/get-full-month-interval";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 
 interface UseVisitorRegistrationProps {
-  startDate: Date;
-  endDate: Date
+  selectedDate: Date;
+
 }
 export function useVisitorRegistration({
-  startDate,
-  endDate
+  selectedDate
 }: UseVisitorRegistrationProps) {
   const { user } = useUserContext();
+  const {
+    startDate,
+    endDate
+  } = getFullMonthInterval(format(selectedDate, 'yyyy-MM-dd'))
   const condominiumId = user.condominiumId;
-  const startDateFormmated = format(startDate, 'yyyy-MM-dd');
-  const endDateFormmated = format(endDate, 'yyyy-MM-dd');
   const queryClient = useQueryClient();
+
   const { data: visitors, status: visitorsStatus } = useQuery({
     queryKey: ['visitors', startDate, endDate],
     queryFn: () => fetchVisitors({
       condominiumId,
-      startDate: startDateFormmated,
-      endDate: endDateFormmated,
+      startDate,
+      endDate
     }),
-    enabled: !!startDateFormmated && !!endDateFormmated
+    enabled: !!startDate && !!endDate
   })
 
   const { mutateAsync: handleDoneCheckout } = useMutation({
@@ -36,10 +40,16 @@ export function useVisitorRegistration({
     }
   })
 
+  const { data: apartaments, status: apartamentsStatus } = useQuery({
+    queryKey: ['apartaments'],
+    queryFn: async () => fetchApartaments({ condominiumId })
+  })
+
   return {
     visitors,
     visitorsStatus,
-    handleDoneCheckout
+    handleDoneCheckout,
+    apartaments,
+    apartamentsStatus
   }
-
 }

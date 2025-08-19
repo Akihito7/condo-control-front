@@ -28,6 +28,7 @@ import { format, parseISO } from "date-fns";
 import { userPagePermission } from "@/utils/user-page-permission";
 import { redirect } from "next/navigation";
 import { useUserContext } from "@/providers/use-user-context";
+import { MonthYearPicker } from "@/components/month-year-select";
 
 export default function VistitorRegistration() {
   const { read, edit } = userPagePermission({ pageId: 12 });
@@ -38,18 +39,19 @@ export default function VistitorRegistration() {
   }
 
   const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [range, setRange] = useState({
-    from: new Date(),
-    to: new Date(),
-  });
+  const [selectedDate, setSelectedDate] = useState(new Date());
 
   const [search, setSearch] = useState("");
 
-  const { visitors, visitorsStatus, handleDoneCheckout } =
-    useVisitorRegistration({
-      startDate: range.from,
-      endDate: range.to,
-    });
+  const {
+    visitors,
+    visitorsStatus,
+    handleDoneCheckout,
+    apartaments,
+    apartamentsStatus,
+  } = useVisitorRegistration({
+    selectedDate,
+  });
 
   return (
     <main className="bg-gray-50 min-h-screen w-full p-0 py-8 px-2 sm:p-8 flex flex-col gap-6">
@@ -68,7 +70,11 @@ export default function VistitorRegistration() {
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Selecione o período
           </label>
-          <DatePickRange range={range} setRange={setRange} />
+          <MonthYearPicker
+            justFutureMonths={false}
+            onChange={setSelectedDate}
+            selectedDate={selectedDate}
+          />
         </div>
         <div className="w-[250px] max-w-[300px]">
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -101,6 +107,7 @@ export default function VistitorRegistration() {
           <ModalRegisterVisitor
             modalIsOpen={modalIsOpen}
             setModalIsOpen={setModalIsOpen}
+            apartaments={apartaments}
           />
         </div>
 

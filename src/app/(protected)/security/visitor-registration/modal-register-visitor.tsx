@@ -14,12 +14,22 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useForm, useFieldArray, useWatch } from "react-hook-form";
+import { useForm, useFieldArray, useWatch, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CreateVisit } from "@/api/create-visit";
 import { useUserContext } from "@/providers/use-user-context";
+import { Apartment } from "@/api/fetch-apartaments";
+
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const personSchema = z.object({
   fullName: z.string().min(3, "Nome muito curto"),
@@ -40,11 +50,13 @@ type FormData = z.infer<typeof schema>;
 interface ModalRegisterVisitorProps {
   modalIsOpen: boolean;
   setModalIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  apartaments: Apartment[] | undefined;
 }
 
 export function ModalRegisterVisitor({
   modalIsOpen,
   setModalIsOpen,
+  apartaments,
 }: ModalRegisterVisitorProps) {
   const queryClient = useQueryClient();
   const { user } = useUserContext();
@@ -87,7 +99,7 @@ export function ModalRegisterVisitor({
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey : ['visitors'],
+        queryKey: ["visitors"],
         exact: false,
       });
     },
@@ -124,7 +136,30 @@ export function ModalRegisterVisitor({
               <Label htmlFor="unit" className="text-right">
                 Unidade/Apto
               </Label>
-              <Input {...register("unit")} className="col-span-3" />
+              <Controller
+                name="unit"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    value={field.value}
+                    onValueChange={(value) => field.onChange(value)}
+                  >
+                    <SelectTrigger className="w-[250px]">
+                      <SelectValue placeholder="Selecione um apartamento." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        {apartaments?.map((apartament) => (
+                          <SelectItem value={String(apartament.id)}>
+                            {apartament.apartmentNumber}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+
               {errors.unit && (
                 <p className="col-start-2 col-span-3 text-sm text-red-600">
                   {errors.unit.message}
