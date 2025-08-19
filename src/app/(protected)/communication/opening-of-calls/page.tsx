@@ -239,6 +239,7 @@ export default function OpeningOfCalls() {
               title="Tempo Médio Resolução (H) (mês)"
               icon={<RefreshCw size={20} color="#3b82f6" />}
               value={openingCards!.accuracyHoursCallSolved}
+              isHours={true}
             />
           </>
         )}
