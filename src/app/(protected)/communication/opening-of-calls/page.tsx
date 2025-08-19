@@ -146,6 +146,7 @@ export default function OpeningOfCalls() {
                 )}
               className="w-[400px]"
               isMulti
+              hideSelectedOptions={false}
               onChange={(value) => {
                 if (value.length === 0) return;
                 setStatusOptionsSelected(
