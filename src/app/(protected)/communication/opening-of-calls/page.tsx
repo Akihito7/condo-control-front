@@ -12,8 +12,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { FileDown, Pencil } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { differenceInMinutes, format, parseISO } from "date-fns";
+import ReactSelect, { MultiValue } from "react-select";
 
 import {
   Table,
@@ -59,7 +60,7 @@ export default function OpeningOfCalls() {
     from: new Date(),
     to: new Date(),
   });
-  const [statusOptionSelected, setStatusOptionsSelected] = useState<string>();
+  const [statusOptionSelected, setStatusOptionsSelected] = useState<number[]>();
   const [issueOptionSeleted, setIssueOptionSelected] = useState<string>("-1");
   const [openingRecordSelected, setOpeningRecordSelected] =
     useState<OpeningCall | null>(null);
@@ -104,6 +105,10 @@ export default function OpeningOfCalls() {
     endDate: rangeDate.to,
   });
 
+  useEffect(() => {
+    console.log("STATUS OPTIONS", statusOptionSelected);
+  }, [statusOptionSelected]);
+
   return (
     <div className="bg-gray-50 min-h-screen w-full p-8 flex flex-col gap-6">
       <div className="space-y-2">
@@ -130,22 +135,45 @@ export default function OpeningOfCalls() {
               Status chamados
             </label>
 
-            <Select
-              defaultValue={statusOptions[0].id}
-              value={statusOptionSelected}
-              onValueChange={(value) => setStatusOptionsSelected(value)}
-            >
-              <SelectTrigger className="bg-white w-[260px] min-h-[40px]">
-                <SelectValue placeholder="Selecione o status" />
-              </SelectTrigger>
-              <SelectContent>
-                {statusOptions?.map((option: any, index: number) => (
-                  <SelectItem key={index} value={option.id}>
-                    {option.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <ReactSelect
+              value={statusOptions
+                ?.map((option: any) => ({
+                  value: option.id,
+                  label: option.name,
+                }))
+                .filter((option: any) =>
+                  statusOptionSelected?.includes(option.value)
+                )}
+              className="w-[400px]"
+              isMulti
+              onChange={(value) => {
+                if (value.length === 0) return;
+                setStatusOptionsSelected(
+                  value.map((value: any) => value.value)
+                );
+              }}
+              options={statusOptions?.map((option: any) => ({
+                value: option.id,
+                label: option.name,
+              }))}
+              placeholder="Selecione..."
+              styles={{
+                multiValue: (base) => ({
+                  ...base,
+                  marginRight: 8,
+                  display: "inline-flex",
+                  flexWrap: "nowrap",
+                  width: "100px",
+                }),
+                valueContainer: (base) => ({
+                  ...base,
+                  display: "flex",
+                  flexWrap: "nowrap",
+                  overflowX: "hidden",
+                  gap: "4px",
+                }),
+              }}
+            />
           </div>
         )}
 
@@ -277,12 +305,10 @@ export default function OpeningOfCalls() {
                         ? true
                         : String(openingRecord.issueTypeId) ===
                           String(issueOptionSeleted);
-                    const statusSelectedInitialValue = statusOptionSelected
-                      ? String(statusOptionSelected)
-                      : "1";
-                    const statusOptionsMatch =
-                      statusSelectedInitialValue ===
-                      String(openingRecord.statusId);
+
+                    const statusOptionsMatch = statusOptionSelected?.includes(
+                      openingRecord.statusId
+                    );
                     return issueOptionsMatch && statusOptionsMatch;
                   })
                   .map((openingRecord: any) => (
