@@ -396,7 +396,10 @@ export default function EmployeeManagement() {
 
                       const getOptions = (areaId: number) =>
                         employees
-                          ?.filter((emp) => emp.workAreaId === areaId)
+                          ?.filter(
+                            (emp) =>
+                              emp.workAreaId === areaId && emp.statusId !== 2
+                          )
                           .map((emp) => ({
                             label: emp.name,
                             value: emp.id,
