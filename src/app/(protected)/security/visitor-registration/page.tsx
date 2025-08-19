@@ -28,7 +28,6 @@ import { format, parseISO } from "date-fns";
 import { userPagePermission } from "@/utils/user-page-permission";
 import { redirect } from "next/navigation";
 import { useUserContext } from "@/providers/use-user-context";
-import { MonthYearPicker } from "@/components/month-year-select";
 
 export default function VistitorRegistration() {
   const { read, edit } = userPagePermission({ pageId: 12 });
@@ -39,7 +38,10 @@ export default function VistitorRegistration() {
   }
 
   const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [range, setRange] = useState({
+    from: new Date(),
+    to: new Date(),
+  });
 
   const [search, setSearch] = useState("");
 
@@ -50,7 +52,8 @@ export default function VistitorRegistration() {
     apartaments,
     apartamentsStatus,
   } = useVisitorRegistration({
-    selectedDate,
+    startDate: range.from,
+    endDate: range.to,
   });
 
   return (
@@ -70,11 +73,7 @@ export default function VistitorRegistration() {
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Selecione o período
           </label>
-          <MonthYearPicker
-            justFutureMonths={false}
-            onChange={setSelectedDate}
-            selectedDate={selectedDate}
-          />
+          <DatePickRange range={range} setRange={setRange} />
         </div>
         <div className="w-[250px] max-w-[300px]">
           <label className="block text-sm font-medium text-gray-700 mb-2">
