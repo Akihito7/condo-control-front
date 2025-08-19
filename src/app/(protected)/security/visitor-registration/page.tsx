@@ -148,9 +148,9 @@ export default function VistitorRegistration() {
                         person.cpf.toLowerCase().includes(search.toLowerCase())
                       );
 
-                      const unitMatch =
-                        search.toLowerCase() ===
-                        visitor.apartmentApartmentNumber.toLowerCase();
+                      const unitMatch = visitor.apartmentApartmentNumber
+                        .toLowerCase()
+                        .includes(search.toLowerCase());
 
                       return nameMatch || cpfMatch || unitMatch;
                     })
