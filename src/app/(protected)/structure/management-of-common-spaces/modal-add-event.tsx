@@ -10,7 +10,6 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CalendarIcon, DollarSign } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
@@ -18,10 +17,18 @@ import { CondominiumArea } from "@/api/get-management-commom-spaces";
 import React, { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { DayWithEvents } from "@/api/fetch-events-by-condominium-area";
-import { MonthYearPicker } from "@/components/month-year-select";
 import { format } from "date-fns";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createSpaceEvent } from "@/api/create-space-event";
+import { Apartment } from "@/api/fetch-apartaments";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useUserContext } from "@/providers/use-user-context";
 
 interface ModalAddEventProps {
   open: boolean;
@@ -32,11 +39,12 @@ interface ModalAddEventProps {
   setDayWithEventSelected: React.Dispatch<
     React.SetStateAction<DayWithEvents | undefined>
   >;
+  apartaments: Apartment[] | undefined;
 }
 
 type FormValues = {
   eventDate: Date;
-  apartmentId: number;
+  apartmentId: string;
   condominiumAreaId: string;
   timeBlocks: string[];
   startTime: string;
@@ -58,10 +66,12 @@ export function ModalAddEvent({
   spacesCommom,
   dayWithEventSelected,
   setDayWithEventSelected,
+  apartaments,
 }: ModalAddEventProps) {
   const [selectedBlocks, setSelectedBlocks] = useState<string[]>([]);
   const timeBlocks = generateTimeBlocks();
-
+  const { user } = useUserContext();
+  const isResident = !!user.userAssociationApartmentId;
   const {
     register,
     handleSubmit,
@@ -73,19 +83,12 @@ export function ModalAddEvent({
     defaultValues: {
       eventDate: new Date(),
       condominiumAreaId: condominiumAreaId,
+      apartmentId: "3",
       timeBlocks: [],
       startTime: "",
       endTime: "",
     },
   });
-
-  useEffect(() => {
-    if (condominiumAreaId) {
-      reset({
-        condominiumAreaId,
-      });
-    }
-  }, [condominiumAreaId]);
 
   const currentCondominiumArea = spacesCommom?.find(
     (space) => String(space.id) === condominiumAreaId
@@ -171,6 +174,15 @@ export function ModalAddEvent({
     },
   });
 
+  useEffect(() => {
+    reset({
+      condominiumAreaId: condominiumAreaId,
+      apartmentId: user.userAssociationApartmentId
+        ? String(user.userAssociationApartmentId)
+        : "",
+    });
+  }, [user, condominiumAreaId]);
+
   return (
     <Dialog
       open={open}
@@ -209,6 +221,35 @@ export function ModalAddEvent({
         </div>
 
         <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+          <div className="grid gap-2">
+            <Label>Apartamentos</Label>
+            <Controller
+              name="apartmentId"
+              control={control}
+              render={({ field: { value, onChange } }) => {
+                console.log("field do apartament select", value);
+                return (
+                  <Select
+                    value={value as string}
+                    onValueChange={onChange}
+                    disabled={isResident}
+                  >
+                    <SelectTrigger className="col-span-3 w-full">
+                      <SelectValue placeholder="Selecione um apartamento" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {apartaments?.map((apartament) => (
+                        <SelectItem value={String(apartament.id)}>
+                          {apartament.apartmentNumber}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                );
+              }}
+            />
+          </div>
+
           <div className="grid gap-2">
             <Label>Horários Disponíveis</Label>
             <div className="grid grid-cols-4 gap-2">

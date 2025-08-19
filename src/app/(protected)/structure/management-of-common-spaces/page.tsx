@@ -20,6 +20,7 @@ import { ModalAddGuests } from "./moda-action-event";
 import { userPagePermission } from "@/utils/user-page-permission";
 import { redirect } from "next/navigation";
 import { useUserContext } from "@/providers/use-user-context";
+import { MonthYearPicker } from "@/components/month-year-select";
 
 export default function ManagementOfCommonSpaces() {
   const { read, edit } = userPagePermission({ pageId: 6 });
@@ -36,11 +37,16 @@ export default function ManagementOfCommonSpaces() {
     useState<DayWithEvents>();
   const [condominiumAreaIdSelected, setCondominiumAreaIdSelected] =
     useState("");
-  const { spacesCommom, spacesCommumStatus, spacesEvents, spacesEventsStatus } =
-    useManagementOfCommomSpaces({
-      date,
-      condominiumAreaIdSelected,
-    });
+  const {
+    spacesCommom,
+    spacesCommumStatus,
+    spacesEvents,
+    spacesEventsStatus,
+    apartaments,
+  } = useManagementOfCommomSpaces({
+    date,
+    condominiumAreaIdSelected,
+  });
   const [eventSelected, setEventSelected] = useState<Event>();
   useEffect(() => {
     if (Array.isArray(spacesCommom)) {
@@ -68,9 +74,13 @@ export default function ManagementOfCommonSpaces() {
       <div className="flex  flex-col gap-4 md:items-end md:flex-row ">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Selecione o período
+            Selecione o mes e ano
           </label>
-          <DatePicker date={date} setDate={setDate} />
+          <MonthYearPicker
+            selectedDate={date}
+            onChange={setDate}
+            justFutureMonths={false}
+          />
         </div>
 
         <div>
@@ -134,7 +144,14 @@ export default function ManagementOfCommonSpaces() {
                     className="border border-bg-gray-700 shadow-md text-gray-800 text-xs rounded-lg px-3 py-1 cursor-pointer"
                   >
                     <span className="font-semibold">
-                      Apartamento : {event.apartmentId}
+                      Apartamento :{" "}
+                      {
+                        apartaments?.find(
+                          (apartament) =>
+                            String(apartament.id).toLowerCase() ===
+                            String(event.apartmentId).toLowerCase()
+                        )?.apartmentNumber
+                      }
                     </span>
                     <div>
                       Horario : {formatTimeWithoutSeconds(event.startTime)}-
@@ -155,6 +172,7 @@ export default function ManagementOfCommonSpaces() {
         spacesCommom={spacesCommom}
         dayWithEventSelected={dayWithEventSelected}
         setDayWithEventSelected={setDayWithEventSelected}
+        apartaments={apartaments}
       />
 
       <ModalAddGuests
