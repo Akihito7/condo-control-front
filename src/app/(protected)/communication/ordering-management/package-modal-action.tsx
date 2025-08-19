@@ -27,6 +27,15 @@ import { Delivery } from "@/api/fetch-deliveries";
 import { parseISO } from "date-fns";
 import { updateDelivery } from "@/api/update-delivery";
 import { markAsDelivered } from "@/api/mark-as-delivered";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface PackageModalActionProps {
   isOpen: boolean;
@@ -144,7 +153,9 @@ export function PackageModalAction({
         ? parseISO(deliverySelected.receivedAt)
         : undefined;
       reset({
-        apartment: deliverySelected?.apartmentApartmentNumber,
+        apartment: deliverySelected?.apartmentId
+          ? String(deliverySelected.apartmentId)
+          : "",
         deliveredDate: deliveryDateFormmated,
         description: deliverySelected?.description,
         receivedDate: receveidDateFormmated,
@@ -202,11 +213,23 @@ export function PackageModalAction({
                 name="apartment"
                 control={control}
                 render={({ field }) => (
-                  <Input
-                    {...field}
-                    placeholder="Enter apartment number"
-                    className="col-span-3"
-                  />
+                  <Select
+                    value={field.value}
+                    onValueChange={(value) => field.onChange(value)}
+                  >
+                    <SelectTrigger className="w-[250px]">
+                      <SelectValue placeholder="Selecione um apartamento." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        {apartaments?.map((apartament) => (
+                          <SelectItem value={String(apartament.id)}>
+                            {apartament.apartmentNumber}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
                 )}
               />
               {errors.apartment && (
@@ -226,7 +249,7 @@ export function PackageModalAction({
                 render={({ field }) => (
                   <Input
                     {...field}
-                    placeholder="Package description"
+                    placeholder="Descrição da entrega"
                     className="col-span-3"
                   />
                 )}
@@ -268,7 +291,7 @@ export function PackageModalAction({
               <div className="col-span-4 mt-4">
                 <label className="flex flex-col items-center justify-center gap-2 rounded-md border-2 border-dashed border-gray-400 text-gray-600 cursor-pointer p-8 hover:border-gray-600">
                   <Paperclip />
-                  Click to upload image
+                  Clique para adicionar documentos
                   <Controller
                     name="attachment"
                     control={control}
@@ -291,8 +314,10 @@ export function PackageModalAction({
                 {selectedFiles && selectedFiles.length > 0 && (
                   <div className="mt-4 rounded-md border border-gray-300 bg-gray-50 p-4 text-sm text-gray-800">
                     <p className="mb-2 font-semibold">
-                      {selectedFiles.length} file
-                      {selectedFiles.length > 1 ? "s" : ""} selected:
+                      {selectedFiles.length} Arquivo
+                      {selectedFiles.length > 1
+                        ? "s Selecionados :"
+                        : " Selecionado :"}
                     </p>
                     <ul className="space-y-1 max-h-40 overflow-y-auto pr-1">
                       {selectedFiles.map((file: File, index: number) => (

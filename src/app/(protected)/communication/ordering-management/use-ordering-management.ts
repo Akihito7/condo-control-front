@@ -1,4 +1,5 @@
 import { fetchApartaments } from "@/api/fetch-apartaments";
+import { fetchApartments } from "@/api/fetch-apartments";
 import { fetchDeliveries } from "@/api/fetch-deliveries";
 import { fetchDeliveryStatus } from "@/api/fetch-delivery-status";
 import { useUserContext } from "@/providers/use-user-context";
@@ -35,13 +36,12 @@ export function useOrderingManagement({
     queryKey: ['statusOptions'],
     queryFn: fetchDeliveryStatus
   })
-
   return {
     deliveries,
     deliveriesStatus,
     apartaments,
     apartamentsStatus,
-    statusOptions,
+    statusOptions
   }
 
 }
