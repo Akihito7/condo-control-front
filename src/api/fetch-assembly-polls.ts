@@ -21,8 +21,13 @@ export type PollWithStats = {
   percentageYes: number;
   percentageNo: number;
   currentUserAlreadyVoted: boolean
-  currentVoteUser: string | null
+  currentVoteUser: number | null
   description: string;
+  votesInfo: {
+    optionId: number;
+    optionName: string;
+    total: number;
+  }[]
 };
 
 export async function fetchAssemblyVirtualPolls({

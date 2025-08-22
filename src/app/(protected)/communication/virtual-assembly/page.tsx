@@ -43,30 +43,12 @@ export default function VirtualAssembly() {
   const [pollSelected, setPollSelected] = useState<PollWithStats | undefined>();
   const [voteModalIsOpen, setVoteModalIsOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [dropdownOpenToThisItem, setDropdownOpenToThisItem] = useState<
+    number | undefined
+  >();
+
   const [actionPollModalIsOpen, setActionPollModalActionIsOpen] =
     useState(false);
-
-  const renderYesNoBar = (poll: PollWithStats) => {
-    if (!poll) return "-";
-
-    return (
-      <div className="w-48">
-        <div className="text-xs text-muted-foreground mb-1">
-          {poll.percentageYes}% /{poll.percentageNo}%
-        </div>
-        <div className="w-full bg-gray-200 rounded-full h-2 relative overflow-hidden">
-          <div
-            className="bg-green-500 h-2 absolute left-0 top-0"
-            style={{ width: `${poll.percentageYes}%` }}
-          />
-          <div
-            className="bg-red-500 h-2 absolute right-0 top-0"
-            style={{ width: `${poll.percentageNo}%` }}
-          />
-        </div>
-      </div>
-    );
-  };
 
   const { polls, pollsStatus, handleDeletePoll } = useVirtualAssembly({
     date,
@@ -172,8 +154,6 @@ export default function VirtualAssembly() {
                 <TableHead>Status</TableHead>
                 <TableHead>Total Votos</TableHead>
                 <TableHead>Participação</TableHead>
-                <TableHead>Sim / Não</TableHead>
-                <TableHead>Resultado Final</TableHead>
                 <TableHead className="text-center">Ação</TableHead>
               </TableRow>
             </TableHeader>
@@ -190,12 +170,16 @@ export default function VirtualAssembly() {
                   <TableCell>{poll.status}</TableCell>
                   <TableCell>{poll.totalVotes}</TableCell>
                   <TableCell>-</TableCell>
-                  <TableCell>{renderYesNoBar(poll)}</TableCell>
-                  <TableCell>{poll.finalResult ?? "-"}</TableCell>
                   <TableCell className="text-center">
                     <DropdownMenu
-                      open={dropdownOpen}
-                      onOpenChange={(open) => setDropdownOpen(open)}
+                      open={dropdownOpen && poll.id === dropdownOpenToThisItem}
+                      onOpenChange={(open) => {
+                        if (!open) {
+                          setDropdownOpenToThisItem(undefined);
+                        }
+                        setDropdownOpenToThisItem(poll.id);
+                        setDropdownOpen(open);
+                      }}
                     >
                       <DropdownMenuTrigger className="outline-none">
                         <MoreHorizontal className="w-5 h-5 cursor-pointer text-gray-600" />

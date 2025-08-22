@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Dialog,
   DialogTrigger,
@@ -16,16 +16,21 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { PollWithStats } from "@/api/fetch-assembly-polls";
-import { useForm, Controller } from "react-hook-form";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useForm, Controller, useFieldArray } from "react-hook-form";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createPoll } from "@/api/create-poll";
 import { updatePoll } from "@/api/update-poll";
 import { DatePickerWithHours } from "@/components/date-picker-with-hours";
+import { getOptionsVote } from "@/api/get-options-vote";
 
 interface CreatePollFormValues {
   title: string;
   description: string;
   endDate: Date | undefined;
+  options: {
+    optionId?: number;
+    name: string;
+  }[];
 }
 
 interface ActionPollModalProps {
@@ -56,9 +61,22 @@ export function ActionPollModal({
       title: "",
       description: "",
       endDate: undefined,
+      options: [
+        {
+          optionId: -1,
+          name: "",
+        },
+      ],
     },
   });
+
+  const { append, fields, remove } = useFieldArray({
+    control,
+    name: "options",
+  });
+
   const queryClient = useQueryClient();
+
   const { mutateAsync: handleCreatePoll } = useMutation({
     mutationFn: async (data: CreatePollFormValues) => createPoll(data),
     onSuccess: () => {
@@ -74,6 +92,7 @@ export function ActionPollModal({
       updatePoll({
         pollId: pollSelected!.id,
         ...data,
+        optionsToRemove
       });
     },
     onSuccess: () => {
@@ -83,26 +102,63 @@ export function ActionPollModal({
       });
     },
   });
+  const optionsRef = useRef([]);
+  const [optionsToRemove, setOptionsToRemove] = useState<number[]>([]);
 
   const onSubmit = async (data: CreatePollFormValues) => {
     if (type === "create") {
       await handleCreatePoll(data);
     } else {
-      await handleUpdatePoll(data);
+      const optionsNewOrUpdated = data.options.filter((option) => {
+        const initialOptionValue: any = optionsRef.current.find(
+          (initialOption: any) => initialOption.id === option.optionId
+        );
+        if (initialOptionValue) {
+          return initialOptionValue.name !== option.name;
+        }
+
+        return true;
+      });
+
+      await handleUpdatePoll({
+        ...data,
+        options: optionsNewOrUpdated,
+      });
     }
     setIsOpen(false);
     setPollSelected(undefined);
-    reset();
+    reset({
+      title: "",
+      description: "",
+      endDate: undefined,
+      options: [
+        {
+          name: "",
+        },
+      ],
+    });
   };
 
+  const { data: voteOptions } = useQuery({
+    queryKey: ["options", pollSelected],
+    queryFn: () => getOptionsVote(pollSelected?.id ?? -1),
+    enabled: !!pollSelected?.id,
+  });
+
   useEffect(() => {
+    setOptionsToRemove([]);
     if (pollSelected && type === "edit") {
+      optionsRef.current = voteOptions;
       reset({
         title: pollSelected.title,
         description: pollSelected.description,
         endDate: pollSelected.endDate
           ? new Date(pollSelected.endDate)
           : (null as any),
+        options: voteOptions?.map((option: any) => ({
+          optionId: option.id,
+          name: option.name,
+        })),
       });
     } else {
       reset({
@@ -111,13 +167,14 @@ export function ActionPollModal({
         endDate: null as any,
       });
     }
-  }, [pollSelected, reset, type]);
+  }, [pollSelected, reset, type, voteOptions]);
 
   return (
     <Dialog
       open={isOpen}
       onOpenChange={(open) => {
         if (!open) {
+          setOptionsToRemove([]);
           setPollSelected(undefined);
           reset();
         }
@@ -165,6 +222,60 @@ export function ActionPollModal({
                   {...register("description")}
                 />
               </div>
+            </div>
+          </fieldset>
+
+          <fieldset className="border border-gray-200 rounded-md p-4 flex flex-col items-start">
+            <legend className="text-sm font-semibold mb-2">Opções</legend>
+
+            <Button
+              type="button"
+              variant="outline"
+              className="ml-auto"
+              onClick={() => {
+                append({ optionId: -1, name: "" });
+              }}
+            >
+              Adicionar
+            </Button>
+
+            <div className="space-y-4">
+              {fields.map((option, index) => (
+                <div key={option.id} className="flex items-end gap-4">
+                  <div className="space-y-2 ">
+                    <Label>Opção {index + 1}</Label>
+                    <Controller
+                      name={`options.${index}.name`}
+                      control={control}
+                      render={({ field }) => (
+                        <Input
+                          className="w-[250px]"
+                          value={field.value}
+                          onChange={field.onChange}
+                        />
+                      )}
+                    />
+                  </div>
+
+                  <Button
+                    type="button"
+                    className="disabled:cursor-not-allowed"
+                    disabled={fields.length <= 1}
+                    variant="destructive"
+                    onClick={() => {
+                      if (option.optionId) {
+                        setOptionsToRemove((prev) => [
+                          ...prev,
+                          option.optionId as number,
+                        ]);
+                      }
+                      remove(index);
+                    }}
+                  >
+                    Remover
+                  </Button>
+                </div>
+              ))}
             </div>
           </fieldset>
 

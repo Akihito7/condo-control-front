@@ -4,16 +4,21 @@ interface CreatePollProps {
   title: string;
   description: string;
   endDate: Date | undefined;
+  options: {
+    name: string
+  }[]
 }
 export async function createPoll({
   title,
   description,
-  endDate
+  endDate,
+  options
 }: CreatePollProps) {
   const response = await api.post('communication/assembly-virtual/polls/create', {
     title,
     description,
-    endDate
+    endDate,
+    options
   });
   return response.data;
 }

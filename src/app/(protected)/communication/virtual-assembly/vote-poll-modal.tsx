@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -15,10 +14,11 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { PollWithStats } from "@/api/fetch-assembly-polls";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createVoteAssemblyVirtualPoll } from "@/api/create-vote-assembly-virtual-poll";
 import { isBefore } from "date-fns";
 import { Progress } from "@/components/ui/progress";
+import { getOptionsVote } from "@/api/get-options-vote";
 
 type VotePollModalProps = {
   pollTitle: string;
@@ -37,7 +37,7 @@ export function VotePollModal({
   setPollSelected,
   pollSelected,
 }: VotePollModalProps) {
-  const [choice, setChoice] = useState<"sim" | "não" | "">("");
+  const [choice, setChoice] = useState<string>("");
   const alreadyVoted = pollSelected?.currentUserAlreadyVoted ?? false;
   const alreadyFinished = pollSelected
     ? isBefore(new Date(pollSelected?.endDate), new Date())
@@ -56,9 +56,15 @@ export function VotePollModal({
     },
   });
 
+  const { data: voteOptions } = useQuery({
+    queryKey: ["options", pollSelected],
+    queryFn: () => getOptionsVote(pollSelected?.id ?? -1),
+    enabled: !!pollSelected?.id,
+  });
+
   useEffect(() => {
     if (alreadyVoted) {
-      setChoice(pollSelected?.currentVoteUser?.toLowerCase() as any);
+      setChoice(pollSelected?.currentVoteUser?.toString() as any);
     }
   }, [pollSelected, alreadyVoted]);
 
@@ -78,6 +84,19 @@ export function VotePollModal({
     setChoice("");
   };
 
+  // Guardar resultado final (vencedores múltiplos em caso de empate)
+  const [finalResults, setFinalResults] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (alreadyFinished && pollSelected?.votesInfo) {
+      const maxVotes = Math.max(...pollSelected.votesInfo.map((v) => v.total));
+      const winners = pollSelected.votesInfo
+        .filter((v) => v.total === maxVotes)
+        .map((v) => v.optionName);
+      setFinalResults(winners);
+    }
+  }, [alreadyFinished, pollSelected]);
+
   return (
     <Dialog
       open={isOpen}
@@ -88,9 +107,11 @@ export function VotePollModal({
         setIsOpen(open);
       }}
     >
-      <DialogContent className="sm:max-w-lg rounded-2xl shadow-xl">
+      <DialogContent className="sm:max-w-lg rounded-2xl shadow-2xl p-6 bg-white">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold">{pollTitle}</DialogTitle>
+          <DialogTitle className="text-2xl font-bold text-gray-900">
+            {pollTitle}
+          </DialogTitle>
           {pollSelected?.description && (
             <p className="mt-3 text-sm text-gray-600 italic leading-relaxed">
               {pollSelected.description}
@@ -98,90 +119,118 @@ export function VotePollModal({
           )}
           <DialogDescription className="text-muted-foreground mt-1">
             {alreadyVoted
-              ? "Você já votou nesta enquete. Abaixo está sua escolha:"
-              : "Escolha uma opção abaixo para registrar seu voto."}
+              ? "✅ Você já votou nesta enquete. Abaixo está sua escolha:"
+              : "🗳️ Escolha uma opção abaixo para registrar seu voto."}
           </DialogDescription>
         </DialogHeader>
 
-  
+        {/* --- Tela de Votação --- */}
         {!alreadyFinished && (
           <div className="space-y-4 mt-4">
-            <fieldset className="border border-gray-200 rounded-md p-4">
-              <legend className="text-sm font-semibold mb-2">
+            <fieldset className="border border-gray-200 rounded-lg p-4">
+              <legend className="text-sm font-semibold mb-2 text-gray-800">
                 Sua escolha
               </legend>
               <RadioGroup
                 value={choice}
-                onValueChange={(val) => setChoice(val as "sim" | "não")}
+                onValueChange={(val) => setChoice(val)}
                 disabled={alreadyVoted}
               >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="sim" id="vote-sim" />
-                  <Label htmlFor="vote-sim">Sim</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="não" id="vote-nao" />
-                  <Label htmlFor="vote-nao">Não</Label>
-                </div>
+                {voteOptions?.map((option: any) => (
+                  <div
+                    key={option.id}
+                    className="flex items-center space-x-2 rounded-md hover:bg-gray-50 p-2 transition"
+                  >
+                    <RadioGroupItem
+                      value={String(option.id)}
+                      id={String(option.id)}
+                    />
+                    <Label htmlFor={String(option.id)} className="cursor-pointer">
+                      {option.name}
+                    </Label>
+                  </div>
+                ))}
               </RadioGroup>
             </fieldset>
           </div>
         )}
 
-    
+        {/* --- Resultados --- */}
         {alreadyFinished && (
           <div className="mt-6 space-y-4">
-            <h4 className="font-semibold text-base">Resultados da votação</h4>
+            <h4 className="font-semibold text-lg text-gray-800 flex items-center gap-2">
+              📊 Resultados da votação
+            </h4>
 
-   
             {choice && (
               <p className="font-medium mb-4">
                 Sua escolha:{" "}
-                <span
-                  className={
-                    choice === "sim" ? "text-green-600" : "text-red-600"
+                <span className="text-blue-600 font-semibold">
+                  {
+                    voteOptions?.find(
+                      (vote: any) => vote.id === pollSelected?.currentVoteUser
+                    )?.name
                   }
-                >
-                  {choice.charAt(0).toUpperCase() + choice.slice(1)}
                 </span>
               </p>
             )}
-=
-            <div>
-              <div className="flex justify-between text-sm mb-1">
-                <span>Sim</span>
-                <span>{pollSelected!.percentageYes.toFixed(1)}%</span>
-              </div>
-              <Progress
-                value={pollSelected!.percentageYes}
-                className="bg-green-200 [&>div]:bg-green-500"
-              />
+
+            <p className="text-sm text-muted-foreground">
+              Total de votos: <strong>{pollSelected?.totalVotes}</strong>
+            </p>
+
+            <div className="space-y-3">
+              {pollSelected?.votesInfo.map((vote) => {
+                const percentage =
+                  pollSelected.totalVotes > 0
+                    ? Math.round((vote.total / pollSelected.totalVotes) * 100)
+                    : 0;
+
+                const isWinner = finalResults.includes(vote.optionName);
+
+                return (
+                  <div
+                    key={vote.optionId}
+                    className={`space-y-1 p-2 rounded-lg ${
+                      isWinner ? "bg-green-50 border border-green-300" : ""
+                    }`}
+                  >
+                    <div className="flex justify-between text-sm">
+                      <span
+                        className={
+                          isWinner ? "font-semibold text-green-700" : ""
+                        }
+                      >
+                        {vote.optionName}
+                      </span>
+                      <span
+                        className={
+                          isWinner ? "font-semibold text-green-700" : ""
+                        }
+                      >
+                        {vote.total} votos ({percentage}%)
+                      </span>
+                    </div>
+                    <Progress
+                      value={percentage}
+                      className={isWinner ? "h-2 bg-green-300" : "h-2"}
+                    />
+                  </div>
+                );
+              })}
             </div>
 
-            
-            <div>
-              <div className="flex justify-between text-sm mb-1">
-                <span>Não</span>
-                <span>{pollSelected!.percentageNo.toFixed(1)}%</span>
-              </div>
-              <Progress
-                value={pollSelected!.percentageNo}
-                className="bg-red-200 [&>div]:bg-red-500"
-              />
-            </div>
-
-            <div className="text-sm text-muted-foreground mt-2">
-              <p>
-                Total de votos: <strong>{pollSelected?.totalVotes}</strong>
+            {finalResults.length > 1 ? (
+              <p className="mt-4 text-lg font-semibold text-yellow-600">
+                🤝 Empate entre: {finalResults.join(", ")}
               </p>
-              <p>Votos "Sim": {pollSelected?.totalVotesYes}</p>
-              <p>Votos "Não": {pollSelected?.totalVotesNo}</p>
-              {pollSelected?.finalResult && (
-                <p className="mt-2">
-                  <strong>Resultado final:</strong> {pollSelected?.finalResult}
+            ) : (
+              finalResults.length === 1 && (
+                <p className="mt-4 text-lg font-semibold text-green-600">
+                  🏆 Resultado final: {finalResults[0]}
                 </p>
-              )}
-            </div>
+              )
+            )}
           </div>
         )}
 
