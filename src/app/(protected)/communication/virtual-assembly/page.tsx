@@ -69,7 +69,7 @@ export default function VirtualAssembly() {
       <div className="flex flex-col sm:flex-row gap-4 items-end">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Mês de referência
+            Mês e ano de referência
           </label>
           <MonthYearPicker selectedDate={date} onChange={setDate} />
         </div>
