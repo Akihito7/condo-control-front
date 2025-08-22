@@ -13,7 +13,8 @@ interface FetchCardsTransactionEntryResponse {
   balance: number
   incomeTarget: number | undefined
   expensesTarget: number | undefined
-  isSameMonth: boolean
+  isSameMonth: boolean,
+  accumulatedBalance: number;
 }
 
 export async function fetchCardsTransactionEntry({

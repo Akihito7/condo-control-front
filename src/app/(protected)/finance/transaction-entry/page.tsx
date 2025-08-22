@@ -161,10 +161,10 @@ export default function Finance() {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
         {cardsTransactionStatus === "pending" ? (
           <>
-            {Array.from({ length: 3 }).map((_, index) => (
+            {Array.from({ length: 4 }).map((_, index) => (
               <CardSkeleton key={index} />
             ))}
           </>
@@ -243,7 +243,26 @@ export default function Finance() {
               <CardFinance
                 title="Saldo"
                 value={cardsTransaction?.balance ?? 0}
-                target={cardsTransaction?.incomeTarget}
+                target={undefined}
+                isSameMonth={cardsTransaction?.isSameMonth ?? false}
+                icon={
+                  <DollarSign
+                    color={
+                      cardsTransaction
+                        ? cardsTransaction.balance > 0
+                          ? "#22c55e"
+                          : "#ef4444"
+                        : "#22c55e"
+                    }
+                  />
+                }
+                date={selectedDate}
+              />
+
+              <CardFinance
+                title="Saldo Acumulado"
+                value={cardsTransaction?.accumulatedBalance ?? 0}
+                target={undefined}
                 isSameMonth={cardsTransaction?.isSameMonth ?? false}
                 icon={
                   <DollarSign

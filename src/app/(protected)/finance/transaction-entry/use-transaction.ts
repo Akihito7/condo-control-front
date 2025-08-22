@@ -74,9 +74,11 @@ export function useTransaction({ selectedDate, incomeExpenseOptionsSelected, con
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ['transactions', startDate, endDate, incomeExpenseOptionsSelected, condominiumId],
+        exact : false
       });
       queryClient.invalidateQueries({
         queryKey: ['revenueTotal', startDate, endDate, condominiumId],
+        exact : false
       });
     }
   })

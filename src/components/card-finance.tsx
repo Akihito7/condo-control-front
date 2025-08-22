@@ -168,6 +168,13 @@ export function CardFinance({
     }
   }
 
+  console.log(
+    "TARGET",
+    target,
+    type,
+    type != "balance" && isSameMonth && target
+  );
+
   return (
     <Dialog
       open={isSameMonth && modalIsOpen}
@@ -206,17 +213,20 @@ export function CardFinance({
               {moneyFormmated}
             </span>
 
-            {type != "balance" && isSameMonth && target && target > 0 && (
-              <span className="text-sm font-medium text-zinc-600 dark:text-foreground">
-                Meta{" "}
-                {target?.toLocaleString("pt-br", {
-                  currency: "BRL",
-                  style: "currency",
-                })}
-              </span>
-            )}
+            {type != "balance" &&
+              isSameMonth &&
+              target != null &&
+              target > 0 && (
+                <span className="text-sm font-medium text-zinc-600 dark:text-foreground">
+                  Meta{" "}
+                  {target.toLocaleString("pt-br", {
+                    currency: "BRL",
+                    style: "currency",
+                  })}
+                </span>
+              )}
 
-            {type != "balance" && isSameMonth && !target && (
+            {type != "balance" && isSameMonth && (!target || target <= 0) && (
               <span className="text-sm font-medium text-zinc-600 dark:text-foreground">
                 Sem metas para este mês
               </span>
