@@ -42,6 +42,7 @@ import { Label } from "@radix-ui/react-label";
 import { userPagePermission } from "@/utils/user-page-permission";
 import { redirect } from "next/navigation";
 import { useUserContext } from "@/providers/use-user-context";
+import { format } from "date-fns";
 
 export default function MaintenanceBacklog() {
   const { read, edit } = userPagePermission({ pageId: 4 });
@@ -223,6 +224,10 @@ export default function MaintenanceBacklog() {
                 <TableHead>Forma de Pagamento</TableHead>
                 <TableHead>Data de Pagamento</TableHead>
                 <TableHead>Conclusão do Pagamento</TableHead>
+                <TableHead className="text-center">Inicio Planejado</TableHead>
+                <TableHead className="text-center">Inicio Real</TableHead>
+                <TableHead className="text-center">Fim Planejado</TableHead>
+                <TableHead className="text-center">Fim Real</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-center">Ações</TableHead>
               </TableRow>
@@ -286,13 +291,41 @@ export default function MaintenanceBacklog() {
                             : "-"}
                         </TableCell>
 
+                        <TableCell className="text-center">
+                          {item.plannedStart
+                            ? format(
+                                item.plannedStart as any,
+                                "dd/MM/yyyy HH:ss"
+                              )
+                            : "-"}
+                        </TableCell>
+
+                        <TableCell className="text-center">
+                          {item.actualStart
+                            ? format(
+                                item.actualStart as any,
+                                "dd/MM/yyyy HH:ss"
+                              )
+                            : "-"}
+                        </TableCell>
+
+                        <TableCell className="text-center">
+                          {item.plannedEnd
+                            ? format(item.plannedEnd as any, "dd/MM/yyyy HH:ss")
+                            : "-"}
+                        </TableCell>
+
+                        <TableCell className="text-center">
+                          {item.actualEnd
+                            ? format(item.actualEnd as any, "dd/MM/yyyy HH:ss")
+                            : "-"}
+                        </TableCell>
                         <TableCell>{item.maintenanceStatusesName}</TableCell>
 
                         <TableCell className="text-center">
                           <DropdownMenu
                             open={
-                              dropdownOpen &&
-                              dropdownOpenToThisItem === item.id
+                              dropdownOpen && dropdownOpenToThisItem === item.id
                             }
                             onOpenChange={(open) => {
                               if (!open) {
