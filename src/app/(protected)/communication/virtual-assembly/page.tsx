@@ -30,6 +30,7 @@ import { ActionPollModal } from "./action-poll-modal";
 import { userPagePermission } from "@/utils/user-page-permission";
 import { redirect } from "next/navigation";
 import { useUserContext } from "@/providers/use-user-context";
+import { MonthYearPicker } from "@/components/month-year-select";
 
 export default function VirtualAssembly() {
   const { read, edit } = userPagePermission({ pageId: 11 });
@@ -70,7 +71,7 @@ export default function VirtualAssembly() {
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Mês de referência
           </label>
-          <DatePicker date={date} setDate={setDate} />
+          <MonthYearPicker selectedDate={date} onChange={setDate} />
         </div>
 
         <Button
