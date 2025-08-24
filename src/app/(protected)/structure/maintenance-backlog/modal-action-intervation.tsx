@@ -24,7 +24,6 @@ import {
 import { useForm, Controller, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { DatePickerWithHours } from "@/components/date-picker-with-hours";
 import { PriorityOption } from "@/api/fetch-priority-options";
 import { PaymentMethod } from "@/api/fetch-payment-method.options";
 import { AreasOptions } from "@/api/fetch-condominium-areas";
@@ -35,27 +34,56 @@ import { createIntervention } from "@/api/create-intervention";
 import { useUserContext } from "@/providers/use-user-context";
 import { Intervention } from "@/api/fetch-interventions";
 import { updateIntervention } from "@/api/update-intervention";
+import { DatePicker } from "@/components/date-picker";
 
-// Atualiza o schema adicionando isInstallment (boolean) e numberOfInstallments (number)
-const interventionSchema = z.object({
-  priority: z.string().min(1, "Por favor, selecione uma prioridade"),
-  type: z.string().min(1, "Por favor, selecione um tipo"),
-  area: z.string().min(1, "Por favor, selecione uma área"),
-  description: z.string().min(3, "Por favor, insira uma descrição"),
-  provider: z.string().optional(),
-  value: z.string().regex(/^\d+(\.\d{1,2})?$/, "Por favor, insira um valor válido"),
-  paymentMethod: z.string().min(1, "Por favor, selecione um método de pagamento"),
-  paymentDate: z.date().optional().nullable(),
-  paymentCompletionDate: z.date().optional().nullable(),
-  duration: z.string().optional(),
-  plannedStart: z.date().optional().nullable(),
-  plannedEnd: z.date().optional().nullable(),
-  actualStart: z.date().optional().nullable(),
-  actualEnd: z.date().optional().nullable(),
-  status: z.string().min(1, "Por favor, selecione um status"),
-  isInstallment: z.boolean().optional(),
-  numberOfInstallments: z.number().int().positive().optional(),
-});
+const interventionSchema = z
+  .object({
+    priority: z.string().min(1, "Por favor, selecione uma prioridade"),
+    type: z.string().min(1, "Por favor, selecione um tipo"),
+    area: z.string().min(1, "Por favor, selecione uma área"),
+    description: z.string().min(3, "Por favor, insira uma descrição"),
+    provider: z.string().optional(),
+    value: z
+      .string()
+      .regex(/^\d+(\.\d{1,2})?$/, "Por favor, insira um valor válido"),
+    paymentMethod: z
+      .string()
+      .min(1, "Por favor, selecione um método de pagamento"),
+    paymentDate: z.date().optional().nullable(),
+    paymentCompletionDate: z.date().optional().nullable(),
+    duration: z.string().optional(),
+    plannedStart: z.date().optional().nullable(),
+    plannedEnd: z.date().optional().nullable(),
+    actualStart: z.date().optional().nullable(),
+    actualEnd: z.date().optional().nullable(),
+    status: z.string().min(1, "Por favor, selecione um status"),
+    isInstallment: z.boolean().optional(),
+    numberOfInstallments: z.any().nullish(),
+  })
+  .superRefine(({ isInstallment, numberOfInstallments }, ctx) => {
+    if (isInstallment) {
+      if (numberOfInstallments === null || numberOfInstallments === undefined) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Por favor, informe o número de parcelas",
+          path: ["numberOfInstallments"],
+        });
+      }
+    } else {
+      if (
+        numberOfInstallments !== null &&
+        numberOfInstallments !== undefined &&
+        !Number.isNaN(numberOfInstallments)
+      ) {
+        console.log(numberOfInstallments);
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Número de parcelas só deve ser informado se for parcelado",
+          path: ["numberOfInstallments"],
+        });
+      }
+    }
+  });
 
 export type InterventionFormData = z.infer<typeof interventionSchema>;
 
@@ -100,6 +128,7 @@ export function ModalActionIntervention({
     handleSubmit,
     reset,
     setValue,
+    getValues,
     formState: { errors },
   } = useForm<InterventionFormData>({
     resolver: zodResolver(interventionSchema),
@@ -130,6 +159,10 @@ export function ModalActionIntervention({
   });
 
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    console.log(errors);
+  }, [errors]);
 
   async function onSubmit(data: InterventionFormData) {
     if (type === "create") {
@@ -258,10 +291,7 @@ export function ModalActionIntervention({
           <DialogDescription>{modalDescription}</DialogDescription>
         </DialogHeader>
 
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="space-y-4 py-4"
-        >
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-4">
           {/* Priority */}
           <div className="grid grid-cols-4 items-center gap-4">
             <Label className="text-right">Prioridade</Label>
@@ -440,42 +470,6 @@ export function ModalActionIntervention({
             </p>
           )}
 
-          {/* Payment Date */}
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Data do Pagamento</Label>
-            <div className="col-span-3">
-              <Controller
-                name="paymentDate"
-                control={control}
-                render={({ field: { onChange, value } }) => (
-                  <DatePickerWithHours
-                    date={value as any}
-                    setDate={onChange}
-                    isDisabled={isDisabled}
-                  />
-                )}
-              />
-            </div>
-          </div>
-
-          {/* Payment Completion Date */}
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Data de Conclusão do Pagamento</Label>
-            <div className="col-span-3">
-              <Controller
-                name="paymentCompletionDate"
-                control={control}
-                render={({ field: { onChange, value } }) => (
-                  <DatePickerWithHours
-                    date={value as any}
-                    setDate={onChange}
-                    isDisabled={isDisabled}
-                  />
-                )}
-              />
-            </div>
-          </div>
-
           {/* Checkbox isInstallment */}
           <div className="grid grid-cols-4 items-center gap-4">
             <Label className="text-right">É Parcelado</Label>
@@ -512,6 +506,53 @@ export function ModalActionIntervention({
             </div>
           )}
 
+          {/* Payment Date */}
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label className="text-right">Data do Pagamento</Label>
+            <div className="col-span-3">
+              <Controller
+                name="paymentDate"
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <DatePicker
+                    date={value as any}
+                    setDate={(value) => {
+                      if (!isInstallment) {
+                        setValue("paymentCompletionDate", value);
+                      }
+                      onChange(value);
+                    }}
+                    disabled={isDisabled}
+                    label="Data do Pagamento"
+                  />
+                )}
+              />
+            </div>
+          </div>
+
+          {/* Payment Completion Date */}
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label className="text-right">Dt. Conclusão Pgto</Label>
+            <div className="col-span-3">
+              <Controller
+                name="paymentCompletionDate"
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <DatePicker
+                    date={value as any}
+                    setDate={(value) => {
+                      if (isInstallment) {
+                        onChange(value);
+                      }
+                    }}
+                    disabled={isDisabled || !isInstallment}
+                    label="Data de Conclusão do Pagamento"
+                  />
+                )}
+              />
+            </div>
+          </div>
+
           {/* Duration */}
           <div className="grid grid-cols-4 items-center gap-4">
             <Label className="text-right">Duração</Label>
@@ -531,10 +572,11 @@ export function ModalActionIntervention({
                 name="plannedStart"
                 control={control}
                 render={({ field: { onChange, value } }) => (
-                  <DatePickerWithHours
+                  <DatePicker
                     date={value as any}
                     setDate={onChange}
-                    isDisabled={isDisabled}
+                    disabled={isDisabled}
+                    label="Início Planejado"
                   />
                 )}
               />
@@ -549,10 +591,11 @@ export function ModalActionIntervention({
                 name="plannedEnd"
                 control={control}
                 render={({ field: { onChange, value } }) => (
-                  <DatePickerWithHours
+                  <DatePicker
                     date={value as any}
                     setDate={onChange}
-                    isDisabled={isDisabled}
+                    disabled={isDisabled}
+                    label="Término Planejado"
                   />
                 )}
               />
@@ -567,10 +610,11 @@ export function ModalActionIntervention({
                 name="actualStart"
                 control={control}
                 render={({ field: { onChange, value } }) => (
-                  <DatePickerWithHours
+                  <DatePicker
                     date={value as any}
                     setDate={onChange}
-                    isDisabled={isDisabled}
+                    disabled={isDisabled}
+                    label="Início Real"
                   />
                 )}
               />
@@ -585,10 +629,11 @@ export function ModalActionIntervention({
                 name="actualEnd"
                 control={control}
                 render={({ field: { onChange, value } }) => (
-                  <DatePickerWithHours
+                  <DatePicker
                     date={value as any}
                     setDate={onChange}
-                    isDisabled={isDisabled}
+                    disabled={isDisabled}
+                    label="Término Real"
                   />
                 )}
               />
