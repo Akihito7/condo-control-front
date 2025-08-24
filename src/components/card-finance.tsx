@@ -167,14 +167,7 @@ export function CardFinance({
       styleTitle = value < target ? "text-green-500" : "text-red-500";
     }
   }
-
-  console.log(
-    "TARGET",
-    target,
-    type,
-    type != "balance" && isSameMonth && target
-  );
-
+  
   return (
     <Dialog
       open={isSameMonth && modalIsOpen}

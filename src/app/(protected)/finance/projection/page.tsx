@@ -43,7 +43,11 @@ export default function FinancialForecast() {
     redirect("/home");
   }
 
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date>(() => {
+    const date = new Date();
+    date.setMonth(date.getMonth() + 1);
+    return date;
+  });
 
   const {
     cardsProjection,

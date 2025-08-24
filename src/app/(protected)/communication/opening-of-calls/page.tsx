@@ -105,10 +105,6 @@ export default function OpeningOfCalls() {
     endDate: rangeDate.to,
   });
 
-  useEffect(() => {
-    console.log("STATUS OPTIONS", statusOptionSelected);
-  }, [statusOptionSelected]);
-
   return (
     <div className="bg-gray-50 min-h-screen w-full p-8 flex flex-col gap-6">
       <div className="space-y-2">

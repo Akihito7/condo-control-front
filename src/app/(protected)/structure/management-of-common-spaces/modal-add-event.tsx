@@ -227,7 +227,6 @@ export function ModalAddEvent({
               name="apartmentId"
               control={control}
               render={({ field: { value, onChange } }) => {
-                console.log("field do apartament select", value);
                 return (
                   <Select
                     value={value as string}

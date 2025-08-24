@@ -36,16 +36,15 @@ export function MonthYearPicker({
   justFutureMonths = false,
 }: MonthYearPickerProps) {
   const [selectedMonth, setSelectedMonth] = useState<number>(
-    new Date().getMonth()
+    selectedDate.getMonth()
   );
-
   const [selectedYear, setSelectedYear] = useState<number>(currentYear);
 
   useEffect(() => {
     onChange(new Date(selectedYear, selectedMonth));
   }, [selectedMonth, selectedYear]);
 
-  function isFutureOrCurrentMonth(month: string) {
+  function isNotFutureMonth(month: string) {
     const currentYear = new Date().getFullYear();
     const input = `${month}/${currentYear}`;
 
@@ -58,7 +57,7 @@ export function MonthYearPicker({
     const parsedDateStartsMonth = startOfMonth(parsedDate);
     const currentDateStartsMonth = startOfMonth(currentDate);
 
-    return parsedDateStartsMonth < currentDateStartsMonth;
+    return parsedDateStartsMonth <= currentDateStartsMonth;
   }
 
   return (
@@ -81,7 +80,7 @@ export function MonthYearPicker({
               <SelectItem
                 key={index}
                 value={index.toString()}
-                disabled={justFutureMonths && isFutureOrCurrentMonth(month)}
+                disabled={justFutureMonths && isNotFutureMonth(month)}
               >
                 {month}
               </SelectItem>
