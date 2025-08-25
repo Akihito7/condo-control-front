@@ -1,7 +1,7 @@
 "use client";
 
 import { Breadcrumb } from "@/components/breadcrumb";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Table,
   TableBody,
@@ -41,8 +41,8 @@ import { useIsMobile } from "@/lib/use-is-mobile";
 import { ButtonOpenSidebar } from "@/components/button-open-sidebar";
 import { redirect } from "next/navigation";
 import { userPagePermission } from "@/utils/user-page-permission";
-import { DatePicker } from "@/components/date-picker";
 import { MonthYearPicker } from "@/components/month-year-select";
+import { printDocument } from "@/utils/print-document";
 
 export type OptionType = {
   value: number;
@@ -62,9 +62,10 @@ export default function Finance() {
     redirect("/home");
   }
   const [selectedDate, setSelectedDate] = useState(new Date());
-
   const [incomeExpenseOptionsSelected, setIncomeExpenseOptionSelected] =
     useState<MultiValue<OptionType>>([]);
+  const componentMainRef = useRef<HTMLElement>(null);
+  const componentFilterRef = useRef<HTMLDivElement>(null);
 
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -115,7 +116,10 @@ export default function Finance() {
     })) ?? [];
 
   return (
-    <main className="bg-gray-50 min-h-screen w-full p-0 py-8 px-2 sm:p-8 flex flex-col gap-6 overflow-y-auto">
+    <main
+      ref={componentMainRef}
+      className="bg-gray-50 min-h-screen w-full p-0 py-8 px-2 sm:p-8 flex flex-col gap-6 overflow-y-auto"
+    >
       <div className="space-y-2">
         <div className="flex items-center mb-8 gap-2">
           <ButtonOpenSidebar />
@@ -126,11 +130,15 @@ export default function Finance() {
         </h1>
       </div>
 
-      <div className="flex  flex-col gap-4 md:items-end md:flex-row ">
-        <div>
+      <div
+        ref={componentFilterRef}
+        className={`flex flex-col gap-4 md:items-end md:flex-row`}
+      >
+        <div className="flex flex-col">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Mês e ano de referência
           </label>
+
           <MonthYearPicker
             selectedDate={selectedDate}
             onChange={setSelectedDate}
@@ -155,6 +163,11 @@ export default function Finance() {
         <Button
           variant="outline"
           className="ml-auto flex items-center gap-2 h-10 cursor-pointer"
+          onClick={() => {
+            if (!componentFilterRef.current || !componentMainRef.current)
+              return;
+            printDocument(componentMainRef.current, componentFilterRef.current);
+          }}
         >
           <FileDown className="w-6 h-6" />
           Exportar PDF

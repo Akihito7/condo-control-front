@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Breadcrumb } from "@/components/breadcrumb";
 import {
   Table,
@@ -32,6 +32,7 @@ import { useIsMobile } from "@/lib/use-is-mobile";
 import { userPagePermission } from "@/utils/user-page-permission";
 import { redirect } from "next/navigation";
 import { useUserContext } from "@/providers/use-user-context";
+import { printDocument } from "@/utils/print-document";
 
 export default function FinancialForecast() {
   const { read, edit } = userPagePermission({
@@ -49,6 +50,9 @@ export default function FinancialForecast() {
     return date;
   });
 
+  const componentMainRef = useRef<HTMLElement>(null);
+  const componentFilterRef = useRef<HTMLDivElement>(null);
+
   const {
     cardsProjection,
     cardsProjectionStatus,
@@ -63,7 +67,10 @@ export default function FinancialForecast() {
   const isMobile = useIsMobile();
 
   return (
-    <div className="bg-gray-50 min-h-screen w-full p-8 flex flex-col gap-6">
+    <main
+      ref={componentMainRef}
+      className="bg-gray-50 min-h-screen w-full p-8 flex flex-col gap-6"
+    >
       <div className="space-y-2">
         <div className="flex items-center mb-8 gap-2">
           <ButtonOpenSidebar />
@@ -75,7 +82,7 @@ export default function FinancialForecast() {
         </h1>
       </div>
 
-      <div className="flex flex-row gap-4 items-end">
+      <div ref={componentFilterRef} className="flex flex-row gap-4 items-end">
         <div className="">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Mês e ano de referência
@@ -90,6 +97,11 @@ export default function FinancialForecast() {
         <Button
           variant="outline"
           className="ml-auto flex items-center gap-2 h-10 cursor-pointer"
+          onClick={() => {
+            if (!componentFilterRef.current || !componentMainRef.current)
+              return;
+            printDocument(componentMainRef.current, componentFilterRef.current);
+          }}
         >
           <FileDown className="w-6 h-6" />
           Exportar PDF
@@ -217,6 +229,6 @@ export default function FinancialForecast() {
           </Table>
         </div>
       </section>
-    </div>
+    </main>
   );
 }

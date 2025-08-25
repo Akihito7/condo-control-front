@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Breadcrumb } from "@/components/breadcrumb";
 import {
   Select,
@@ -37,6 +37,7 @@ import { Delinquency } from "@/api/fetch-delinquency-registers";
 import { userPagePermission } from "@/utils/user-page-permission";
 import { redirect } from "next/navigation";
 import { useUserContext } from "@/providers/use-user-context";
+import { printDocument } from "@/utils/print-document";
 
 export default function DelinquencyControl() {
   const { edit, read } = userPagePermission({ pageId: 2 });
@@ -55,6 +56,8 @@ export default function DelinquencyControl() {
   >();
 
   const [date, setDate] = useState<Date>(new Date());
+  const componentMainRef = useRef<HTMLElement>(null);
+  const componentFilterRef = useRef<HTMLDivElement>(null);
 
   const [paymentStatus, setStatusPayment] = useState<string>("-1");
 
@@ -79,7 +82,10 @@ export default function DelinquencyControl() {
   );
 
   return (
-    <div className="bg-gray-50 min-h-screen w-full p-8 flex flex-col gap-6">
+    <main
+      ref={componentMainRef}
+      className="bg-gray-50 min-h-screen w-full p-8 flex flex-col gap-6"
+    >
       <div className="space-y-2">
         <div className="flex items-center mb-8 gap-2">
           <ButtonOpenSidebar />
@@ -90,7 +96,10 @@ export default function DelinquencyControl() {
         </h1>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-4 items-end">
+      <div
+        ref={componentFilterRef}
+        className="flex flex-col sm:flex-row gap-4 items-end"
+      >
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Mês de referência
@@ -126,6 +135,11 @@ export default function DelinquencyControl() {
         <Button
           variant="outline"
           className="ml-auto flex items-center gap-2 h-10 cursor-pointer"
+          onClick={() => {
+            if (!componentFilterRef.current || !componentMainRef.current)
+              return;
+            printDocument(componentMainRef.current, componentFilterRef.current);
+          }}
         >
           <FileDown className="w-6 h-6" />
           Exportar PDF
@@ -248,6 +262,6 @@ export default function DelinquencyControl() {
           </Table>
         </div>
       </section>
-    </div>
+    </main>
   );
 }
