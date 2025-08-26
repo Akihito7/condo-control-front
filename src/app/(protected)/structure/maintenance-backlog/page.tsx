@@ -221,6 +221,8 @@ export default function MaintenanceBacklog() {
                 <TableHead>Descrição</TableHead>
                 <TableHead>Fornecedor</TableHead>
                 <TableHead className="text-left">Valor</TableHead>
+                <TableHead className="text-center">Nu. Parcelas</TableHead>
+                <TableHead className="text-left">Valor da Parcela</TableHead>
                 <TableHead>Forma de Pagamento</TableHead>
                 <TableHead>Data de Pagamento</TableHead>
                 <TableHead>Conclusão do Pagamento</TableHead>
@@ -271,6 +273,21 @@ export default function MaintenanceBacklog() {
                             style: "currency",
                             currency: "BRL",
                           })}
+                        </TableCell>
+
+                        <TableCell className="text-center">
+                          {item.numberOfInstallments ?? "-"}
+                        </TableCell>
+
+                        <TableCell>
+                          {item.isInstallment
+                            ? (
+                                item.amount / item.numberOfInstallments
+                              ).toLocaleString("pt-BR", {
+                                style: "currency",
+                                currency: "BRL",
+                              })
+                            : "-"}
                         </TableCell>
 
                         <TableCell>{item.paymentMethodsName}</TableCell>
