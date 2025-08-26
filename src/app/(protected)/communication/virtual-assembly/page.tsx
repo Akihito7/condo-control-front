@@ -154,66 +154,82 @@ export default function VirtualAssembly() {
                 <TableHead>Data Encerramento</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Total Votos</TableHead>
+                <TableHead className="text-center">Ganhando</TableHead>
                 <TableHead>Participação</TableHead>
                 <TableHead className="text-center">Ação</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {polls?.map((poll) => (
-                <TableRow key={poll.id}>
-                  <TableCell>{poll.title}</TableCell>
-                  <TableCell>
-                    {format(new Date(poll.createdAt), "dd/MM/yyyy HH:mm:ss")}
-                  </TableCell>
-                  <TableCell>
-                    {format(new Date(poll.endDate), "dd/MM/yyyy HH:mm:ss")}
-                  </TableCell>
-                  <TableCell>{poll.status}</TableCell>
-                  <TableCell>{poll.totalVotes}</TableCell>
-                  <TableCell>-</TableCell>
-                  <TableCell className="text-center">
-                    <DropdownMenu
-                      open={dropdownOpen && poll.id === dropdownOpenToThisItem}
-                      onOpenChange={(open) => {
-                        if (!open) {
-                          setDropdownOpenToThisItem(undefined);
+              {polls?.map((poll) => {
+                const sorted = [...poll.votesInfo].sort(
+                  (a, b) => b.total - a.total
+                );
+
+                let winnerName = "-";
+                if (sorted.length) {
+                  const topVotes = sorted[0].total;
+                  const tied = sorted.filter((v) => v.total === topVotes);
+                  winnerName = tied.map((v) => v.optionName).join(" - ");
+                }
+                return (
+                  <TableRow key={poll.id}>
+                    <TableCell>{poll.title}</TableCell>
+                    <TableCell>
+                      {format(new Date(poll.createdAt), "dd/MM/yyyy HH:mm:ss")}
+                    </TableCell>
+                    <TableCell>
+                      {format(new Date(poll.endDate), "dd/MM/yyyy HH:mm:ss")}
+                    </TableCell>
+                    <TableCell>{poll.status}</TableCell>
+                    <TableCell>{poll.totalVotes}</TableCell>
+                    <TableCell className="text-center">{winnerName}</TableCell>
+                    <TableCell>-</TableCell>
+                    <TableCell className="text-center">
+                      <DropdownMenu
+                        open={
+                          dropdownOpen && poll.id === dropdownOpenToThisItem
                         }
-                        setDropdownOpenToThisItem(poll.id);
-                        setDropdownOpen(open);
-                      }}
-                    >
-                      <DropdownMenuTrigger className="outline-none">
-                        <MoreHorizontal className="w-5 h-5 cursor-pointer text-gray-600" />
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        <DropdownMenuItem
-                          onClick={() => {
-                            setDropdownOpen(false);
-                            setPollSelected(poll);
-                            setVoteModalIsOpen(true);
-                          }}
-                        >
-                          Visualizar
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => {
-                            setDropdownOpen(false);
-                            setPollSelected(poll);
-                            setActionPollModalActionIsOpen(true);
-                          }}
-                        >
-                          Editar
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => handleDeletePoll(poll.id)}
-                        >
-                          Excluir
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))}
+                        onOpenChange={(open) => {
+                          if (!open) {
+                            setDropdownOpenToThisItem(undefined);
+                          }
+                          setDropdownOpenToThisItem(poll.id);
+                          setDropdownOpen(open);
+                        }}
+                      >
+                        <DropdownMenuTrigger className="outline-none">
+                          <MoreHorizontal className="w-5 h-5 cursor-pointer text-gray-600" />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              setDropdownOpen(false);
+                              setPollSelected(poll);
+                              setVoteModalIsOpen(true);
+                            }}
+                          >
+                            Visualizar
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              setDropdownOpen(false);
+                              setPollSelected(poll);
+                              setActionPollModalActionIsOpen(true);
+                            }}
+                          >
+                            Editar
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => handleDeletePoll(poll.id)}
+                          >
+                            Excluir
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </div>
