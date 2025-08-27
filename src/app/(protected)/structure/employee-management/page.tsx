@@ -9,6 +9,7 @@ import { userPagePermission } from "@/utils/user-page-permission";
 import { useUserContext } from "@/providers/use-user-context";
 import { ScheduleEmployeeTab } from "./tabs/schedule-employee-tab";
 import { EmployeesTab } from "./tabs/employees-tab";
+import { IndicatorsTab } from "./tabs/indicators-tab";
 
 export default function EmployeeManagement() {
   const { read, edit } = userPagePermission({ pageId: 5 });
@@ -63,6 +64,15 @@ export default function EmployeeManagement() {
           >
             Escala de Funcionários
           </TabsTrigger>
+
+          <TabsTrigger
+            value="indicators"
+            className="px-4 py-2 text-sm font-medium rounded-md transition-all
+      data-[state=active]:bg-white data-[state=active]:text-primary
+      data-[state=active]:shadow-sm hover:bg-white hover:text-primary"
+          >
+            Indicadores
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="employees" className="pt-4 space-y-4">
@@ -86,6 +96,10 @@ export default function EmployeeManagement() {
             scheduleEmployees={scheduleEmployees}
             employees={employees}
           />
+        </TabsContent>
+
+        <TabsContent value="indicators" className="pt-4">
+          <IndicatorsTab />
         </TabsContent>
       </Tabs>
     </main>
