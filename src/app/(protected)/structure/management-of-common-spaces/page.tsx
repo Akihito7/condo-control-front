@@ -105,6 +105,7 @@ export default function ManagementOfCommonSpaces() {
           </Select>
         </div>
       </div>
+
       <div className="bg-white shadow-md rounded-xl border border-gray-200">
         <div className="grid grid-cols-7 bg-gray-100 text-center text-sm font-medium text-gray-700 border-b border-gray-200">
           {uniqueDays?.map((day, i) => (

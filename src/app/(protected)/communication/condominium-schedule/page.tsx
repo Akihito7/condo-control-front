@@ -2,15 +2,16 @@
 
 import { Breadcrumb } from "@/components/breadcrumb";
 import { ButtonOpenSidebar } from "@/components/button-open-sidebar";
-import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useState } from "react";
-import { format, addMonths, subMonths } from "date-fns";
-import { ptBR } from "date-fns/locale";
 import { EventDetailsModal } from "./event-details-modal";
-import { AddEventModal } from "./add-event-modal";
 import { userPagePermission } from "@/utils/user-page-permission";
 import { redirect } from "next/navigation";
 import { useUserContext } from "@/providers/use-user-context";
+import { MonthYearPicker } from "@/components/month-year-select";
+import { Button } from "@/components/ui/button";
+import { useCondominiumSchedule } from "./use-condominium-schedule";
+import { ModalAddEvent } from "../../structure/management-of-common-spaces/modal-add-event";
+import { AddEventModal } from "./add-event-modal";
 
 export default function CondominiumSchedule() {
   const { read, edit } = userPagePermission({ pageId: 9 });
@@ -23,23 +24,36 @@ export default function CondominiumSchedule() {
 
   const [modalEventDetailsIsOpen, setModalEventDetailsIsOpen] = useState(false);
   const [eventSelected, setEventSelected] = useState();
-  const [dateSelected, setDateSelected] = useState(new Date());
 
-  function handleChangeDateSelected(action: "back" | "next") {
-    if (action === "back") {
-      const newDate = subMonths(dateSelected, 1);
-      return setDateSelected(newDate);
-    }
+  const {
+    date,
+    handleDateSelected,
+    condominiumSchedule,
+    condominiumScheduleStatus,
+    modalAddEventIsOpen,
+    setModalAddEventIsOpen,
+    setDaySelected,
+    daySelected,
+  } = useCondominiumSchedule();
 
-    const newDate = addMonths(dateSelected, 1);
-    setDateSelected(newDate);
-  }
+  console.log(condominiumSchedule);
+
+  const uniqueDays = [
+    ...new Set(condominiumSchedule?.map((day) => day.dayName)),
+  ];
 
   return (
-    <div className="bg-gray-50 min-h-screen w-full p-6 md:p-10 flex flex-col gap-6">
+    <div className="bg-gray-50 h-screen w-full p-6 md:p-10 flex flex-col gap-6 overflow-y-auto">
       <EventDetailsModal
         isOpen={modalEventDetailsIsOpen}
         setModalIsOpen={setModalEventDetailsIsOpen}
+      />
+
+      <AddEventModal
+        isOpen={modalAddEventIsOpen}
+        setIsOpen={setModalAddEventIsOpen}
+        daySelected={daySelected}
+        setDaySelected={setDaySelected}
       />
 
       <div className="space-y-2">
@@ -52,33 +66,22 @@ export default function CondominiumSchedule() {
         </h1>
       </div>
 
-      <div className="bg-white shadow-md rounded-xl border border-gray-200 overflow-hidden">
-        <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200">
-          <div className="flex items-center gap-3">
-            <div
-              className="border border-b-gray-100 p-2 rounded-md"
-              onClick={() => handleChangeDateSelected("back")}
-            >
-              <ArrowLeft className="text-gray-600 hover:text-gray-800 cursor-pointer" />
-            </div>
-
-            <h2 className="text-xl font-semibold text-gray-800">
-              {format(dateSelected, "MMMM yyyy", { locale: ptBR })}
-            </h2>
-
-            <div
-              className="border border-b-gray-100 p-2 rounded-md"
-              onClick={() => handleChangeDateSelected("next")}
-            >
-              <ArrowRight className="text-gray-600 hover:text-gray-800 cursor-pointer" />
-            </div>
-          </div>
-
-          <AddEventModal />
+      <div className="flex  flex-col gap-4 md:items-end md:flex-row ">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Selecione o mes e ano
+          </label>
+          <MonthYearPicker
+            selectedDate={date}
+            onChange={handleDateSelected}
+            justFutureMonths={false}
+          />
         </div>
+      </div>
 
+      <div className="bg-white shadow-md rounded-xl border border-gray-200">
         <div className="grid grid-cols-7 bg-gray-100 text-center text-sm font-medium text-gray-700 border-b border-gray-200">
-          {["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"].map((day, i) => (
+          {uniqueDays.map((day, i) => (
             <div key={i} className="py-2">
               {day}
             </div>
@@ -86,28 +89,74 @@ export default function CondominiumSchedule() {
         </div>
 
         <div className="grid grid-cols-7">
-          {Array.from({ length: 31 }).map((_, index) => (
+          {condominiumSchedule?.map((day, index) => (
             <div
               key={index}
-              className="border border-gray-200 p-2 flex flex-col gap-2 min-h-42"
+              className="border border-gray-200 p-2 flex flex-col gap-2 min-h-56 overflow-auto max-h-56"
+              onClick={() => {
+                setDaySelected(day);
+                setModalAddEventIsOpen(true);
+              }}
             >
               <span className="text-sm font-medium text-gray-700">
-                {index + 1}
+                {day.dayNumber}
               </span>
 
-              <div className="flex flex-col gap-2">
-                <div
-                  onClick={() => setModalEventDetailsIsOpen(true)}
-                  className="bg-green-100 text-gray-800 text-xs rounded-lg px-3 py-1 cursor-pointer"
-                >
-                  <span className="font-semibold">Festa Junina</span>
-                  <div>(18:00 - 23:00)</div>
-                </div>
-                <div className="bg-green-100 text-gray-800 text-xs rounded-lg px-3 py-1 cursor-pointer">
-                  <span className="font-semibold">Festa Junina</span>
-                  <div>(18:00 - 23:00)</div>
-                </div>
-              </div>
+              <Button variant="outline">Adicionar Evento</Button>
+
+              {day.events?.map((event, index) => {
+                const colors = [
+                  "bg-blue-100 text-blue-800 border-blue-300",
+                  "bg-green-100 text-green-800 border-green-300",
+                  "bg-purple-100 text-purple-800 border-purple-300",
+                  "bg-pink-100 text-pink-800 border-pink-300",
+                  "bg-yellow-100 text-yellow-800 border-yellow-300",
+                  "bg-red-100 text-red-800 border-red-300",
+                  "bg-indigo-100 text-indigo-800 border-indigo-300",
+                ];
+
+                const colorClass = colors[event.id % colors.length];
+
+                const startTime = new Date(event.startTime).toLocaleTimeString(
+                  "pt-BR",
+                  {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  }
+                );
+
+                const endTime = new Date(event.endTime).toLocaleTimeString(
+                  "pt-BR",
+                  {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  }
+                );
+
+                return (
+                  <div
+                    key={event.id}
+                    className={`shadow-sm rounded-xl p-2 hover:shadow-md transition cursor-pointer flex flex-col gap-1 border ${colorClass}`}
+                  >
+                    {/* Título */}
+                    <span className="font-semibold text-sm truncate">
+                      {event.title}
+                    </span>
+
+                    {/* Horário simplificado */}
+                    <span className="text-[11px] text-gray-700 opacity-90">
+                      {startTime} - {endTime}
+                    </span>
+
+                    {/* Descrição */}
+                    {event.description && (
+                      <p className="text-[11px] text-gray-600 truncate">
+                        {event.description}
+                      </p>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           ))}
         </div>

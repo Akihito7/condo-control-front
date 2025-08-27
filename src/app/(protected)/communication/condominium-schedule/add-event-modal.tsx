@@ -2,7 +2,6 @@
 
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -11,87 +10,166 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
-import { DatePickerWithHours } from "@/components/date-picker-with-hours";
+import React, { useEffect, useMemo } from "react";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { DaySchedule } from "@/api/fetch-condominium-schedule";
 
-export function AddEventModal() {
-  const [open, setOpen] = useState(false);
-  const [startDate, setStartDate] = useState<Date | undefined>(new Date());
+interface AddEventModalProps {
+  isOpen: boolean;
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  daySelected: DaySchedule | undefined;
+  setDaySelected: React.Dispatch<React.SetStateAction<DaySchedule | undefined>>;
+}
+
+interface EventFormValues {
+  title: string;
+  type: string;
+  location: string;
+  startTime: string;
+  endTime: string;
+  date: string;
+  description: string;
+}
+
+export function AddEventModal({
+  isOpen,
+  setIsOpen,
+  daySelected,
+  setDaySelected,
+}: AddEventModalProps) {
+  const { register, handleSubmit, reset, setValue } =
+    useForm<EventFormValues>();
+
+  const onSubmit: SubmitHandler<EventFormValues> = (data) => {
+    console.log("Form data:", data);
+    reset();
+    setIsOpen(false);
+  };
+
+  useEffect(() => {
+    if (daySelected?.date) setValue("date", daySelected.date);
+  }, [daySelected, setValue]);
+
+  const formattedDate = useMemo(() => {
+    if (!daySelected?.date) return "";
+    const [year, month, day] = daySelected.date.split("-").map(Number);
+    const date = new Date(year, month - 1, day); // mês é 0-indexado
+    return new Intl.DateTimeFormat("pt-BR", {
+      weekday: "long",
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    }).format(date);
+  }, [daySelected]);
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline" onClick={() => setOpen(true)}>
-          Adicionar Evento
-        </Button>
-      </DialogTrigger>
-
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="max-w-xl">
         <DialogHeader>
           <DialogTitle>Adicionar Novo Evento</DialogTitle>
         </DialogHeader>
 
-        <fieldset className="border border-gray-300 rounded-md px-4 pt-4 pb-2 mb-4 relative">
-          <legend className="text-sm font-medium px-2 text-gray-700">
-            Informações do Evento
-          </legend>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <fieldset className="border border-gray-300 rounded-md px-4 pt-4 pb-2 mb-4 relative">
+            <legend className="text-sm font-medium px-2 text-gray-700">
+              Informações do Evento
+            </legend>
 
-          <div className="grid gap-4 mt-2">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Título
-              </label>
-              <Input type="text" placeholder="Título do evento" />
+            <div className="grid gap-4 mt-2">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Título
+                </label>
+                <Input
+                  type="text"
+                  placeholder="Título do evento"
+                  {...register("title", { required: true })}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Tipo de Evento
+                </label>
+                <Input
+                  type="text"
+                  placeholder="Tipo (ex: reunião, palestra...)"
+                  {...register("type", { required: true })}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Local
+                </label>
+                <Input
+                  type="text"
+                  placeholder="Local do evento"
+                  {...register("location")}
+                />
+              </div>
+
+              <div className="col-span-full">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Descrição
+                </label>
+                <textarea
+                  placeholder="Descrição do evento"
+                  {...register("description")}
+                  className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
             </div>
+          </fieldset>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Tipo de Evento
-              </label>
-              <Input
-                type="text"
-                placeholder="Tipo (ex: reunião, palestra...)"
-              />
+          <fieldset className="border border-gray-300 rounded-md px-4 pt-4 pb-2 mb-4 relative">
+            <legend className="text-sm font-medium px-2 text-gray-700">
+              Horário do Evento
+            </legend>
+
+            <div className="flex flex-col gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Data
+                </label>
+                <Input
+                  value={formattedDate}
+                  readOnly
+                  className="bg-gray-100 cursor-not-allowed"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Início
+                </label>
+                <Input
+                  type="time"
+                  {...register("startTime", { required: true })}
+                  className="w-32"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Término
+                </label>
+                <Input
+                  type="time"
+                  {...register("endTime", { required: true })}
+                  className="w-32"
+                />
+              </div>
             </div>
+          </fieldset>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Local
-              </label>
-              <Input type="text" placeholder="Local do evento" />
-            </div>
-          </div>
-        </fieldset>
-
-  
-        <fieldset className="border border-gray-300 rounded-md px-4 pt-4 pb-2 mb-4 relative ">
-          <legend className="text-sm font-medium px-2 text-gray-700">
-            Horário do Evento
-          </legend>
-
-          <div className="flex flex-col gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Início
-              </label>
-              <DatePickerWithHours date={startDate} setDate={setStartDate} />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Término
-              </label>
-              <DatePickerWithHours date={startDate} setDate={setStartDate} />
-            </div>
-          </div>
-        </fieldset>
-
-        <DialogFooter className="mt-4">
-          <DialogClose asChild>
-            <Button variant="outline">Cancelar</Button>
-          </DialogClose>
-          <Button type="submit">Salvar</Button>
-        </DialogFooter>
+          <DialogFooter className="mt-4 flex justify-end gap-2">
+            <DialogClose asChild>
+              <Button variant="outline">Cancelar</Button>
+            </DialogClose>
+            <Button type="submit">Salvar</Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );
