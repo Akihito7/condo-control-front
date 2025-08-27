@@ -13,6 +13,8 @@ import { Input } from "@/components/ui/input";
 import React, { useEffect, useMemo } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { DaySchedule } from "@/api/fetch-condominium-schedule";
+import { useMutation } from "@tanstack/react-query";
+import { createEventCondominium } from "@/api/create-event-condominium";
 
 interface AddEventModalProps {
   isOpen: boolean;
@@ -41,10 +43,26 @@ export function AddEventModal({
     useForm<EventFormValues>();
 
   const onSubmit: SubmitHandler<EventFormValues> = (data) => {
-    console.log("Form data:", data);
+    handleCreateEvent(data);
     reset();
     setIsOpen(false);
   };
+
+  const { mutateAsync: handleCreateEvent } = useMutation({
+    mutationFn: (data: EventFormValues) => createEventCondominium({ data }),
+    onSuccess: (data) => {
+      const events = daySelected?.events ?? [];
+      events.push(data);
+      if (daySelected) {
+        setDaySelected((prev: any) => {
+          return {
+            ...prev,
+            events,
+          };
+        });
+      }
+    },
+  });
 
   useEffect(() => {
     if (daySelected?.date) setValue("date", daySelected.date);
@@ -53,7 +71,7 @@ export function AddEventModal({
   const formattedDate = useMemo(() => {
     if (!daySelected?.date) return "";
     const [year, month, day] = daySelected.date.split("-").map(Number);
-    const date = new Date(year, month - 1, day); // mês é 0-indexado
+    const date = new Date(year, month - 1, day); 
     return new Intl.DateTimeFormat("pt-BR", {
       weekday: "long",
       day: "2-digit",
