@@ -1,4 +1,7 @@
+import { Employee } from "@/api/fetch-employees-structure";
+import { Option } from "@/api/fetch-work-areas";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useEffect, useState } from "react";
 import {
   Bar,
   BarChart,
@@ -12,14 +15,53 @@ import {
   Legend,
 } from "recharts";
 
-export function IndicatorsTab() {
-  const data = [
-    { name: "Portaria", value: 12 },
-    { name: "Limpeza", value: 18 },
-    { name: "Manutenção", value: 5 },
-    { name: "Administração", value: 9 },
-    { name: "Jardinagem", value: 9 },
-  ];
+interface IndicatorsTabProps {
+  employees: Employee[];
+  workAreas: Option[];
+}
+
+interface ChartDataItem {
+  id: number;
+  name: string;
+  value: number;
+  totalCost: number;
+}
+
+export function IndicatorsTab({ employees, workAreas }: IndicatorsTabProps) {
+  const [dataEmployeesByArea, setDataEmployeesByArea] = useState<
+    ChartDataItem[]
+  >([]);
+
+  const totalCost = employees.reduce(
+    (acc, employee) => (acc += employee.salary),
+    0
+  );
+  const totalEmployees = employees.length;
+
+  function formatEmployeesByWorkArea() {
+    const employeesByWorkArea: ChartDataItem[] = workAreas.map((area) => ({
+      id: area.id,
+      name: area.name,
+      value: 0,
+      totalCost: 0,
+    }));
+
+    employees.forEach((employee) => {
+      const workAreaData = employeesByWorkArea.find(
+        (workArea) => workArea.id === employee.workAreaId
+      );
+      if (!workAreaData) return;
+
+      workAreaData.totalCost += employee.salary;
+      workAreaData.value += 1;
+    });
+
+    setDataEmployeesByArea(employeesByWorkArea);
+  }
+
+  useEffect(() => {
+    formatEmployeesByWorkArea();
+  }, []);
 
   // paleta suave, neutra mas elegante
   const COLORS = ["#4273fc", "#60a5fa", "#93c5fd", "#2563eb", "#1e40af"];
@@ -36,7 +78,9 @@ export function IndicatorsTab() {
             </div>
           </CardHeader>
           <CardContent className="flex flex-col gap-1">
-            <span className="text-3xl font-bold dark:text-foreground">7</span>
+            <span className="text-3xl font-bold dark:text-foreground">
+              {totalEmployees}
+            </span>
           </CardContent>
         </Card>
 
@@ -50,7 +94,10 @@ export function IndicatorsTab() {
           </CardHeader>
           <CardContent className="flex flex-col gap-1">
             <span className="text-3xl font-bold dark:text-foreground">
-              R$ 17.700,00
+              {totalCost.toLocaleString("pt-BR", {
+                currency: "BRL",
+                style: "currency",
+              })}
             </span>
           </CardContent>
         </Card>
@@ -66,7 +113,7 @@ export function IndicatorsTab() {
             <div className="h-[0.1px] w-full bg-gray-300 mb-4" />
             <div className="flex-1">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={data} barSize={20}>
+                <BarChart data={dataEmployeesByArea} barSize={20}>
                   <XAxis
                     dataKey="name"
                     axisLine={false}
@@ -109,14 +156,14 @@ export function IndicatorsTab() {
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={data}
-                    dataKey="value"
+                    data={dataEmployeesByArea}
+                    dataKey="totalCost"
                     nameKey="name"
                     outerRadius={100}
                     innerRadius={60}
                     paddingAngle={3}
                   >
-                    {data.map((entry, index) => (
+                    {dataEmployeesByArea.map((entry, index) => (
                       <Cell
                         key={`cell-${index}`}
                         fill={COLORS[index % COLORS.length]}

@@ -99,7 +99,9 @@ export default function EmployeeManagement() {
         </TabsContent>
 
         <TabsContent value="indicators" className="pt-4">
-          <IndicatorsTab />
+          {employees && workAreas && (
+            <IndicatorsTab employees={employees} workAreas={workAreas} />
+          )}
         </TabsContent>
       </Tabs>
     </main>
