@@ -2,7 +2,7 @@
 
 import { Breadcrumb } from "@/components/breadcrumb";
 import { ButtonOpenSidebar } from "@/components/button-open-sidebar";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { EventDetailsModal } from "./event-details-modal";
 import { userPagePermission } from "@/utils/user-page-permission";
 import { redirect } from "next/navigation";
@@ -21,10 +21,6 @@ export default function CondominiumSchedule() {
   if (!read && !userIsLoading) {
     redirect("/home");
   }
-
-  const [modalEventDetailsIsOpen, setModalEventDetailsIsOpen] = useState(false);
-  const [eventSelected, setEventSelected] = useState();
-
   const {
     date,
     handleDateSelected,
@@ -34,9 +30,11 @@ export default function CondominiumSchedule() {
     setModalAddEventIsOpen,
     setDaySelected,
     daySelected,
+    eventSelected,
+    setEventSelected,
+    modalEventDetailsIsOpen,
+    setModalEventDetailsIsOpen,
   } = useCondominiumSchedule();
-
-  console.log(condominiumSchedule);
 
   const uniqueDays = [
     ...new Set(condominiumSchedule?.map((day) => day.dayName)),
@@ -46,7 +44,9 @@ export default function CondominiumSchedule() {
     <div className="bg-gray-50 h-screen w-full p-6 md:p-10 flex flex-col gap-6 overflow-y-auto">
       <EventDetailsModal
         isOpen={modalEventDetailsIsOpen}
-        setModalIsOpen={setModalEventDetailsIsOpen}
+        setIsOpen={setModalEventDetailsIsOpen}
+        eventSelected={eventSelected}
+        setEventSelected={setEventSelected}
       />
 
       <AddEventModal
@@ -93,16 +93,20 @@ export default function CondominiumSchedule() {
             <div
               key={index}
               className="border border-gray-200 p-2 flex flex-col gap-2 min-h-56 overflow-auto max-h-56"
-              onClick={() => {
-                setDaySelected(day);
-                setModalAddEventIsOpen(true);
-              }}
             >
               <span className="text-sm font-medium text-gray-700">
                 {day.dayNumber}
               </span>
 
-              <Button variant="outline">Adicionar Evento</Button>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setDaySelected(day);
+                  setModalAddEventIsOpen(true);
+                }}
+              >
+                Adicionar Evento
+              </Button>
 
               {day.events?.map((event, index) => {
                 const colors = [
@@ -137,6 +141,10 @@ export default function CondominiumSchedule() {
                   <div
                     key={event.id}
                     className={`shadow-sm rounded-xl p-2 hover:shadow-md transition cursor-pointer flex flex-col gap-1 border ${colorClass}`}
+                    onClick={() => {
+                      setEventSelected(event);
+                      setModalEventDetailsIsOpen(true);
+                    }}
                   >
                     {/* Título */}
                     <span className="font-semibold text-sm truncate">

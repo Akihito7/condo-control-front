@@ -75,7 +75,6 @@ const interventionSchema = z
         numberOfInstallments !== undefined &&
         !Number.isNaN(numberOfInstallments)
       ) {
-        console.log(numberOfInstallments);
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: "Número de parcelas só deve ser informado se for parcelado",
@@ -159,10 +158,6 @@ export function ModalActionIntervention({
   });
 
   const closeButtonRef = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    console.log(errors);
-  }, [errors]);
 
   async function onSubmit(data: InterventionFormData) {
     if (type === "create") {

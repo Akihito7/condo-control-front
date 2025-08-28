@@ -5,23 +5,25 @@ interface FetchCondominiumScheduleProps {
   condominiumId: number;
 }
 
-interface Event {
+export interface Event {
   id: number;
   title: string;
   description: string | null;
   condominiumId: number;
   eventTypeId: number | null;
-  startTime: string;   
-  endTime: string;     
-  createdAt: string;   
+  startTime: string;
+  area: string;
+  type: string;
+  endTime: string;
+  createdAt: string;
   updatedAt: string | null;
   createdBy: string | null;
 }
 
 export interface DaySchedule {
-  date : string;
+  date: string;
   dayName: string;
-  dayNumber: number;  
+  dayNumber: number;
   events: Event[];
 }
 
