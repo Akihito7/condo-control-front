@@ -4,7 +4,9 @@ import Link from "next/link";
 import { useIsMobile } from "@/lib/use-is-mobile";
 import { useSidebarContext } from "@/providers/use-sidebar-context";
 import { useUserContext } from "@/providers/use-user-context";
-import { userModulePermission } from "@/utils/user-module-permission";
+import { useEffect, useRef, useState } from "react";
+import clsx from "clsx";
+import { redirect } from "next/navigation";
 import {
   ChevronUp,
   ChevronDown,
@@ -29,38 +31,22 @@ import {
   MoreHorizontal,
   LogOut,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import clsx from "clsx";
-import { redirect } from "next/navigation";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@radix-ui/react-dropdown-menu";
 import { Button } from "./ui/button";
-import { deleteCookies, setCookies } from "@/actions/cookies";
-import { useRouter } from "next/router";
+import { deleteCookies } from "@/actions/cookies";
+import { Module } from "@/api/fetch-me";
 
 export function Sidebar() {
   const { isOpen, setIsOpen } = useSidebarContext();
-  const { user } = useUserContext();
-  const [userModulesCanRead, setUserModulesCanRead] = useState({
-    finance: false,
-    structure: false,
-    indicators: false,
-    communication: false,
-    security: false,
-  });
-  const [isSubMenuOpen, setIsSubMenuOpen] = useState({
-    finance: false,
-    structure: false,
-    communication: false,
-    security: false,
-    indicators: false,
-  });
+  const { user, userIsLoading } = useUserContext();
+  const [isSubMenuOpen, setIsSubMenuOpen] = useState<Record<string, boolean>>(
+    {}
+  );
 
   const isMobile = useIsMobile();
   const sidebarRef = useRef<HTMLDivElement>(null);
@@ -70,62 +56,60 @@ export function Sidebar() {
     redirect("/signin");
   }
 
-  // Atualiza permissões
   useEffect(() => {
-    if (user?.id) {
-      setUserModulesCanRead({
-        finance: userModulePermission({
-          moduleId: 1,
-          modules: user.modulesWithPermissionByRole,
-        }),
-        structure: userModulePermission({
-          moduleId: 2,
-          modules: user.modulesWithPermissionByRole,
-        }),
-        indicators: userModulePermission({
-          moduleId: 3,
-          modules: user.modulesWithPermissionByRole,
-        }),
-        communication: userModulePermission({
-          moduleId: 4,
-          modules: user.modulesWithPermissionByRole,
-        }),
-        security: userModulePermission({
-          moduleId: 5,
-          modules: user.modulesWithPermissionByRole,
-        }),
-      });
-    }
-  }, [user]);
-
-  // Fecha sidebar ao clicar fora no mobile
-  useEffect(() => {
-    if (!isOpen) return;
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        isMobile &&
-        sidebarRef.current &&
-        !sidebarRef.current.contains(event.target as Node)
-      ) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isMobile, isOpen, setIsOpen]);
-
-  // Fecha submenus se sidebar fechar
-  useEffect(() => {
-    if (!isOpen) {
-      setIsSubMenuOpen({
-        finance: false,
-        structure: false,
-        communication: false,
-        security: false,
-        indicators: false,
-      });
-    }
+    if (!isOpen) setIsSubMenuOpen({});
   }, [isOpen]);
+
+  const toggleSubMenu = (moduleName: string) => {
+    setIsSubMenuOpen((prev) => ({
+      ...prev,
+      [moduleName]: !prev[moduleName],
+    }));
+    if (!isOpen) setIsOpen(true);
+  };
+
+  if (userIsLoading) {
+    return (
+      <aside
+        style={{
+          position: isMobile ? "fixed" : "static",
+          zIndex: isMobile ? 999 : 1,
+        }}
+        className={clsx(
+          "h-screen bg-white border-r border-gray-200 flex flex-col font-sans text-sm text-gray-800 transition-all duration-300 ease-in-out",
+          isMobile ? (isOpen ? "w-72" : "hidden") : isOpen ? "w-90" : "w-16"
+        )}
+      >
+        {/* Cabeçalho Skeleton */}
+        <div className="p-6 border-b border-gray-200">
+          <div className="h-4 w-4 bg-gray-200 rounded animate-pulse"></div>
+        </div>
+
+        {/* Navegação Skeleton */}
+        <nav className="flex-1 px-2 py-6 space-y-2">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="flex items-center px-3 py-2 space-x-3">
+              <div className="h-4 w-4 bg-gray-200 rounded animate-pulse"></div>
+              {isOpen && (
+                <div className="h-4 w-24 bg-gray-200 rounded animate-pulse"></div>
+              )}
+            </div>
+          ))}
+        </nav>
+
+        {/* Footer Skeleton */}
+        <div className="p-4 border-t border-gray-200 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-gray-200 animate-pulse"></div>
+          {isOpen && (
+            <div className="flex-1 space-y-1">
+              <div className="h-4 w-20 bg-gray-200 rounded animate-pulse"></div>
+              <div className="h-3 w-32 bg-gray-200 rounded animate-pulse"></div>
+            </div>
+          )}
+        </div>
+      </aside>
+    );
+  }
 
   return (
     <aside
@@ -151,6 +135,7 @@ export function Sidebar() {
       </div>
 
       <nav className="flex-1 px-2 py-6 space-y-2">
+        {/* Home sempre visível */}
         <div>
           <button
             onClick={() => {
@@ -173,162 +158,22 @@ export function Sidebar() {
           </button>
         </div>
 
-        {userModulesCanRead.finance && (
-          <div>
-            <button
-              onClick={() => {
-                if (!isOpen) setIsOpen(true);
-                setIsSubMenuOpen((prev) => ({
-                  ...prev,
-                  finance: !prev.finance,
-                }));
-              }}
-              className="w-full flex items-center justify-between px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700 font-medium transition"
-            >
-              <span className="flex items-center">
-                <LayoutDashboard className="w-5 h-5" size={18} />
-                {isOpen && <span className="ml-3">Finanças</span>}
-              </span>
-              {isOpen &&
-                (isSubMenuOpen.finance ? (
-                  <ChevronUp className="w-4 h-4" />
-                ) : (
-                  <ChevronDown className="w-4 h-4" />
-                ))}
-            </button>
-
-            {isSubMenuOpen.finance && isOpen && (
-              <div className="ml-7 mt-2 space-y-1">
-                <SidebarItem
-                  href="/finance/transaction-entry"
-                  icon={<FileText className="w-4 h-4" />}
-                  label="Lançamento de registros"
-                />
-                <SidebarItem
-                  href="/finance/delinquency-control"
-                  icon={<FileBarChart className="w-4 h-4" />}
-                  label="Gestão de Inadimplência"
-                />
-                <SidebarItem
-                  href="/finance/projection"
-                  icon={<DollarSign className="w-4 h-4" />}
-                  label="Previsões financeiras"
-                />
-              </div>
-            )}
-          </div>
-        )}
-        {userModulesCanRead.structure && (
+        {/* Módulos do usuário */}
+        {user?.tabStructure?.map((module) => (
           <SidebarSection
-            label="Estrutura e Operações"
-            icon={<Wrench size={18} />}
+            key={module.moduleId}
+            label={getModuleLabel(module.moduleName)}
+            icon={getModuleIcon(module.moduleName)}
             isOpen={isOpen}
-            isSubOpen={isSubMenuOpen.structure}
-            toggle={() => {
-              if (!isOpen) setIsOpen(true);
-              setIsSubMenuOpen((prev) => ({
-                ...prev,
-                structure: !prev.structure,
-              }));
-            }}
+            isSubOpen={!!isSubMenuOpen[module.moduleName]}
+            toggle={() => toggleSubMenu(module.moduleName)}
           >
-            <SidebarItem
-              href="/structure/maintenance-backlog"
-              icon={<Wrench className="w-4 h-4" />}
-              label="Backlog de manutenções"
-            />
-            <SidebarItem
-              href="/structure/employee-management"
-              icon={<Users className="w-4 h-4" />}
-              label="Gestão de Funcionários"
-            />
-            <SidebarItem
-              href="/structure/management-of-common-spaces"
-              icon={<MapPin className="w-4 h-4" />}
-              label="Gestão de Espaços Comuns"
-            />
+            {renderPages(module, isOpen)}
           </SidebarSection>
-        )}
-        {userModulesCanRead.communication && (
-          <SidebarSection
-            label="Comunicação e Suporte"
-            icon={<MessageSquare size={18} />}
-            isOpen={isOpen}
-            isSubOpen={isSubMenuOpen.communication}
-            toggle={() => {
-              if (!isOpen) setIsOpen(true);
-              setIsSubMenuOpen((prev) => ({
-                ...prev,
-                communication: !prev.communication,
-              }));
-            }}
-          >
-            <SidebarItem
-              href="/communication/opening-of-calls"
-              icon={<Phone className="w-4 h-4" />}
-              label="Abertura de chamados"
-            />
-            <SidebarItem
-              href="/communication/condominium-schedule"
-              icon={<Calendar className="w-4 h-4" />}
-              label="Agenda do Condomínio"
-            />
-            <SidebarItem
-              href="/communication/ordering-management"
-              icon={<Package className="w-4 h-4" />}
-              label="Gestão de Encomendas"
-            />
-            <SidebarItem
-              href="/communication/virtual-assembly"
-              icon={<Package className="w-4 h-4" />}
-              label="Assembleia Digital"
-            />
-          </SidebarSection>
-        )}
-        {userModulesCanRead.security && (
-          <SidebarSection
-            label="Segurança"
-            icon={<Shield size={18} />}
-            isOpen={isOpen}
-            isSubOpen={isSubMenuOpen.security}
-            toggle={() => {
-              if (!isOpen) setIsOpen(true);
-              setIsSubMenuOpen((prev) => ({
-                ...prev,
-                security: !prev.security,
-              }));
-            }}
-          >
-            <SidebarItem
-              href="/security/visitor-registration"
-              icon={<UserCheck className="w-4 h-4" />}
-              label="Registro de Visitantes"
-            />
-          </SidebarSection>
-        )}
-        {userModulesCanRead.indicators && (
-          <SidebarSection
-            label="Indicadores"
-            icon={<TrendingUp size={18} />}
-            isOpen={isOpen}
-            isSubOpen={isSubMenuOpen.indicators}
-            toggle={() => {
-              if (!isOpen) setIsOpen(true);
-              setIsSubMenuOpen((prev) => ({
-                ...prev,
-                indicators: !prev.indicators,
-              }));
-            }}
-          >
-            <SidebarItem
-              href="/indicators/financial-summary"
-              icon={<DollarSign className="w-4 h-4" />}
-              label="Resumo financeiro"
-            />
-          </SidebarSection>
-        )}
+        ))}
       </nav>
 
+      {/* Footer */}
       <div className="p-4 border-t border-gray-200 hover:bg-gray-50 transition">
         {isOpen ? (
           <div className="flex items-center gap-3">
@@ -410,26 +255,15 @@ function SidebarSection({
   );
 }
 
-function SidebarLink({
-  href,
-  icon,
-  label,
-  isOpen,
-}: {
-  href: string;
-  icon: React.ReactNode;
-  label: string;
-  isOpen: boolean;
-}) {
-  return (
-    <Link
-      href={href}
-      className="flex items-center px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700 font-medium transition"
-    >
-      <div className="w-5 h-5">{icon}</div>
-      {isOpen && <span className="ml-3">{label}</span>}
-    </Link>
-  );
+function renderPages(module: Module, isOpen: boolean) {
+  return module.modulePages.map((page) => (
+    <SidebarItem
+      key={page.pageId}
+      href={page.pageRoutePath}
+      icon={getPageIcon(page.pageIconName)}
+      label={page.pageName}
+    />
+  ));
 }
 
 function SidebarItem({
@@ -450,4 +284,52 @@ function SidebarItem({
       <span className="ml-2">{label}</span>
     </Link>
   );
+}
+
+// Ícones por módulo
+function getModuleIcon(moduleName: string) {
+  const icons: Record<string, React.ReactNode> = {
+    financial: <LayoutDashboard size={18} />,
+    structure: <Wrench size={18} />,
+    communication: <MessageSquare size={18} />,
+    security: <Shield size={18} />,
+    indicators: <TrendingUp size={18} />,
+  };
+  return icons[moduleName] || <FileText size={18} />;
+}
+
+// Labels amigáveis
+function getModuleLabel(moduleName: string) {
+  const labels: Record<string, string> = {
+    financial: "Finanças",
+    structure: "Estrutura e Operações",
+    communication: "Comunicação e Suporte",
+    security: "Segurança",
+    indicators: "Indicadores",
+  };
+  return labels[moduleName] || moduleName;
+}
+
+// Ícones para páginas, recebendo string do backend, fallback FileText
+function getPageIcon(iconName?: string) {
+  console.log("icon name", iconName);
+  const icons: Record<string, React.ReactNode> = {
+    Users: <Users className="w-4 h-4" />,
+    Building: <Building className="w-4 h-4" />,
+    Settings: <Settings className="w-4 h-4" />,
+    FileText: <FileText className="w-4 h-4" />,
+    FileBarChart: <FileBarChart className="w-4 h-4" />,
+    DollarSign: <DollarSign className="w-4 h-4" />,
+    UserCircle: <UserCircle className="w-4 h-4" />,
+    MessageSquare: <MessageSquare className="w-4 h-4" />,
+    Phone: <Phone className="w-4 h-4" />,
+    Package: <Package className="w-4 h-4" />,
+    Shield: <Shield className="w-4 h-4" />,
+    UserCheck: <UserCheck className="w-4 h-4" />,
+    Calendar: <Calendar className="w-4 h-4" />,
+    TrendingUp: <TrendingUp className="w-4 h-4" />,
+    Wrench: <Wrench className="w-4 h-4" />,
+    MapPin: <MapPin className="w-4 h-4" />,
+  };
+  return icons[iconName || ""] || <FileText className="w-4 h-4" />;
 }

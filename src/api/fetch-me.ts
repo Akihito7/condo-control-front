@@ -20,6 +20,7 @@ export type User = {
   condominiumId: number;
   pagesWithPermissionByRole: RolePageRelation[]
   modulesWithPermissionByRole: ModulePermissionByRole[]
+  tabStructure: Module[]
 };
 
 export type RolePageRelation = {
@@ -41,6 +42,29 @@ export type ModulePermissionByRole = {
   read: boolean;
   roleName: string;
 };
+
+interface Page {
+  pageId: number;
+  roleName: string;
+  read: boolean;
+  write: boolean;
+  edit: boolean;
+  delete: boolean;
+  pageName: string;
+  pageModuleId: number;
+  pageCreatedAt: string;
+  pageRoutePath: string;
+  pageUpdatedAt: string | null;
+  pageIconName: string,
+}
+
+export interface Module {
+  moduleId: number;
+  moduleName: string;
+  moduleRoutePath: string;
+  modulePages: Page[];
+}
+
 
 
 
