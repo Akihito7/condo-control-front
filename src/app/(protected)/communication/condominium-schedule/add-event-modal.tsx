@@ -71,7 +71,7 @@ export function AddEventModal({
   const formattedDate = useMemo(() => {
     if (!daySelected?.date) return "";
     const [year, month, day] = daySelected.date.split("-").map(Number);
-    const date = new Date(year, month - 1, day); 
+    const date = new Date(year, month - 1, day);
     return new Intl.DateTimeFormat("pt-BR", {
       weekday: "long",
       day: "2-digit",
@@ -102,6 +102,7 @@ export function AddEventModal({
                   type="text"
                   placeholder="Título do evento"
                   {...register("title", { required: true })}
+                  className=" border-gray-300 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:border-blue-500"
                 />
               </div>
 
@@ -113,6 +114,7 @@ export function AddEventModal({
                   type="text"
                   placeholder="Tipo (ex: reunião, palestra...)"
                   {...register("type", { required: true })}
+                  className="border-gray-300 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:border-blue-500"
                 />
               </div>
 
@@ -124,6 +126,7 @@ export function AddEventModal({
                   type="text"
                   placeholder="Local do evento"
                   {...register("location")}
+                  className="border-gray-300 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:border-blue-500"
                 />
               </div>
 
@@ -153,7 +156,7 @@ export function AddEventModal({
                 <Input
                   value={formattedDate}
                   readOnly
-                  className="bg-gray-100 cursor-not-allowed"
+                  className="bg-gray-100 cursor-not-allowed border-gray-300 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:border-blue-500"
                 />
               </div>
 
@@ -164,7 +167,7 @@ export function AddEventModal({
                 <Input
                   type="time"
                   {...register("startTime", { required: true })}
-                  className="w-32"
+                  className="w-32 focus-visible:ring-2 border-gray-300 focus-visible:ring-blue-500 focus-visible:border-blue-500"
                 />
               </div>
 
@@ -175,7 +178,7 @@ export function AddEventModal({
                 <Input
                   type="time"
                   {...register("endTime", { required: true })}
-                  className="w-32"
+                  className="w-32 border-gray-300 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:border-blue-500"
                 />
               </div>
             </div>

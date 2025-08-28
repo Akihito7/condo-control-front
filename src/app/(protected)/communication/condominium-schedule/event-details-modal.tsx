@@ -148,6 +148,7 @@ export function EventDetailsModal({
                   <Input
                     type="text"
                     {...register("title", { required: true })}
+                    className="border-gray-300 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:border-blue-500"
                   />
                 </div>
 
@@ -158,6 +159,7 @@ export function EventDetailsModal({
                   <Input
                     type="text"
                     {...register("type", { required: true })}
+                    className="border-gray-300 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:border-blue-500"
                   />
                 </div>
 
@@ -165,7 +167,12 @@ export function EventDetailsModal({
                   <label className="block text-sm font-medium mb-1">
                     Local
                   </label>
-                  <Input type="text" {...register("location")} />
+                  <Input
+                    type="text"
+                    {...register("location")}
+                    className="border-gray-300 focus-visible:ring-2
+                  focus-visible:ring-blue-500 focus-visible:border-blue-500"
+                  />
                 </div>
 
                 <div>
@@ -192,7 +199,7 @@ export function EventDetailsModal({
                   <Input
                     value={formatDate(getValues("date"))}
                     readOnly
-                    className="bg-gray-100 cursor-not-allowed"
+                    className="bg-gray-100 cursor-not-allowed focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:border-blue-500"
                   />
                 </div>
 
@@ -203,6 +210,7 @@ export function EventDetailsModal({
                   <Input
                     type="time"
                     {...register("startTime", { required: true })}
+                    className="border-gray-300 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:border-blue-500"
                   />
                 </div>
 
@@ -213,6 +221,7 @@ export function EventDetailsModal({
                   <Input
                     type="time"
                     {...register("endTime", { required: true })}
+                    className="border-gray-300 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:border-blue-500"
                   />
                 </div>
               </div>
