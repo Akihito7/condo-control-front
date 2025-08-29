@@ -1,0 +1,46 @@
+import { fetchAssetCategories } from "@/api/fetch-asset-categories";
+import { fetchAssetStatus } from "@/api/fetch-asset-status";
+import { fetchCondominiumAreas } from "@/api/fetch-condominium-areas";
+import { useUserContext } from "@/providers/use-user-context";
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+
+export function useAssetManagement() {
+  const [assetSelected, setAssetSelected] = useState();
+  const [modalAssetIsOpen, setModalAssetIsOpen] = useState(false);
+
+  const {
+    user
+  } = useUserContext();
+  const { condominiumId } = user;
+
+  const { data: categoriesOptions, status: categoriesOptionsStatus } = useQuery({
+    queryKey: ['categories'],
+    queryFn: fetchAssetCategories
+  });
+
+  const { data: areasOptions, status: areasOptionsStatus } = useQuery({
+    queryKey: ['areas'],
+    queryFn: () => fetchCondominiumAreas(condominiumId),
+    enabled: !!condominiumId
+  })
+
+  const { data: statusOptions, status: statusOptionsStatus } = useQuery({
+    queryKey: ['status'],
+    queryFn: fetchAssetStatus,
+    enabled: !!condominiumId
+  })
+
+  return {
+    assetSelected,
+    setAssetSelected,
+    modalAssetIsOpen,
+    setModalAssetIsOpen,
+    categoriesOptions,
+    categoriesOptionsStatus,
+    areasOptions,
+    areasOptionsStatus,
+    statusOptionsStatus,
+    statusOptions
+  }
+}
