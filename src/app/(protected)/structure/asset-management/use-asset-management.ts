@@ -64,7 +64,5 @@ export function useAssetManagement() {
     assets,
     statusAssets,
     handleDeleteAsset,
-    modalDeleteIsOpen,
-    setModalDeleteIsOpen
   }
 }

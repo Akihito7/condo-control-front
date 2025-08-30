@@ -4,7 +4,7 @@ import { Breadcrumb } from "@/components/breadcrumb";
 import { ButtonOpenSidebar } from "@/components/button-open-sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { FileDown, Pencil } from "lucide-react";
+import { FileDown, Paperclip, Pencil } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -20,9 +20,19 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
+
 import { useAssetManagement } from "./use-asset-management";
 import { ModalActionAsset } from "./modal-action-asset";
 import { TableRowSkeleton } from "@/components/table-row-skeleton";
+import { useEffect, useRef, useState } from "react";
 
 export default function AssetManagement() {
   const {
@@ -40,6 +50,20 @@ export default function AssetManagement() {
     statusAssets,
     handleDeleteAsset,
   } = useAssetManagement();
+
+  const [modalPhotoIsOpen, setModalPhotoIsOpen] = useState(false);
+  const [newPhoto, setNewPhoto] = useState<any>(undefined);
+  const [previewPhoto, setPreviewPhoto] = useState<string | null>();
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (newPhoto) {
+      const url = URL.createObjectURL(newPhoto);
+      setPreviewPhoto(url);
+    } else {
+      setPreviewPhoto(null);
+    }
+  }, [newPhoto]);
 
   return (
     <main className="bg-gray-50 min-h-screen overflow-auto w-full p-0 py-8 px-2 sm:p-8 flex flex-col gap-6">
@@ -111,7 +135,12 @@ export default function AssetManagement() {
               ) : (
                 assets?.map((asset, index) => (
                   <TableRow key={index}>
-                    <TableCell>
+                    <TableCell
+                      onClick={() => {
+                        setAssetSelected(asset);
+                        setModalPhotoIsOpen(true);
+                      }}
+                    >
                       <img
                         src={asset.publicUrl}
                         alt="foto do item"
@@ -158,6 +187,64 @@ export default function AssetManagement() {
           </Table>
         </div>
       </section>
+
+      <Dialog open={modalPhotoIsOpen} onOpenChange={setModalPhotoIsOpen}>
+        <DialogContent className="max-w-xl max-h-[90vh] overflow-auto">
+          <DialogHeader>
+            <DialogTitle>Foto</DialogTitle>
+          </DialogHeader>
+
+          {!newPhoto && (
+            <>
+              <img src={assetSelected?.publicUrl} alt="foto do item" />
+              <div className="flex w-full gap-4">
+                <Button className="flex-1" variant="destructive">
+                  Exluir foto atual
+                </Button>
+              </div>
+            </>
+          )}
+
+          {previewPhoto && <img src={previewPhoto} alt="preview new Image" />}
+          <label className="flex flex-col items-center justify-center gap-2 rounded-md border-2 border-dashed border-gray-400 text-gray-600 cursor-pointer p-8 hover:border-gray-600">
+            <Paperclip />
+            Clique para adicionar uma nova foto
+            <input
+              ref={inputRef}
+              className="hidden"
+              type="file"
+              onChange={(event) => {
+                const files = event.target.files;
+                if (files && files.length > 0) {
+                  setNewPhoto(files[0]);
+                } else {
+                  setPreviewPhoto(null);
+                  setNewPhoto(null);
+                }
+              }}
+            />
+          </label>
+
+          {newPhoto && (
+            <div className="flex w-full gap-4">
+              <Button
+                className="flex-1"
+                variant="outline"
+                onClick={() => {
+                  setPreviewPhoto(null);
+                  setNewPhoto(null);
+                  if (inputRef && inputRef.current) {
+                    inputRef.current.value = "";
+                  }
+                }}
+              >
+                Voltar
+              </Button>
+              <Button className="flex-1">Confirmar troca de foto</Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </main>
   );
 }
