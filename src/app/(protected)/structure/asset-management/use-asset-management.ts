@@ -1,12 +1,13 @@
 import { fetchAssetCategories } from "@/api/fetch-asset-categories";
 import { fetchAssetStatus } from "@/api/fetch-asset-status";
+import { Asset, fetchAssets } from "@/api/fetch-assets";
 import { fetchCondominiumAreas } from "@/api/fetch-condominium-areas";
 import { useUserContext } from "@/providers/use-user-context";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
 export function useAssetManagement() {
-  const [assetSelected, setAssetSelected] = useState();
+  const [assetSelected, setAssetSelected] = useState<Asset | undefined>();
   const [modalAssetIsOpen, setModalAssetIsOpen] = useState(false);
 
   const {
@@ -31,6 +32,12 @@ export function useAssetManagement() {
     enabled: !!condominiumId
   })
 
+  const { data: assets, status: statusAssets } = useQuery({
+    queryKey: [condominiumId],
+    queryFn: async () => fetchAssets({ condominiumId }),
+    enabled: !!condominiumId
+  })
+
   return {
     assetSelected,
     setAssetSelected,
@@ -41,6 +48,8 @@ export function useAssetManagement() {
     areasOptions,
     areasOptionsStatus,
     statusOptionsStatus,
-    statusOptions
+    statusOptions,
+    assets,
+    statusAssets
   }
 }

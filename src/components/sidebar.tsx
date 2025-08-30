@@ -312,7 +312,6 @@ function getModuleLabel(moduleName: string) {
 
 // Ícones para páginas, recebendo string do backend, fallback FileText
 function getPageIcon(iconName?: string) {
-  console.log("icon name", iconName);
   const icons: Record<string, React.ReactNode> = {
     Users: <Users className="w-4 h-4" />,
     Building: <Building className="w-4 h-4" />,

@@ -4,7 +4,7 @@ import { Breadcrumb } from "@/components/breadcrumb";
 import { ButtonOpenSidebar } from "@/components/button-open-sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { FileDown } from "lucide-react";
+import { FileDown, Pencil } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -13,83 +13,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
 import { useAssetManagement } from "./use-asset-management";
 import { ModalActionAsset } from "./modal-action-asset";
-
-const MOCKDATA = [
-  {
-    photo: "https://example.com/photo1.jpg",
-    item: "Item 1",
-    codigo: "COD0001",
-    area: "Centro",
-    categoria: "Alimentos",
-    status: "Indisponível",
-  },
-  {
-    photo: "https://example.com/photo2.jpg",
-    item: "Item 2",
-    codigo: "COD0002",
-    area: "Oeste",
-    categoria: "Alimentos",
-    status: "Em Estoque",
-  },
-  {
-    photo: "https://example.com/photo3.jpg",
-    item: "Item 3",
-    codigo: "COD0003",
-    area: "Norte",
-    categoria: "Eletrônicos",
-    status: "Em Estoque",
-  },
-  {
-    photo: "https://example.com/photo4.jpg",
-    item: "Item 4",
-    codigo: "COD0004",
-    area: "Oeste",
-    categoria: "Eletrônicos",
-    status: "Disponível",
-  },
-  {
-    photo: "https://example.com/photo5.jpg",
-    item: "Item 5",
-    codigo: "COD0005",
-    area: "Centro",
-    categoria: "Brinquedos",
-    status: "Em Estoque",
-  },
-  {
-    photo: "https://example.com/photo6.jpg",
-    item: "Item 6",
-    codigo: "COD0006",
-    area: "Sul",
-    categoria: "Eletrônicos",
-    status: "Disponível",
-  },
-  {
-    photo: "https://example.com/photo7.jpg",
-    item: "Item 7",
-    codigo: "COD0007",
-    area: "Leste",
-    categoria: "Eletrônicos",
-    status: "Em Estoque",
-  },
-  {
-    photo: "https://example.com/photo8.jpg",
-    item: "Item 8",
-    codigo: "COD0008",
-    area: "Oeste",
-    categoria: "Alimentos",
-    status: "Disponível",
-  },
-  {
-    photo: "https://example.com/photo9.jpg",
-    item: "Item 9",
-    codigo: "COD0009",
-    area: "Norte",
-    categoria: "Brinquedos",
-    status: "Esgotado",
-  },
-];
+import { TableRowSkeleton } from "@/components/table-row-skeleton";
 
 export default function AssetManagement() {
   const {
@@ -103,6 +36,8 @@ export default function AssetManagement() {
     areasOptionsStatus,
     statusOptionsStatus,
     statusOptions,
+    assets,
+    statusAssets,
   } = useAssetManagement();
 
   return (
@@ -148,6 +83,7 @@ export default function AssetManagement() {
             categoriasOptions={categoriesOptions}
             areasOptions={areasOptions}
             statusOptions={statusOptions}
+            type={assetSelected ? "edit" : "create"}
           />
         </div>
 
@@ -165,21 +101,52 @@ export default function AssetManagement() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {MOCKDATA.map((data) => (
-                <TableRow>
-                  <TableCell>
-                    <img
-                      src="https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=300"
-                      alt="foto do item"
-                      className="w-16 h-16 rounded-lg"
-                    />
-                  </TableCell>
-                  <TableCell>{data.item}</TableCell>
-                  <TableCell>{data.codigo}</TableCell>
-                  <TableCell>{data.area}</TableCell>
-                  <TableCell>{data.status}</TableCell>
-                </TableRow>
-              ))}
+              {statusAssets === "pending" ? (
+                <>
+                  {Array.from({ length: 5 }).map((_, index) => (
+                    <TableRowSkeleton className="h-18" key={index} />
+                  ))}
+                </>
+              ) : (
+                assets?.map((asset, index) => (
+                  <TableRow key={index}>
+                    <TableCell>
+                      <img
+                        src={asset.publicUrl}
+                        alt="foto do item"
+                        className="w-16 h-16 rounded-lg"
+                      />
+                    </TableCell>
+                    <TableCell>{asset.name}</TableCell>
+                    <TableCell>{asset.codeItem}</TableCell>
+                    <TableCell>{asset.condominiumAreasName}</TableCell>
+                    <TableCell>{asset.assetCategoriesName}</TableCell>
+                    <TableCell className="text-center">
+                      {asset.assetStatusName}
+                    </TableCell>
+
+                    <TableCell className="text-center">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger className="outline-none ring-0 focus:outline-none focus:ring-0 cursor-pointer">
+                          <Pencil className="w-4 h-4 text-gray-700" />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuItem>Reportar Problema</DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              setAssetSelected(asset);
+                              setModalAssetIsOpen(true);
+                            }}
+                          >
+                            Editar
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>Excluir</DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </div>

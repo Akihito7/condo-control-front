@@ -25,13 +25,19 @@ import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Option } from "@/api/fetch-work-areas";
+import { Eye, Paperclip } from "lucide-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { createAsset } from "@/api/create-asset";
+import { useUserContext } from "@/providers/use-user-context";
+import { Asset } from "@/api/fetch-assets";
+import { updateAsset } from "@/api/update-asset";
 
 const assetSchema = z.object({
   item: z.string().min(1, "Por favor, insira o item"),
-  codigo: z.string().min(1, "Por favor, insira o código"),
-  area: z.string().min(1, "Por favor, selecione a área"),
-  categoria: z.string().min(1, "Por favor, selecione a categoria"),
-  status: z.string().min(1, "Por favor, selecione o status"),
+  code: z.string().min(1, "Por favor, insira o código"),
+  areaId: z.string().min(1, "Por favor, selecione a área"),
+  categoryId: z.string().min(1, "Por favor, selecione a categoria"),
+  statusId: z.string().min(1, "Por favor, selecione o status"),
   photo: z
     .any()
     .refine(
@@ -49,10 +55,8 @@ interface ModalActionAssetProps {
   areasOptions?: Option[] | undefined;
   categoriasOptions?: Option[] | undefined;
   statusOptions?: Option[] | undefined;
-  assetSelected?: AssetFormData;
-  setAssetSelected?: React.Dispatch<
-    React.SetStateAction<AssetFormData | undefined>
-  >;
+  assetSelected?: Asset | undefined;
+  setAssetSelected?: React.Dispatch<React.SetStateAction<Asset | undefined>>;
   type?: "create" | "edit" | "view";
 }
 
@@ -72,15 +76,17 @@ export function ModalActionAsset({
     handleSubmit,
     reset,
     setValue,
+    getValues,
     formState: { errors },
+    watch,
   } = useForm<AssetFormData>({
     resolver: zodResolver(assetSchema),
     defaultValues: {
       item: "",
-      codigo: "",
-      area: "",
-      categoria: "",
-      status: "",
+      code: "",
+      areaId: "",
+      categoryId: "",
+      statusId: "",
       photo: undefined,
     },
   });
@@ -89,13 +95,22 @@ export function ModalActionAsset({
 
   const isDisabled = type === "view";
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const { user } = useUserContext();
+  const { condominiumId } = user;
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (assetSelected && (type === "edit" || type === "view")) {
-      reset(assetSelected);
-      if (assetSelected.photo && typeof assetSelected.photo === "string") {
+      reset({
+        areaId: assetSelected.areaId.toString(),
+        categoryId: assetSelected.categoryId.toString(),
+        code: assetSelected.categoryId.toString(),
+        item: assetSelected.name,
+        statusId: assetSelected.statusId.toString(),
+      });
+      /*     if (assetSelected.photo && typeof assetSelected.photo === "string") {
         setPreviewPhoto(assetSelected.photo);
-      }
+      } */
     } else if (type === "create") {
       reset();
       setPreviewPhoto(null);
@@ -114,8 +129,21 @@ export function ModalActionAsset({
   }
 
   async function onSubmit(data: AssetFormData) {
-    // Submeter os dados do formulário
-    console.log("Dados do asset:", data);
+    const formData = new FormData();
+    formData.append("code", data.code);
+    formData.append("item", data.item);
+    formData.append("areaId", data.areaId);
+    formData.append("statusId", data.statusId);
+    formData.append("categoryId", data.categoryId);
+    formData.append("photo", data.photo?.[0]);
+
+    if (type === "create") {
+      await handleCreateAsset(formData);
+    } else {
+      alert("atualizando");
+      await handleUpdateAsset(data);
+    }
+
     reset();
     setPreviewPhoto(null);
     setAssetSelected && setAssetSelected(undefined);
@@ -123,12 +151,34 @@ export function ModalActionAsset({
     setIsOpen(false);
   }
 
+  const { mutateAsync: handleCreateAsset } = useMutation({
+    mutationFn: (formData: FormData) =>
+      createAsset({ form: formData, condominiumId }),
+    onSuccess: async () => {
+      await invalidQueries();
+    },
+  });
+
+  const { mutateAsync: handleUpdateAsset } = useMutation({
+    mutationFn: (data: AssetFormData) =>
+      updateAsset({ assetId: assetSelected!.id, data }),
+    onSuccess: async () => {
+      await invalidQueries();
+    },
+  });
+  async function invalidQueries() {
+    await queryClient.invalidateQueries({
+      exact: true,
+      queryKey: [condominiumId],
+    });
+  }
+
   const modalTitle =
     type === "create"
-      ? "Adicionar Asset"
+      ? "Adicionar Patrimônio"
       : type === "edit"
-      ? "Editar Asset"
-      : "Visualizar Asset";
+      ? "Editar Patrimônio"
+      : "Visualizar Patrimônio";
 
   const modalDescription =
     type === "create"
@@ -184,14 +234,14 @@ export function ModalActionAsset({
           <div className="grid grid-cols-4 items-center gap-4">
             <Label className="text-right">Código</Label>
             <Input
-              {...register("codigo")}
+              {...register("code")}
               className="col-span-3"
               disabled={isDisabled}
             />
           </div>
-          {errors.codigo && !isDisabled && (
+          {errors.code && !isDisabled && (
             <p className="text-red-500 text-sm -mt-2 ml-[100px]">
-              {errors.codigo.message}
+              {errors.code.message}
             </p>
           )}
 
@@ -199,7 +249,7 @@ export function ModalActionAsset({
           <div className="grid grid-cols-4 items-center gap-4">
             <Label className="text-right">Área</Label>
             <Controller
-              name="area"
+              name="areaId"
               control={control}
               render={({ field }) => (
                 <Select
@@ -221,9 +271,9 @@ export function ModalActionAsset({
               )}
             />
           </div>
-          {errors.area && !isDisabled && (
+          {errors.areaId && !isDisabled && (
             <p className="text-red-500 text-sm -mt-2 ml-[100px]">
-              {errors.area.message}
+              {errors.areaId.message}
             </p>
           )}
 
@@ -231,7 +281,7 @@ export function ModalActionAsset({
           <div className="grid grid-cols-4 items-center gap-4">
             <Label className="text-right">Categoria</Label>
             <Controller
-              name="categoria"
+              name="categoryId"
               control={control}
               render={({ field }) => (
                 <Select
@@ -253,9 +303,9 @@ export function ModalActionAsset({
               )}
             />
           </div>
-          {errors.categoria && !isDisabled && (
+          {errors.categoryId && !isDisabled && (
             <p className="text-red-500 text-sm -mt-2 ml-[100px]">
-              {errors.categoria.message}
+              {errors.categoryId.message}
             </p>
           )}
 
@@ -263,7 +313,7 @@ export function ModalActionAsset({
           <div className="grid grid-cols-4 items-center gap-4">
             <Label className="text-right">Status</Label>
             <Controller
-              name="status"
+              name="statusId"
               control={control}
               render={({ field }) => (
                 <Select
@@ -285,37 +335,72 @@ export function ModalActionAsset({
               )}
             />
           </div>
-          {errors.status && !isDisabled && (
+          {errors.statusId && !isDisabled && (
             <p className="text-red-500 text-sm -mt-2 ml-[100px]">
-              {errors.status.message}
+              {errors.statusId.message}
             </p>
           )}
 
           {/* Foto */}
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Foto</Label>
-            <div className="col-span-3">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={onFileChange}
-                disabled={isDisabled}
-                className="file-input"
-              />
-              {errors.photo && !isDisabled && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.photo.message?.toString()}
-                </p>
-              )}
-              {previewPhoto && (
-                <img
-                  src={previewPhoto}
-                  alt="Preview da foto"
-                  className="mt-2 max-h-40 rounded-md"
-                />
-              )}
+
+          {type === "create" && (
+            <div className="grid grid-cols-4 items-start gap-4">
+              <Label className="text-right pt-2">Foto</Label>
+              <div className="col-span-3 flex flex-col gap-2">
+                <label className="flex flex-col items-center justify-center gap-2 rounded-md border-2 border-dashed border-gray-400 text-gray-600 cursor-pointer p-8 hover:border-gray-600">
+                  <Paperclip />
+                  Clique para selecionar anexos.
+                  <Controller
+                    name="photo"
+                    control={control}
+                    render={({ field: { onChange } }) => (
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const files = e.target.files; // pega os arquivos
+                          if (!files || files.length === 0) {
+                            setPreviewPhoto(null);
+                            onChange(undefined);
+                            return;
+                          }
+
+                          onChange(files); // atualiza RHF com FileList
+                          const file = files[0];
+                          const previewUrl = URL.createObjectURL(file);
+                          setPreviewPhoto(previewUrl);
+                        }}
+                        disabled={isDisabled}
+                        className="file-input hidden"
+                      />
+                    )}
+                  />
+                </label>
+                {errors.photo && !isDisabled && (
+                  <p className="text-red-500 text-sm">
+                    {errors.photo.message?.toString()}
+                  </p>
+                )}
+
+                {previewPhoto && (
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button className="mt-1 w-fit" variant="outline">
+                        Ver imagem <Eye className="ml-1" />
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-[90vw] max-h-[90vh] p-0 flex items-center justify-center">
+                      <img
+                        src={previewPhoto}
+                        alt="Foto em tela cheia"
+                        className="w-full h-full object-contain rounded-md"
+                      />
+                    </DialogContent>
+                  </Dialog>
+                )}
+              </div>
             </div>
-          </div>
+          )}
 
           <DialogFooter className="pt-4">
             <DialogClose asChild>
