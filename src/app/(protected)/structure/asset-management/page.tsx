@@ -38,6 +38,7 @@ export default function AssetManagement() {
     statusOptions,
     assets,
     statusAssets,
+    handleDeleteAsset,
   } = useAssetManagement();
 
   return (
@@ -140,7 +141,13 @@ export default function AssetManagement() {
                           >
                             Editar
                           </DropdownMenuItem>
-                          <DropdownMenuItem>Excluir</DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={async () => {
+                              await handleDeleteAsset(asset.id);
+                            }}
+                          >
+                            Excluir
+                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>

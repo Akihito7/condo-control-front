@@ -1,9 +1,10 @@
+import { deleteAsset } from "@/api/delete-asset";
 import { fetchAssetCategories } from "@/api/fetch-asset-categories";
 import { fetchAssetStatus } from "@/api/fetch-asset-status";
 import { Asset, fetchAssets } from "@/api/fetch-assets";
 import { fetchCondominiumAreas } from "@/api/fetch-condominium-areas";
 import { useUserContext } from "@/providers/use-user-context";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 
 export function useAssetManagement() {
@@ -14,6 +15,8 @@ export function useAssetManagement() {
     user
   } = useUserContext();
   const { condominiumId } = user;
+
+  const queryClient = useQueryClient();
 
   const { data: categoriesOptions, status: categoriesOptionsStatus } = useQuery({
     queryKey: ['categories'],
@@ -38,6 +41,15 @@ export function useAssetManagement() {
     enabled: !!condominiumId
   })
 
+  const { mutateAsync: handleDeleteAsset } = useMutation({
+    mutationFn: async (assetId: number) => deleteAsset(assetId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [condominiumId]
+      })
+    }
+  })
+
   return {
     assetSelected,
     setAssetSelected,
@@ -50,6 +62,9 @@ export function useAssetManagement() {
     statusOptionsStatus,
     statusOptions,
     assets,
-    statusAssets
+    statusAssets,
+    handleDeleteAsset,
+    modalDeleteIsOpen,
+    setModalDeleteIsOpen
   }
 }
