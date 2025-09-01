@@ -42,6 +42,8 @@ import { ModalActionAsset } from "./modal-action-asset";
 import { TableRowSkeleton } from "@/components/table-row-skeleton";
 import { useEffect, useRef, useState } from "react";
 import { NotificationDropdown } from "@/components/notification";
+import { ModalReport } from "./modal-report";
+import Link from "next/link";
 
 export default function AssetManagement() {
   const {
@@ -75,6 +77,7 @@ export default function AssetManagement() {
   // Filtros
   const [areaSelected, setAreaSelected] = useState("-1");
   const [codeSearch, setCodeSearch] = useState("");
+  const [modalReportIsOpen, setModalReportIsOpen] = useState(false);
 
   useEffect(() => {
     if (newPhoto) {
@@ -188,6 +191,7 @@ export default function AssetManagement() {
                 <TableHead>Área</TableHead>
                 <TableHead className="text-left">Categoria</TableHead>
                 <TableHead className="text-center">Status</TableHead>
+                <TableHead className="text-left">Reports</TableHead>
                 <TableHead className="text-center">Ações</TableHead>
               </TableRow>
             </TableHeader>
@@ -226,6 +230,15 @@ export default function AssetManagement() {
                     <TableCell className="text-center">
                       {asset.assetStatusName}
                     </TableCell>
+                    <TableCell>
+                      <Link
+                        href={`asset-management/${asset.id}`}
+                        className="flex items-center justify-center gap-1 px-2 py-1 bg-gray-100 rounded hover:bg-gray-200 transition w-12 h-12"
+                      >
+                        <Paperclip className="w-4 h-4 text-gray-700" />{" "}
+                        <span>{asset.reportCount ?? 0}</span>
+                      </Link>
+                    </TableCell>
 
                     <TableCell className="text-center">
                       <DropdownMenu
@@ -249,6 +262,8 @@ export default function AssetManagement() {
                             onClick={() => {
                               setDropdownOpen(false);
                               setDropdownOpenToThisItem(undefined);
+                              setAssetSelected(asset);
+                              setModalReportIsOpen(true);
                             }}
                           >
                             Reportar Problema
@@ -396,6 +411,13 @@ export default function AssetManagement() {
           )}
         </DialogContent>
       </Dialog>
+
+      <ModalReport
+        isOpen={modalReportIsOpen}
+        setIsOpen={(value: boolean) => setModalReportIsOpen(value)}
+        assetSelected={assetSelected}
+        setAssetSelected={setAssetSelected}
+      />
     </main>
   );
 }

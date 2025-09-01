@@ -25,6 +25,7 @@ export interface Asset {
   condominiumAreasId: number;
   condominiumAreasName: string
   condominiumAreasType: string;
+  reportCount: number;
 }
 
 
@@ -32,6 +33,7 @@ export async function fetchAssets({
   condominiumId
 }: FetchAssetsProps): Promise<Asset[]> {
   const response = await api.get(`structure/assets/${condominiumId}`);
+  console.log(response.data)
   const data = response.data;
   return data;
 }
