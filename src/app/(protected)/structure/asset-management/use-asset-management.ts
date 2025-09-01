@@ -1,8 +1,10 @@
 import { deleteAsset } from "@/api/delete-asset";
+import { deleteAssetImage } from "@/api/delete-asset-image";
 import { fetchAssetCategories } from "@/api/fetch-asset-categories";
 import { fetchAssetStatus } from "@/api/fetch-asset-status";
 import { Asset, fetchAssets } from "@/api/fetch-assets";
 import { fetchCondominiumAreas } from "@/api/fetch-condominium-areas";
+import { updateAssetImage } from "@/api/update-asset-image";
 import { useUserContext } from "@/providers/use-user-context";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -50,6 +52,27 @@ export function useAssetManagement() {
     }
   })
 
+  const { mutateAsync: handleChangeAssetImage } = useMutation({
+    mutationFn: ({
+      formData,
+      assetId
+    }: any) => updateAssetImage({ assetId, formData }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [condominiumId]
+      })
+    }
+  })
+
+  const { mutateAsync: handleDeleteAssetImage, status: deleteAssetImageStatus } = useMutation({
+    mutationFn: (assetId: number) => deleteAssetImage({ assetId }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [condominiumId]
+      })
+    }
+  })
+
   return {
     assetSelected,
     setAssetSelected,
@@ -64,5 +87,7 @@ export function useAssetManagement() {
     assets,
     statusAssets,
     handleDeleteAsset,
+    handleChangeAssetImage,
+    handleDeleteAssetImage,
   }
 }

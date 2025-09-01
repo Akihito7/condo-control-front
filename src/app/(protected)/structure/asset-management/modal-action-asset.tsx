@@ -100,7 +100,7 @@ export function ModalActionAsset({
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    if (assetSelected && (type === "edit" || type === "view")) {
+    if (assetSelected) {
       reset({
         areaId: assetSelected.areaId.toString(),
         categoryId: assetSelected.categoryId.toString(),
@@ -111,22 +111,18 @@ export function ModalActionAsset({
       /*     if (assetSelected.photo && typeof assetSelected.photo === "string") {
         setPreviewPhoto(assetSelected.photo);
       } */
-    } else if (type === "create") {
-      reset();
+    } else {
+      reset({
+        areaId: "",
+        categoryId: "",
+        code: "",
+        item: "",
+        photo: "",
+        statusId: "",
+      });
       setPreviewPhoto(null);
     }
   }, [assetSelected, reset, type]);
-
-  function onFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files && e.target.files[0];
-    setValue("photo", e.target.files);
-    if (file) {
-      const url = URL.createObjectURL(file);
-      setPreviewPhoto(url);
-    } else {
-      setPreviewPhoto(null);
-    }
-  }
 
   async function onSubmit(data: AssetFormData) {
     const formData = new FormData();
@@ -140,7 +136,6 @@ export function ModalActionAsset({
     if (type === "create") {
       await handleCreateAsset(formData);
     } else {
-      alert("atualizando");
       await handleUpdateAsset(data);
     }
 

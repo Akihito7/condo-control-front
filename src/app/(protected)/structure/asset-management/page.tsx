@@ -4,7 +4,7 @@ import { Breadcrumb } from "@/components/breadcrumb";
 import { ButtonOpenSidebar } from "@/components/button-open-sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { FileDown, Paperclip, Pencil } from "lucide-react";
+import { FileDown, ImageOff, Paperclip, Pencil } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -49,12 +49,19 @@ export default function AssetManagement() {
     assets,
     statusAssets,
     handleDeleteAsset,
+    handleChangeAssetImage,
+    handleDeleteAssetImage,
   } = useAssetManagement();
 
   const [modalPhotoIsOpen, setModalPhotoIsOpen] = useState(false);
   const [newPhoto, setNewPhoto] = useState<any>(undefined);
   const [previewPhoto, setPreviewPhoto] = useState<string | null>();
   const inputRef = useRef<HTMLInputElement>(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [dropdownOpenToThisItem, setDropdownOpenToThisItem] = useState<
+    number | undefined
+  >();
+  const [updatingImage, setUpdatingImaged] = useState(false);
 
   useEffect(() => {
     if (newPhoto) {
@@ -141,11 +148,17 @@ export default function AssetManagement() {
                         setModalPhotoIsOpen(true);
                       }}
                     >
-                      <img
-                        src={asset.publicUrl}
-                        alt="foto do item"
-                        className="w-16 h-16 rounded-lg"
-                      />
+                      {asset.publicUrl ? (
+                        <img
+                          src={asset.publicUrl}
+                          alt="foto do item"
+                          className="w-16 h-16 rounded-lg object-cover"
+                        />
+                      ) : (
+                        <div className="w-16 h-16 flex items-center justify-center rounded-lg bg-gray-200 text-gray-500">
+                          <ImageOff className="w-6 h-6" />
+                        </div>
+                      )}
                     </TableCell>
                     <TableCell>{asset.name}</TableCell>
                     <TableCell>{asset.codeItem}</TableCell>
@@ -156,14 +169,35 @@ export default function AssetManagement() {
                     </TableCell>
 
                     <TableCell className="text-center">
-                      <DropdownMenu>
+                      <DropdownMenu
+                        open={
+                          dropdownOpen && dropdownOpenToThisItem === asset.id
+                        }
+                        onOpenChange={(open) => {
+                          if (!open) {
+                            setDropdownOpenToThisItem(undefined);
+                          } else {
+                            setDropdownOpenToThisItem(asset.id);
+                          }
+                          setDropdownOpen(open);
+                        }}
+                      >
                         <DropdownMenuTrigger className="outline-none ring-0 focus:outline-none focus:ring-0 cursor-pointer">
                           <Pencil className="w-4 h-4 text-gray-700" />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
-                          <DropdownMenuItem>Reportar Problema</DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => {
+                              setDropdownOpen(false);
+                              setDropdownOpenToThisItem(undefined);
+                            }}
+                          >
+                            Reportar Problema
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              setDropdownOpen(false);
+                              setDropdownOpenToThisItem(undefined);
                               setAssetSelected(asset);
                               setModalAssetIsOpen(true);
                             }}
@@ -188,21 +222,51 @@ export default function AssetManagement() {
         </div>
       </section>
 
-      <Dialog open={modalPhotoIsOpen} onOpenChange={setModalPhotoIsOpen}>
+      <Dialog
+        open={modalPhotoIsOpen && !!assetSelected?.id}
+        onOpenChange={(open) => {
+          if (!open) {
+            setNewPhoto(undefined);
+            setPreviewPhoto(undefined);
+            setModalPhotoIsOpen(false);
+            setAssetSelected(undefined);
+          }
+          setModalPhotoIsOpen(open);
+        }}
+      >
         <DialogContent className="max-w-xl max-h-[90vh] overflow-auto">
           <DialogHeader>
             <DialogTitle>Foto</DialogTitle>
           </DialogHeader>
 
-          {!newPhoto && (
+          {!newPhoto && assetSelected?.publicUrl ? (
             <>
-              <img src={assetSelected?.publicUrl} alt="foto do item" />
-              <div className="flex w-full gap-4">
-                <Button className="flex-1" variant="destructive">
-                  Exluir foto atual
+              <img
+                src={assetSelected?.publicUrl}
+                alt="foto do item"
+                className="w-32 h-32 rounded-lg object-cover mx-auto"
+              />
+              <div className="flex w-full gap-4 mt-4">
+                <Button
+                  onClick={async () => {
+                    await handleDeleteAssetImage(assetSelected!.id);
+                    setModalPhotoIsOpen(false);
+                    setAssetSelected(undefined);
+                  }}
+                  className="flex-1"
+                  variant="destructive"
+                >
+                  Remover foto atual
                 </Button>
               </div>
             </>
+          ) : (
+            <div className="flex flex-col items-center justify-center text-gray-500 gap-2">
+              <span>Este item ainda não possui foto</span>
+              <span className="text-sm">
+                Você pode adicionar uma nova imagem agora.
+              </span>
+            </div>
           )}
 
           {previewPhoto && <img src={previewPhoto} alt="preview new Image" />}
@@ -240,7 +304,26 @@ export default function AssetManagement() {
               >
                 Voltar
               </Button>
-              <Button className="flex-1">Confirmar troca de foto</Button>
+              <Button
+                disabled={updatingImage}
+                onClick={async () => {
+                  setUpdatingImaged(true);
+                  const formData = new FormData();
+                  formData.append("photo", newPhoto);
+                  await handleChangeAssetImage({
+                    assetId: assetSelected!.id,
+                    formData,
+                  });
+                  setNewPhoto(undefined);
+                  setPreviewPhoto(undefined);
+                  setModalPhotoIsOpen(false);
+                  setAssetSelected(undefined);
+                  setUpdatingImaged(false);
+                }}
+                className="flex-1"
+              >
+                Confirmar troca de foto
+              </Button>
             </div>
           )}
         </DialogContent>
