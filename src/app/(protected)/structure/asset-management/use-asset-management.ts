@@ -22,7 +22,8 @@ export function useAssetManagement() {
 
   const { data: categoriesOptions, status: categoriesOptionsStatus } = useQuery({
     queryKey: ['categories'],
-    queryFn: fetchAssetCategories
+    queryFn: fetchAssetCategories,
+    enabled: !!condominiumId
   });
 
   const { data: areasOptions, status: areasOptionsStatus } = useQuery({

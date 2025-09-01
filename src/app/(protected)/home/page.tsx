@@ -1,6 +1,7 @@
 "use client";
 import { Breadcrumb } from "@/components/breadcrumb";
 import { ButtonOpenSidebar } from "@/components/button-open-sidebar";
+import { NotificationDropdown } from "@/components/notification";
 import { useUserContext } from "@/providers/use-user-context";
 import {
   Building,
@@ -21,6 +22,9 @@ export default function HomePage() {
         <div className="flex items-center mb-8 gap-2">
           <ButtonOpenSidebar />
           <Breadcrumb paths={["Início", "Home"]} />
+          <div className="ml-auto">
+            <NotificationDropdown />
+          </div>
         </div>
       </div>
 
