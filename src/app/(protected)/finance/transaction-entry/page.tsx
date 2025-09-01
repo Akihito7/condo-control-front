@@ -43,6 +43,7 @@ import { redirect } from "next/navigation";
 import { userPagePermission } from "@/utils/user-page-permission";
 import { MonthYearPicker } from "@/components/month-year-select";
 import { printDocument } from "@/utils/print-document";
+import { NotificationDropdown } from "@/components/notification";
 
 export type OptionType = {
   value: number;
@@ -124,6 +125,9 @@ export default function Finance() {
         <div className="flex items-center mb-8 gap-2">
           <ButtonOpenSidebar />
           <Breadcrumb paths={["Início", "Finanças"]} />
+          <div className="ml-auto">
+            <NotificationDropdown />
+          </div>
         </div>
         <h1 className="text-2xl font-semibold text-gray-800">
           Visão Geral Financeira

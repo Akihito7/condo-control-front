@@ -38,6 +38,7 @@ import { userPagePermission } from "@/utils/user-page-permission";
 import { redirect } from "next/navigation";
 import { useUserContext } from "@/providers/use-user-context";
 import { printDocument } from "@/utils/print-document";
+import { NotificationDropdown } from "@/components/notification";
 
 export default function DelinquencyControl() {
   const { edit, read } = userPagePermission({ pageId: 2 });
@@ -90,6 +91,9 @@ export default function DelinquencyControl() {
         <div className="flex items-center mb-8 gap-2">
           <ButtonOpenSidebar />
           <Breadcrumb paths={["Início", "Finanças"]} />
+          <div className="ml-auto">
+            <NotificationDropdown />
+          </div>
         </div>
         <h1 className="text-2xl font-semibold text-gray-800">
           Gestão de Inadimplência

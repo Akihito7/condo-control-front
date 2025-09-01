@@ -3,6 +3,7 @@ import React from "react";
 import { QueryProvider } from "@/providers/query-provider";
 import { UserContextProvider } from "@/contexts/user-context";
 import { SidebarContextProvider } from "@/contexts/sidebar-context";
+import { NotificationContextProvider } from "@/contexts/notification-context";
 
 export default async function Layout({
   children,
@@ -13,10 +14,12 @@ export default async function Layout({
     <SidebarContextProvider>
       <UserContextProvider>
         <QueryProvider>
-          <div className="layout-base">
-            <Sidebar />
-            {children}
-          </div>
+          <NotificationContextProvider>
+            <div className="layout-base">
+              <Sidebar />
+              {children}
+            </div>
+          </NotificationContextProvider>
         </QueryProvider>
       </UserContextProvider>
     </SidebarContextProvider>

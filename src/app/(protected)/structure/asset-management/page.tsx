@@ -41,6 +41,7 @@ import { useAssetManagement } from "./use-asset-management";
 import { ModalActionAsset } from "./modal-action-asset";
 import { TableRowSkeleton } from "@/components/table-row-skeleton";
 import { useEffect, useRef, useState } from "react";
+import { NotificationDropdown } from "@/components/notification";
 
 export default function AssetManagement() {
   const {
@@ -102,6 +103,9 @@ export default function AssetManagement() {
         <div className="flex items-center mb-8 gap-2">
           <ButtonOpenSidebar />
           <Breadcrumb paths={["Início", "Estrutura e operações"]} />
+          <div className="ml-auto">
+            <NotificationDropdown />
+          </div>
         </div>
         <h1 className="text-2xl font-semibold text-gray-800">
           Gestão de Patrimônio

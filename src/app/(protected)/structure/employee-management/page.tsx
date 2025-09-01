@@ -10,6 +10,7 @@ import { useUserContext } from "@/providers/use-user-context";
 import { ScheduleEmployeeTab } from "./tabs/schedule-employee-tab";
 import { EmployeesTab } from "./tabs/employees-tab";
 import { IndicatorsTab } from "./tabs/indicators-tab";
+import { NotificationDropdown } from "@/components/notification";
 
 export default function EmployeeManagement() {
   const { read, edit } = userPagePermission({ pageId: 5 });
@@ -40,6 +41,9 @@ export default function EmployeeManagement() {
         <div className="flex items-center mb-8 gap-2">
           <ButtonOpenSidebar />
           <Breadcrumb paths={["Início", "Estrutura e operações"]} />
+          <div className="ml-auto">
+            <NotificationDropdown />
+          </div>
         </div>
         <h1 className="text-2xl font-semibold text-gray-800">
           Gestão de Funcionários

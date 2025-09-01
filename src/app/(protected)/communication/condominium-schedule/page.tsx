@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { useCondominiumSchedule } from "./use-condominium-schedule";
 import { ModalAddEvent } from "../../structure/management-of-common-spaces/modal-add-event";
 import { AddEventModal } from "./add-event-modal";
+import { NotificationDropdown } from "@/components/notification";
 
 export default function CondominiumSchedule() {
   const { read, edit } = userPagePermission({ pageId: 9 });
@@ -60,6 +61,9 @@ export default function CondominiumSchedule() {
         <div className="flex items-center gap-4">
           <ButtonOpenSidebar />
           <Breadcrumb paths={["Início", "Comunicação"]} />
+          <div className="ml-auto">
+            <NotificationDropdown />
+          </div>
         </div>
         <h1 className="text-2xl font-bold text-gray-900">
           Agenda do Condomínio

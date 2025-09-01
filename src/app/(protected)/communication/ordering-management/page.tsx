@@ -42,6 +42,7 @@ import { deleteDelivery } from "@/api/delete-delivery";
 import { userPagePermission } from "@/utils/user-page-permission";
 import { redirect } from "next/navigation";
 import { useUserContext } from "@/providers/use-user-context";
+import { NotificationDropdown } from "@/components/notification";
 
 export default function OrderingManagement() {
   const { read, edit } = userPagePermission({ pageId: 10 });
@@ -107,6 +108,9 @@ export default function OrderingManagement() {
         <div className="flex items-center mb-8 gap-2">
           <ButtonOpenSidebar />
           <Breadcrumb paths={["Início", "Comunicação"]} />
+          <div className="ml-auto">
+            <NotificationDropdown />
+          </div>
         </div>
         <h1 className="text-2xl font-semibold text-gray-800">
           Gestão de Encomendas

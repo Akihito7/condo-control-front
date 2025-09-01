@@ -31,6 +31,7 @@ import { userPagePermission } from "@/utils/user-page-permission";
 import { redirect } from "next/navigation";
 import { useUserContext } from "@/providers/use-user-context";
 import { MonthYearPicker } from "@/components/month-year-select";
+import { NotificationDropdown } from "@/components/notification";
 
 export default function VirtualAssembly() {
   const { read, edit } = userPagePermission({ pageId: 11 });
@@ -61,6 +62,9 @@ export default function VirtualAssembly() {
         <div className="flex items-center mb-8 gap-2">
           <ButtonOpenSidebar />
           <Breadcrumb paths={["Início", "Comunicação"]} />
+          <div className="ml-auto">
+            <NotificationDropdown />
+          </div>
         </div>
         <h1 className="text-2xl font-semibold text-gray-800">
           Assembleia Digital

@@ -46,6 +46,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteOpeningCallRecord } from "@/api/delete-opening-call-record";
 import { userPagePermission } from "@/utils/user-page-permission";
 import { redirect } from "next/navigation";
+import { NotificationDropdown } from "@/components/notification";
 
 export default function OpeningOfCalls() {
   const { read, edit } = userPagePermission({ pageId: 8 });
@@ -111,6 +112,9 @@ export default function OpeningOfCalls() {
         <div className="flex items-center mb-8 gap-2">
           <ButtonOpenSidebar />
           <Breadcrumb paths={["Início", "Comunicação"]} />
+          <div className="ml-auto">
+            <NotificationDropdown />
+          </div>
         </div>
         <h1 className="text-2xl font-semibold text-gray-800">
           Abertura de Chamados

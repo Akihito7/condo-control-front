@@ -1,66 +1,24 @@
+import { useNotificationContext } from "@/providers/use-notification-context";
 import { BellIcon } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
+import { formatDistanceToNow } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { markNotificationAsRead } from "@/api/mark-notification-as-read";
 
-interface NotificationItem {
-  id: number;
-  title: string;
-  description: string;
-  createdAt: string;
-  read: boolean;
+function parseDateWithoutTimezone(dateString: string) {
+  const [year, month, day, hour, minute, second] = dateString
+    .split(/[-T:.Z]/)
+    .map(Number);
+  return new Date(year, month - 1, day, hour, minute, second || 0);
 }
 
-// Exemplo de notificações
-const sampleNotifications: NotificationItem[] = [
-  {
-    id: 1,
-    title: "Nova Mensagem",
-    description: "Você recebeu uma nova mensagem.",
-    createdAt: "Agora",
-    read: false,
-  },
-  {
-    id: 2,
-    title: "Atualização",
-    description: "O relatório do condomínio foi atualizado.",
-    createdAt: "1h atrás",
-    read: true,
-  },
-  {
-    id: 3,
-    title: "Alerta",
-    description: "Nova tarefa atribuída a você.",
-    createdAt: "2h atrás",
-    read: false,
-  },
-  {
-    id: 4,
-    title: "Lembrete",
-    description: "Reunião começando em 30 minutos.",
-    createdAt: "3h atrás",
-    read: true,
-  },
-  {
-    id: 5,
-    title: "Nova Mensagem",
-    description: "Você recebeu uma nova mensagem.",
-    createdAt: "Agora",
-    read: false,
-  },
-  {
-    id: 6,
-    title: "Atualização",
-    description: "O relatório do condomínio foi atualizado.",
-    createdAt: "1h atrás",
-    read: true,
-  },
-];
-
 export function NotificationDropdown() {
+  const { notifications } = useNotificationContext();
   const [open, setOpen] = useState(false);
-  const unreadCount = sampleNotifications.filter((n) => !n.read).length;
+  const unreadCount = notifications?.filter((n) => !n.read).length ?? 0;
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Fecha o dropdown quando clicar fora
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -75,6 +33,17 @@ export function NotificationDropdown() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [dropdownRef]);
+
+  const queryClient = useQueryClient();
+  const { mutateAsync: handleMarkNotificationAsRead } = useMutation({
+    mutationFn: (notificationId: number) =>
+      markNotificationAsRead(notificationId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["notifications"],
+      });
+    },
+  });
 
   return (
     <div className="relative flex justify-end" ref={dropdownRef}>
@@ -98,22 +67,32 @@ export function NotificationDropdown() {
             Notificações
           </div>
           <div className="max-h-80 overflow-y-auto">
-            {sampleNotifications.map((n) => (
+            {notifications?.map((n) => (
               <div
                 key={n.id}
                 className={`px-4 py-3 cursor-pointer transition-colors duration-150 ${
                   n.read ? "hover:bg-gray-100" : "bg-blue-100 hover:bg-blue-200"
                 }`}
+                onClick={async () => {
+                  await handleMarkNotificationAsRead(n.id);
+                }}
               >
                 <div className="font-medium text-gray-800">{n.title}</div>
                 <div className="text-gray-600 text-sm">{n.description}</div>
-                <div className="text-gray-400 text-xs mt-1">{n.createdAt}</div>
+                <div className="text-gray-400 text-xs mt-1">
+                  {formatDistanceToNow(
+                    n.createdAt
+                      ? parseDateWithoutTimezone(n.createdAt as string)
+                      : new Date(),
+                    {
+                      addSuffix: true,
+                      locale: ptBR,
+                    }
+                  )}
+                </div>
               </div>
             ))}
           </div>
-          {/*  <div className="px-4 py-2 border-t border-gray-200 text-center text-sm text-gray-500 hover:bg-gray-100 cursor-pointer">
-            Ver todas as notificações
-          </div> */}
         </div>
       )}
     </div>

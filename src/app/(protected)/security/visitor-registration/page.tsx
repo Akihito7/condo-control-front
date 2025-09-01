@@ -28,6 +28,7 @@ import { format, parseISO } from "date-fns";
 import { userPagePermission } from "@/utils/user-page-permission";
 import { redirect } from "next/navigation";
 import { useUserContext } from "@/providers/use-user-context";
+import { NotificationDropdown } from "@/components/notification";
 
 export default function VistitorRegistration() {
   const { read, edit } = userPagePermission({ pageId: 12 });
@@ -62,6 +63,9 @@ export default function VistitorRegistration() {
         <div className="flex items-center mb-8 gap-2">
           <ButtonOpenSidebar />
           <Breadcrumb paths={["Início", "Segurança"]} />
+          <div className="ml-auto">
+            <NotificationDropdown />
+          </div>
         </div>
         <h1 className="text-2xl font-semibold text-gray-800">
           Registro de Visitantes
