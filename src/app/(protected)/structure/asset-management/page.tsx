@@ -29,6 +29,14 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
 import { useAssetManagement } from "./use-asset-management";
 import { ModalActionAsset } from "./modal-action-asset";
 import { TableRowSkeleton } from "@/components/table-row-skeleton";
@@ -63,6 +71,10 @@ export default function AssetManagement() {
   >();
   const [updatingImage, setUpdatingImaged] = useState(false);
 
+  // Filtros
+  const [areaSelected, setAreaSelected] = useState("-1");
+  const [codeSearch, setCodeSearch] = useState("");
+
   useEffect(() => {
     if (newPhoto) {
       const url = URL.createObjectURL(newPhoto);
@@ -71,6 +83,18 @@ export default function AssetManagement() {
       setPreviewPhoto(null);
     }
   }, [newPhoto]);
+
+  // Aplica os filtros
+  const filteredAssets = assets?.filter((asset) => {
+    const matchArea =
+      areaSelected === "-1" || String(asset.areaId) === areaSelected;
+
+    const matchCode =
+      codeSearch.trim() === "" ||
+      asset.codeItem.toLowerCase().includes(codeSearch.toLowerCase());
+
+    return matchArea && matchCode;
+  });
 
   return (
     <main className="bg-gray-50 min-h-screen overflow-auto w-full p-0 py-8 px-2 sm:p-8 flex flex-col gap-6">
@@ -84,13 +108,44 @@ export default function AssetManagement() {
         </h1>
       </div>
 
-      <div className="flex  flex-col gap-4 md:items-end md:flex-row ">
+      <div className="flex flex-col gap-4 md:items-end md:flex-row">
         <div className="flex gap-2">
+          {/* Filtro área */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Área
             </label>
-            <Input />
+            <Select
+              value={areaSelected}
+              onValueChange={(value) => {
+                setAreaSelected(value);
+              }}
+            >
+              <SelectTrigger className="col-span-3 w-[250px]">
+                <SelectValue placeholder="Selecione a area" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="-1">Todas</SelectItem>
+                {areasOptions?.map((area) => (
+                  <SelectItem key={area.id} value={String(area.id)}>
+                    {area.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Filtro código */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Busca por Código
+            </label>
+            <Input
+              placeholder="Ex: CAD-001"
+              className="w-[250px]"
+              value={codeSearch}
+              onChange={(e) => setCodeSearch(e.target.value)}
+            />
           </div>
         </div>
 
@@ -139,8 +194,8 @@ export default function AssetManagement() {
                     <TableRowSkeleton className="h-18" key={index} />
                   ))}
                 </>
-              ) : (
-                assets?.map((asset, index) => (
+              ) : filteredAssets?.length ? (
+                filteredAssets.map((asset, index) => (
                   <TableRow key={index}>
                     <TableCell
                       onClick={() => {
@@ -216,6 +271,15 @@ export default function AssetManagement() {
                     </TableCell>
                   </TableRow>
                 ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={7}
+                    className="text-center py-6 text-gray-500"
+                  >
+                    Nenhum patrimônio encontrado
+                  </TableCell>
+                </TableRow>
               )}
             </TableBody>
           </Table>
