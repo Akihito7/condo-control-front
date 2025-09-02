@@ -44,6 +44,9 @@ import { userPagePermission } from "@/utils/user-page-permission";
 import { MonthYearPicker } from "@/components/month-year-select";
 import { printDocument } from "@/utils/print-document";
 import { NotificationDropdown } from "@/components/notification";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TransactionsTab } from "./tabs/transacations-tab";
+import { IndicatorsTab } from "./tabs/indicators-tab";
 
 export type OptionType = {
   value: number;
@@ -68,14 +71,6 @@ export default function Finance() {
   const componentMainRef = useRef<HTMLElement>(null);
   const componentFilterRef = useRef<HTMLDivElement>(null);
 
-  const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [dropdownOpenToThisItem, setDropdownOpenToThisItem] = useState<
-    number | undefined
-  >();
-  const [transactionSelected, setTransacationSelected] = useState<
-    FinancialRecord | undefined
-  >();
   const condominiumId = user.condominiumId;
 
   const isMobile = useIsMobile();
@@ -91,6 +86,16 @@ export default function Finance() {
     handleDeleteRegister,
     cardsTransactionStatus,
     transactionsStatus,
+    chartRevenue,
+    chartRevenueStatus,
+    chartExpense,
+    chartExpenseStatus,
+    chartRevenueFixedVsVariable,
+    chartRevenueFixedVsVariableStatus,
+    chartExpensiveFixedVsVariable,
+    chartExpensiveFixedVsVariableStatus,
+    chartFinacialSummaryMonthlyBalance,
+    chartFinacialSummaryMonthlyBalanceStatus,
   } = useTransaction({
     selectedDate,
     incomeExpenseOptionsSelected,
@@ -164,6 +169,7 @@ export default function Finance() {
             placeholder="Selecione..."
           />
         </div>
+
         <Button
           variant="outline"
           className="ml-auto flex items-center gap-2 h-10 cursor-pointer"
@@ -178,284 +184,65 @@ export default function Finance() {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
-        {cardsTransactionStatus === "pending" ? (
-          <>
-            {Array.from({ length: 4 }).map((_, index) => (
-              <CardSkeleton key={index} />
-            ))}
-          </>
-        ) : cardsTransactionStatus === "success" ? (
-          isMobile ? (
-            <>
-              <Swiper className="w-full" spaceBetween={16} slidesPerView={1.2}>
-                <SwiperSlide>
-                  <CardFinance
-                    title="Receita Total"
-                    type="income"
-                    value={cardsTransaction?.totalIncome ?? 0}
-                    target={cardsTransaction?.incomeTarget}
-                    icon={<TrendingUp color="#22c55e" />}
-                    isSameMonth={cardsTransaction?.isSameMonth ?? false}
-                    date={selectedDate}
-                  />
-                </SwiperSlide>
+      <Tabs defaultValue="transaction-entry">
+        <TabsList className="bg-gray-50 p-1.5 rounded-lg border border-gray-200">
+          <TabsTrigger
+            value="transaction-entry"
+            className="data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-gray-900 px-4 py-2 rounded-md font-medium text-gray-600 transition-all"
+          >
+            Transações
+          </TabsTrigger>
+          <TabsTrigger
+            value="indicators"
+            className="data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-gray-900 px-4 py-2 rounded-md font-medium text-gray-600 transition-all"
+          >
+            Indicadores
+          </TabsTrigger>
+        </TabsList>
 
-                <SwiperSlide>
-                  <CardFinance
-                    title="Despesas Totais"
-                    value={cardsTransaction?.totalExpenses ?? 0}
-                    target={cardsTransaction?.expensesTarget}
-                    icon={<TrendingDown color="#ef4444" />}
-                    type="expensive"
-                    isSameMonth={cardsTransaction?.isSameMonth ?? false}
-                    date={selectedDate}
-                  />
-                </SwiperSlide>
+        <div className="mt-6">
+          <TabsContent value="transaction-entry">
+            <TransactionsTab
+              apartments={apartments}
+              cardsTransaction={cardsTransaction}
+              cardsTransactionStatus={cardsTransactionStatus}
+              categoriesOptions={categoriesOptions}
+              edit={edit}
+              handleDeleteRegister={handleDeleteRegister}
+              incomeExpenseOptions={incomeExpenseOptions}
+              isMobile={isMobile}
+              paymentMethodsOptions={paymentMethodsOptions}
+              paymentStatusOptions={paymentStatusOptions}
+              selectedDate={selectedDate}
+              transactions={transactions}
+              transactionsStatus={transactionsStatus}
+            />
+          </TabsContent>
 
-                <SwiperSlide>
-                  <CardFinance
-                    title="Saldo"
-                    value={cardsTransaction?.balance ?? 0}
-                    target={cardsTransaction?.incomeTarget}
-                    isSameMonth={cardsTransaction?.isSameMonth ?? false}
-                    icon={
-                      <DollarSign
-                        color={
-                          cardsTransaction
-                            ? cardsTransaction.balance > 0
-                              ? "#22c55e"
-                              : "#ef4444"
-                            : "#22c55e"
-                        }
-                      />
-                    }
-                    date={selectedDate}
-                  />
-                </SwiperSlide>
-              </Swiper>
-            </>
-          ) : (
-            <>
-              <CardFinance
-                title="Receita Total"
-                type="income"
-                value={cardsTransaction?.totalIncome ?? 0}
-                target={cardsTransaction?.incomeTarget}
-                icon={<TrendingUp color="#22c55e" />}
-                isSameMonth={cardsTransaction?.isSameMonth ?? false}
-                date={selectedDate}
-              />
-
-              <CardFinance
-                title="Despesas Totais"
-                value={cardsTransaction?.totalExpenses ?? 0}
-                target={cardsTransaction?.expensesTarget}
-                icon={<TrendingDown color="#ef4444" />}
-                type="expensive"
-                isSameMonth={cardsTransaction?.isSameMonth ?? false}
-                date={selectedDate}
-              />
-
-              <CardFinance
-                title="Saldo"
-                value={cardsTransaction?.balance ?? 0}
-                target={undefined}
-                isSameMonth={cardsTransaction?.isSameMonth ?? false}
-                icon={
-                  <DollarSign
-                    color={
-                      cardsTransaction
-                        ? cardsTransaction.balance > 0
-                          ? "#22c55e"
-                          : "#ef4444"
-                        : "#22c55e"
-                    }
-                  />
-                }
-                date={selectedDate}
-              />
-
-              <CardFinance
-                title="Saldo Acumulado"
-                value={cardsTransaction?.accumulatedBalance ?? 0}
-                target={undefined}
-                isSameMonth={cardsTransaction?.isSameMonth ?? false}
-                icon={
-                  <DollarSign
-                    color={
-                      cardsTransaction
-                        ? cardsTransaction.balance > 0
-                          ? "#22c55e"
-                          : "#ef4444"
-                        : "#22c55e"
-                    }
-                  />
-                }
-                date={selectedDate}
-              />
-            </>
-          )
-        ) : (
-          <div className="col-span-3 text-center text-sm text-red-500">
-            Ocorreu um erro ao carregar os dados. Tente novamente mais tarde.
-          </div>
-        )}
-      </div>
-
-      <section
-        className="rounded-xl overflow-auto border"
-        style={{
-          minHeight: isMobile ? "80vh" : "",
-        }}
-      >
-        <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200">
-          <h2 className="font-medium text-gray-800  text-md md:text-lg">
-            Transações Recentes
-          </h2>
-          {Array.isArray(categoriesOptions) &&
-            Array.isArray(incomeExpenseOptions) &&
-            Array.isArray(paymentMethodsOptions) &&
-            Array.isArray(apartments) &&
-            Array.isArray(paymentStatusOptions) && (
-              <ModalActionEntry
-                categoriesOptions={categoriesOptions}
-                incomeExpenseOptions={incomeExpenseOptions}
-                paymentMethodsOptions={paymentMethodsOptions}
-                apartments={apartments}
-                paymentStatusOptions={paymentStatusOptions}
-                type={transactionSelected?.id ? "edit" : "create"}
-                isOpen={modalIsOpen}
-                setIsOpen={setModalIsOpen}
-                setTransacationSelected={setTransacationSelected}
-                transactionSelected={transactionSelected}
-                condominiumId={condominiumId}
-                userCanManage={edit}
-              />
-            )}
+          <TabsContent value="indicators">
+            <IndicatorsTab
+              chartExpense={chartExpense}
+              chartExpenseStatus={chartExpenseStatus}
+              chartExpensiveFixedVsVariable={chartExpensiveFixedVsVariable}
+              chartExpensiveFixedVsVariableStatus={
+                chartExpensiveFixedVsVariableStatus
+              }
+              chartFinacialSummaryMonthlyBalance={
+                chartFinacialSummaryMonthlyBalance
+              }
+              chartFinacialSummaryMonthlyBalanceStatus={
+                chartFinacialSummaryMonthlyBalanceStatus
+              }
+              chartRevenue={chartRevenue}
+              chartRevenueFixedVsVariable={chartRevenueFixedVsVariable}
+              chartRevenueFixedVsVariableStatus={
+                chartRevenueFixedVsVariableStatus
+              }
+              chartRevenueStatus={chartRevenueStatus}
+            />
+          </TabsContent>
         </div>
-
-        <div
-          className=" border overflow-y-auto border-gray-300 rounded"
-          style={{
-            minHeight: isMobile ? "80vh" : "",
-          }}
-        >
-          <Table className="min-w-full border-collapse overflow-y-auto">
-            <TableHeader className="sticky top-0 bg-white shadow-md z-10">
-              <TableRow>
-                <TableHead className="w-[20%]">Data de vencimento</TableHead>
-                <TableHead>Tipo</TableHead>
-                <TableHead>Categoria</TableHead>
-                <TableHead>Apartamento</TableHead>
-                <TableHead>Tipo</TableHead>
-                <TableHead>Recorrente</TableHead>
-                <TableHead>Forma de Pagamento</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-center">Valor</TableHead>
-                <TableHead>Data do Pagamento</TableHead>
-                <TableHead>Valor Pago</TableHead>
-                <TableHead>Observação</TableHead>
-                <TableHead>Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-
-            <TableBody>
-              {transactionsStatus === "pending" ? (
-                Array.from({ length: 5 }).map((_, index) => (
-                  <TableRowSkeleton key={index} />
-                ))
-              ) : (
-                <>
-                  {transactions?.map((transaction) => (
-                    <TableRow key={transaction.id}>
-                      <TableCell className="font-medium">
-                        {transaction.dueDate}
-                      </TableCell>
-                      <TableCell className="capitalize text-sm">
-                        {transaction.incomeExpenseTypeId === 4
-                          ? "Receita"
-                          : "Despesa"}
-                      </TableCell>
-                      <TableCell>{transaction.categoryName}</TableCell>
-                      <TableCell className="text-center">
-                        {transaction.apartmentNumber}
-                      </TableCell>
-                      <TableCell className="text-sm">
-                        {transaction.recordTypeId === 1 ? "Fixo" : "Variável"}
-                      </TableCell>
-                      <TableCell className="text-sm">
-                        {transaction.isRecurring ? "Sim" : "Não"}
-                      </TableCell>
-                      <TableCell className="text-sm">
-                        {transaction.paymentMethodName ?? "-"}
-                      </TableCell>
-
-                      <TableCell>
-                        {transaction.paymentStatusName ?? "-"}
-                      </TableCell>
-                      <TableCell className="text-center font-semibold text-sm">
-                        {transaction.amount.toLocaleString("pt-BR", {
-                          currency: "BRL",
-                          style: "currency",
-                        })}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {transaction.paymentDate ?? "-"}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {transaction.amountPaid?.toLocaleString("pt-BR", {
-                          currency: "BRL",
-                          style: "currency",
-                        }) ?? "-"}
-                      </TableCell>
-                      <TableCell>{transaction.observation}</TableCell>
-                      <TableCell>
-                        <DropdownMenu
-                          open={
-                            dropdownOpen &&
-                            dropdownOpenToThisItem === transaction.id
-                          }
-                          onOpenChange={(open) => {
-                            if (!open) {
-                              setDropdownOpenToThisItem(undefined);
-                            } else {
-                              setDropdownOpenToThisItem(transaction.id);
-                            }
-                            setDropdownOpen(open);
-                          }}
-                        >
-                          <DropdownMenuTrigger className="outline-none ring-0 focus:outline-none focus:ring-0 cursor-pointer">
-                            <Pencil className="w-4 h-4 text-gray-700" />
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent>
-                            <DropdownMenuItem
-                              onClick={() => {
-                                setDropdownOpen(false);
-                                setTransacationSelected(transaction);
-                                setModalIsOpen(true);
-                              }}
-                            >
-                              Editar
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() =>
-                                handleDeleteRegister(transaction.id)
-                              }
-                            >
-                              Excluir
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-      </section>
+      </Tabs>
     </main>
   );
 }

@@ -11,6 +11,11 @@ import { MultiValue } from "react-select";
 import { OptionType } from "./page";
 import { format } from "date-fns";
 import { getFullMonthInterval } from "@/utils/get-full-month-interval";
+import { fetchChartRevenueByCategory } from "@/api/fetch-chart-revenue-by-category";
+import { fetchChartExpenseByCategory } from "@/api/fetch-chart-expense-by-category";
+import { fetchChartRevenueFixedVsVariable } from "@/api/fetch-chart-revenue-fixed-vs-variable";
+import { fetchChartExpensiveFixedVsVariable } from "@/api/fetch-chart-expensive-fixed-vs-variable";
+import { fetchFinancialSummaryMonthlyBalance } from "@/api/fetch-financial-summary-monthly-balance";
 
 
 
@@ -25,7 +30,9 @@ export function useTransaction({ selectedDate, incomeExpenseOptionsSelected, con
   const selectedDateFormatted = format(selectedDate, 'yyyy-MM-dd');
   const {
     startDate, endDate
-  } = getFullMonthInterval(selectedDateFormatted)
+  } = getFullMonthInterval(selectedDateFormatted);
+
+  const year = format(selectedDate, 'yyyy')
 
   const incomeExpenseOptionsSelectedId = incomeExpenseOptionsSelected?.map((option: any) => option.value)
   const { data: transactions, error: errorTransactions, status: transactionsStatus } = useQuery({
@@ -74,13 +81,60 @@ export function useTransaction({ selectedDate, incomeExpenseOptionsSelected, con
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ['transactions', startDate, endDate, incomeExpenseOptionsSelected, condominiumId],
-        exact : false
+        exact: false
       });
       queryClient.invalidateQueries({
         queryKey: ['revenueTotal', startDate, endDate, condominiumId],
-        exact : false
+        exact: false
       });
     }
+  })
+
+  const { data: chartRevenue, status: chartRevenueStatus } = useQuery({
+    queryKey: ['chart-revenue', startDate, endDate],
+    queryFn: async () => fetchChartRevenueByCategory({
+      condominiumId,
+      startDate: startDate,
+      endDate: endDate
+    })
+  })
+
+
+
+  const { data: chartExpense, status: chartExpenseStatus } = useQuery({
+    queryKey: ['chart-expense', startDate, endDate],
+    queryFn: async () => fetchChartExpenseByCategory({
+      condominiumId,
+      startDate: startDate,
+      endDate: endDate
+    })
+  })
+
+
+  const { data: chartRevenueFixedVsVariable, status: chartRevenueFixedVsVariableStatus } = useQuery({
+    queryKey: ['chart-revenue-fixed-variable', startDate, endDate],
+    queryFn: async () => fetchChartRevenueFixedVsVariable({
+      condominiumId,
+      startDate: startDate,
+      endDate: endDate
+    })
+  })
+
+  const { data: chartExpensiveFixedVsVariable, status: chartExpensiveFixedVsVariableStatus } = useQuery({
+    queryKey: ['chart-expensive-fixed-variable', startDate, endDate],
+    queryFn: async () => fetchChartExpensiveFixedVsVariable({
+      condominiumId,
+      startDate: startDate,
+      endDate: endDate
+    })
+  })
+
+  const { data: chartFinacialSummaryMonthlyBalance, status: chartFinacialSummaryMonthlyBalanceStatus } = useQuery({
+    queryKey: ['chart-financial-summary-monthly-balance', year],
+    queryFn: async () => fetchFinancialSummaryMonthlyBalance({
+      condominiumId,
+      year
+    })
   })
 
   return {
@@ -100,6 +154,16 @@ export function useTransaction({ selectedDate, incomeExpenseOptionsSelected, con
     cardsTransactionIsLoading,
     handleDeleteRegister,
     cardsTransactionStatus,
-    transactionsStatus
+    transactionsStatus,
+    chartRevenue,
+    chartRevenueStatus,
+    chartExpense,
+    chartExpenseStatus,
+    chartRevenueFixedVsVariable,
+    chartRevenueFixedVsVariableStatus,
+    chartExpensiveFixedVsVariable,
+    chartExpensiveFixedVsVariableStatus,
+    chartFinacialSummaryMonthlyBalance,
+    chartFinacialSummaryMonthlyBalanceStatus
   }
 }

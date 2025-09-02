@@ -6,7 +6,7 @@ interface FetchFinancialSummaryMonthlyBalanceProps {
 }
 
 
-interface MonthlyBalanace {
+export interface MonthlyBalanace {
   month: string, income: number, expense: number, total: number
 }
 

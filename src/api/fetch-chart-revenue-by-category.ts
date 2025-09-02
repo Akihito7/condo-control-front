@@ -6,7 +6,7 @@ interface FetchChartRevenueByCategoryProps {
   endDate: string;
 }
 
-interface Chart {
+export interface Chart {
   name: string;
   value: number;
   id: number;

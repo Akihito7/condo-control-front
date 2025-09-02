@@ -7,7 +7,7 @@ interface FetchCardsTransactionEntry {
 }
 
 
-interface FetchCardsTransactionEntryResponse {
+export interface FetchCardsTransactionEntryResponse {
   totalIncome: number,
   totalExpenses: number,
   balance: number
