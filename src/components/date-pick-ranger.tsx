@@ -19,9 +19,14 @@ interface DatePickRangeProps {
   range: RangeProps;
   setRange: (range: RangeProps) => void;
   children?: React.ReactNode;
+  className?: string;
 }
 
-export function DatePickRange({ range, setRange }: DatePickRangeProps) {
+export function DatePickRange({
+  range,
+  setRange,
+  className,
+}: DatePickRangeProps) {
   const formatted =
     range.from && range.to
       ? `${format(range.from, "dd/MM/yyyy")} - ${format(
@@ -32,7 +37,9 @@ export function DatePickRange({ range, setRange }: DatePickRangeProps) {
 
   return (
     <Popover>
-      <PopoverTrigger className="w-[260px] bg-white border rounded-md px-4 h-10 justify-start text-left font-normal cursor-pointer">
+      <PopoverTrigger
+        className={`w-[260px] bg-white border rounded-md px-4 h-10 justify-start text-left font-normal cursor-pointer ${className}`}
+      >
         {formatted}
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">

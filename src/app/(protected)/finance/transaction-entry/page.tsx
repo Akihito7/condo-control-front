@@ -2,36 +2,14 @@
 
 import { Breadcrumb } from "@/components/breadcrumb";
 import React, { useEffect, useRef, useState } from "react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
-import { DatePickRange } from "@/components/date-pick-ranger";
-import { CardFinance } from "@/components/card-finance";
 import {
-  DollarSign,
   FileDown,
-  Pencil,
-  TrendingDown,
-  TrendingUp,
 } from "lucide-react";
-import { ModalActionEntry } from "./modal-action-entry";
 import { useTransaction } from "./use-transaction";
 import Select, { MultiValue } from "react-select";
-import { FinancialRecord } from "@/api/fetch-financial-records";
 import { useUserContext } from "@/providers/use-user-context";
 import { CardSkeleton } from "@/components/card-skeleton";
 import { TableRowSkeleton } from "@/components/table-row-skeleton";
