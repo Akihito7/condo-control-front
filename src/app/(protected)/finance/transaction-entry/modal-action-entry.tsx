@@ -230,6 +230,7 @@ export function ModalActionEntry({
   useEffect(() => {
     if (!transactionSelected) {
       reset({
+        condominiumId: condominiumId,
         dueDate: date,
       });
     }

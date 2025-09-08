@@ -16,7 +16,7 @@ import {
   Pie,
   Cell,
 } from "recharts";
-import { RefObject, useRef, useState } from "react";
+import { RefObject, useRef } from "react";
 import {
   Table,
   TableBody,
@@ -25,6 +25,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useIndicators } from "./use-indicators";
 
 interface IndicatorsTabProps {
   mainRef: RefObject<HTMLElement | null>;
@@ -32,19 +33,47 @@ interface IndicatorsTabProps {
 
 export function Indicators({ mainRef }: IndicatorsTabProps) {
   const componentFilterRef = useRef<HTMLDivElement>(null);
-  const [range, setRange] = useState({
-    to: new Date(),
-    from: new Date(),
-  });
+  const {
+    range,
+    setRange,
+    delinquencyResume,
+    delinquencyResumeStatus,
+    chartDistruibition,
+  } = useIndicators();
 
-  // Mock - resumo de indicadores
-  const indicators = [
-    { label: "Mensalidades Pendentes", value: "18" },
-    { label: "Unidades Inadimplentes", value: "12" },
-    { label: "Total em Aberto", value: "R$ 15.300,00" },
-    { label: "Tempo Médio de Pgto.", value: "22 dias" },
-    { label: "% Inadimplência (Mês)", value: "5.8%" },
-    { label: "% Inadimplência (Acum.)", value: "4.2%" },
+  console.log("chart distruibition =>", chartDistruibition);
+
+  const indicatorsToDisplay = [
+    {
+      label: "Mensalidades Pendentes",
+      value: delinquencyResume?.totalInstallments ?? 0,
+    },
+    {
+      label: "Unidades Inadimplentes",
+      value: delinquencyResume?.uniqueApartamentsLength ?? 0,
+    },
+    {
+      label: "Total em Aberto",
+      value: delinquencyResume
+        ? `R$ ${delinquencyResume.totalAmountToReceive.toLocaleString("pt-BR", {
+            minimumFractionDigits: 2,
+          })}`
+        : "R$ 0,00",
+    },
+    {
+      label: "Tempo Médio de Pgto.",
+      value: delinquencyResume
+        ? `${delinquencyResume.averageDaysOverdue} dias`
+        : "0 dias",
+    },
+    {
+      label: "% Inadimplência (Mês)",
+      value: "Mockado 0%",
+    },
+    {
+      label: "% Inadimplência (Acum.)",
+      value: "Mockado 0%",
+    },
   ];
 
   // Mock - evolução mensal
@@ -146,7 +175,7 @@ export function Indicators({ mainRef }: IndicatorsTabProps) {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-            {indicators.map((item) => (
+            {indicatorsToDisplay?.map((item) => (
               <div key={item.label} className="flex flex-col">
                 <span className="text-sm text-muted-foreground">
                   {item.label}
@@ -196,16 +225,16 @@ export function Indicators({ mainRef }: IndicatorsTabProps) {
             <ResponsiveContainer width="100%" height={250}>
               <PieChart>
                 <Pie
-                  data={distribution}
-                  dataKey="value"
-                  nameKey="name"
+                  data={chartDistruibition}
+                  dataKey="categoryPercentage"
+                  nameKey="categoryName"
                   cx="50%"
                   cy="50%"
                   innerRadius={50}
                   outerRadius={80}
                   paddingAngle={2}
                 >
-                  {distribution.map((_, index) => (
+                  {chartDistruibition?.map((_, index) => (
                     <Cell
                       key={`cell-${index}`}
                       fill={COLORS[index % COLORS.length]}
@@ -216,13 +245,13 @@ export function Indicators({ mainRef }: IndicatorsTabProps) {
               </PieChart>
             </ResponsiveContainer>
             <ul className="mt-4 space-y-1 text-sm">
-              {distribution.map((d, i) => (
+              {chartDistruibition?.map((d, i) => (
                 <li key={i} className="flex items-center gap-2">
                   <span
                     className="w-3 h-3 rounded-full"
                     style={{ backgroundColor: COLORS[i % COLORS.length] }}
                   />
-                  {d.name} — {d.value}%
+                  {d.categoryName} — {d.categoryPercentage}%
                 </li>
               ))}
             </ul>

@@ -9,9 +9,13 @@ export const printDocument = async (
 
   if (componentToPrint) {
     const canvas = await html2canvas(componentToPrint, {
-      scale: 2, 
-      useCORS: true, 
+      scale: 2,
+      useCORS: true,
       logging: false,
+      scrollX: 0,
+      scrollY: -window.scrollY,
+      windowWidth: componentToPrint.scrollWidth,
+      windowHeight: componentToPrint.scrollHeight,
     });
 
     const imgData = canvas.toDataURL("image/png", 1.0);

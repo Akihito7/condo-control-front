@@ -64,7 +64,9 @@ export function ModalReport({
     },
   });
 
+  const [isPending, setIsPending] = useState(false);
   const onSubmit = async (data: ReportFormData) => {
+    setIsPending(true);
     const formData = new FormData();
     formData.append("description", data.description);
     if (data.photo) {
@@ -77,6 +79,7 @@ export function ModalReport({
     setCurrentIndex(0);
     closeButtonRef.current?.click();
     setIsOpen(false);
+    setIsPending(false);
   };
 
   const handleFileChange = (files: FileList | null) => {
@@ -213,8 +216,12 @@ export function ModalReport({
                 Cancelar
               </Button>
             </DialogClose>
-            <Button type="submit" className="bg-red-600 hover:bg-red-700">
-              Reportar
+            <Button
+              disabled={isPending}
+              type="submit"
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {isPending ? "Reportando..." : "Reportar"}
             </Button>
           </DialogFooter>
         </form>
