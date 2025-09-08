@@ -1,6 +1,6 @@
 import { DatePicker } from "@/components/date-picker";
 import { Button } from "@/components/ui/button";
-import React, { useEffect, useState } from "react";
+import React, { RefObject, useEffect, useRef, useState } from "react";
 import {
   Table,
   TableBody,
@@ -16,6 +16,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Employee } from "@/api/fetch-employees-structure";
 import { addHours, format } from "date-fns";
 import { useQueryClient } from "@tanstack/react-query";
+import { FileDown } from "lucide-react";
+import { printDocument } from "@/utils/print-document";
 
 interface ScheduleEmployeeTabProps {
   date: Date;
@@ -23,6 +25,7 @@ interface ScheduleEmployeeTabProps {
   handleUpdateEmployeeSchedule: (data: any) => Promise<void>;
   scheduleEmployees: any;
   employees: Employee[] | undefined;
+  componentMainRef: RefObject<HTMLElement | null>; // já tipado certinho
 }
 
 const scheduleItemSchema = z.object({
@@ -51,8 +54,11 @@ export function ScheduleEmployeeTab({
   handleUpdateEmployeeSchedule,
   scheduleEmployees,
   employees,
+  componentMainRef,
 }: ScheduleEmployeeTabProps) {
   const [isEditingSchedule, setIsEditingSchedule] = useState(false);
+  const componentFilterRef = useRef<HTMLDivElement>(null);
+  const divTableRef = useRef<HTMLDivElement | null>(null);
 
   const {
     control,
@@ -102,13 +108,40 @@ export function ScheduleEmployeeTab({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col gap-4 md:items-end md:flex-row">
+      <div
+        ref={componentFilterRef}
+        className="flex flex-col gap-4 md:items-end md:flex-row"
+      >
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Periodo
           </label>
           <DatePicker date={date} setDate={setDate} />
         </div>
+
+        <Button
+          variant="outline"
+          className="ml-auto flex items-center gap-2 h-10 cursor-pointer"
+          onClick={async () => {
+            if (
+              componentFilterRef.current &&
+              componentMainRef.current &&
+              divTableRef.current
+            ) {
+              const classNameBefore = divTableRef.current.className;
+              divTableRef.current.className = "";
+              await printDocument(
+                componentMainRef.current,
+                componentFilterRef.current
+              );
+
+              divTableRef.current.className = classNameBefore;
+            }
+          }}
+        >
+          <FileDown className="w-6 h-6" />
+          Exportar PDF
+        </Button>
       </div>
 
       <section className="rounded-xl overflow-auto border">
@@ -158,7 +191,10 @@ export function ScheduleEmployeeTab({
           )}
         </div>
 
-        <div className="max-h-[70vh] overflow-y-auto border border-gray-300 rounded overflow-x-auto">
+        <div
+          ref={divTableRef}
+          className="max-h-[70vh] overflow-y-auto border border-gray-300 rounded overflow-x-auto none"
+        >
           <Table className="min-w-full border-collapse">
             <TableHeader className="sticky top-0 bg-white shadow-md z-10">
               <TableRow>
@@ -300,31 +336,33 @@ export function ScheduleEmployeeTab({
                 return (
                   <TableRow key={field.shift}>
                     <TableCell className="text-center">
-                      <input
-                        checked={shiftsIncludedToBatchEdit.includes(
-                          field.shift as any
-                        )}
-                        disabled={!isEditingSchedule}
-                        onChange={(event) => {
-                          const checked = event.target.checked;
-                          if (checked) {
-                            setShitsIncludedToBatchEdit((prev) => [
-                              ...prev,
-                              field.shift as any,
-                            ]);
-                          } else {
-                            const newShiftsWithoutCurrent =
-                              shiftsIncludedToBatchEdit.filter(
-                                (shift) => shift !== (field.shift as any)
+                      {isEditingSchedule && (
+                        <input
+                          checked={shiftsIncludedToBatchEdit.includes(
+                            field.shift as any
+                          )}
+                          disabled={!isEditingSchedule}
+                          onChange={(event) => {
+                            const checked = event.target.checked;
+                            if (checked) {
+                              setShitsIncludedToBatchEdit((prev) => [
+                                ...prev,
+                                field.shift as any,
+                              ]);
+                            } else {
+                              const newShiftsWithoutCurrent =
+                                shiftsIncludedToBatchEdit.filter(
+                                  (shift) => shift !== (field.shift as any)
+                                );
+                              setShitsIncludedToBatchEdit(
+                                newShiftsWithoutCurrent
                               );
-                            setShitsIncludedToBatchEdit(
-                              newShiftsWithoutCurrent
-                            );
-                          }
-                        }}
-                        type="checkbox"
-                        className="h-5 w-5 text-blue-600 transition duration-200 ease-in-out rounded border-gray-300"
-                      />
+                            }
+                          }}
+                          type="checkbox"
+                          className="h-5 w-5 text-blue-600 transition duration-200 ease-in-out rounded border-gray-300"
+                        />
+                      )}
                     </TableCell>
                     <TableCell>{formattedTime}</TableCell>
 

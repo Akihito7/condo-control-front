@@ -1,7 +1,7 @@
 "use client";
 import { Breadcrumb } from "@/components/breadcrumb";
 import { ButtonOpenSidebar } from "@/components/button-open-sidebar";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useEmployeeManagement } from "./use-employee-management";
 import { Tabs, TabsList, TabsContent, TabsTrigger } from "@/components/ui/tabs";
 import { redirect } from "next/navigation";
@@ -11,6 +11,8 @@ import { ScheduleEmployeeTab } from "./tabs/schedule-employee-tab";
 import { EmployeesTab } from "./tabs/employees-tab";
 import { IndicatorsTab } from "./tabs/indicators-tab";
 import { NotificationDropdown } from "@/components/notification";
+import { Button } from "@/components/ui/button";
+import { FileDown } from "lucide-react";
 
 export default function EmployeeManagement() {
   const { read, edit } = userPagePermission({ pageId: 5 });
@@ -35,8 +37,12 @@ export default function EmployeeManagement() {
     handleUpdateEmployeeSchedule,
   } = useEmployeeManagement({ date });
 
+  const componentMainRef = useRef<HTMLElement>(null);
   return (
-    <main className="bg-gray-50 min-h-screen w-full p-0 py-8 px-2 sm:p-8 flex flex-col gap-6 overflow-x-hidden">
+    <main
+      ref={componentMainRef}
+      className="bg-gray-50 min-h-screen w-full p-0 py-8 px-2 sm:p-8 flex flex-col gap-6 overflow-x-hidden"
+    >
       <div className="space-y-2">
         <div className="flex items-center mb-8 gap-2">
           <ButtonOpenSidebar />
@@ -99,6 +105,7 @@ export default function EmployeeManagement() {
             handleUpdateEmployeeSchedule={handleUpdateEmployeeSchedule}
             scheduleEmployees={scheduleEmployees}
             employees={employees}
+            componentMainRef={componentMainRef}
           />
         </TabsContent>
 
