@@ -124,6 +124,7 @@ export function IndicatorsTab({ employees, workAreas }: IndicatorsTabProps) {
                     axisLine={false}
                     tickLine={false}
                     tick={{ fill: "#9ca3af", fontSize: 12 }}
+                    allowDecimals={false}
                   />
                   <Tooltip
                     contentStyle={{
