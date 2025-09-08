@@ -24,23 +24,24 @@ export const printDocument = async (
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = pdf.internal.pageSize.getHeight();
 
-    const imgWidth = canvas.width;
-    const imgHeight = canvas.height;
-    const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+    // altura proporcional da imagem em relação à largura do PDF
+    const imgWidth = pdfWidth;
+    const imgHeight = (canvas.height * pdfWidth) / canvas.width;
 
-    const newWidth = imgWidth * ratio;
-    const newHeight = imgHeight * ratio;
+    let heightLeft = imgHeight;
+    let position = 0;
 
-    pdf.addImage(
-      imgData,
-      "PNG",
-      0,
-      0,
-      newWidth,
-      newHeight,
-      undefined,
-      "FAST"
-    );
+    // primeira página
+    pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight, undefined, "FAST");
+    heightLeft -= pdfHeight;
+
+    // páginas adicionais, se precisar
+    while (heightLeft > 0) {
+      position = heightLeft - imgHeight;
+      pdf.addPage();
+      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight, undefined, "FAST");
+      heightLeft -= pdfHeight;
+    }
 
     pdf.save("transaction-entry.pdf");
     componentToHidden.style.display = "flex";

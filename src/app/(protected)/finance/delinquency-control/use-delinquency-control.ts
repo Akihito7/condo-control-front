@@ -3,6 +3,7 @@
 import { deleteDelinquencyRegister } from "@/api/delete-delinquency-register";
 import { fetchCategoriesOptions } from "@/api/fecth-categories-options";
 import { fetchApartments } from "@/api/fetch-apartments";
+import { fetchDelinquencyMonthlyEvolution } from "@/api/fetch-delinquency-monthly-evolution";
 import { fetchDeliquencyRegisters } from "@/api/fetch-delinquency-registers";
 import { useUserContext } from "@/providers/use-user-context";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -16,7 +17,6 @@ export function useDelinquencyControl({ date }: UseDelinquencyControlProps) {
   const { user } = useUserContext();
 
   const condominiumId = user.condominiumId;
-
 
   const dateFormmated = format(date, 'yyyy-MM-dd');
 
@@ -47,8 +47,6 @@ export function useDelinquencyControl({ date }: UseDelinquencyControlProps) {
     }
   });
 
-
-
   return {
     categoriesOptions,
     categorioOptionsStatus,
@@ -56,7 +54,8 @@ export function useDelinquencyControl({ date }: UseDelinquencyControlProps) {
     errorApartaments,
     delinequencyRegisters,
     deliquencyRegistersStatus,
-    handeDeleteRegister
+    handeDeleteRegister,
+
   }
 
 }

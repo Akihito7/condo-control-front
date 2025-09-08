@@ -16,7 +16,7 @@ import {
   Pie,
   Cell,
 } from "recharts";
-import { RefObject, useRef } from "react";
+import React, { RefObject, useRef } from "react";
 import {
   Table,
   TableBody,
@@ -26,22 +26,33 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useIndicators } from "./use-indicators";
+import { MonthYearPicker } from "@/components/month-year-select";
+import { Delinquency } from "@/api/fetch-delinquency-registers";
 
 interface IndicatorsTabProps {
   mainRef: RefObject<HTMLElement | null>;
+  date: Date;
+  setDate: React.Dispatch<React.SetStateAction<Date>>;
+  delinequencyRegisters: Delinquency[] | undefined;
 }
 
-export function Indicators({ mainRef }: IndicatorsTabProps) {
+export function Indicators({
+  mainRef,
+  setDate,
+  date,
+  delinequencyRegisters,
+}: IndicatorsTabProps) {
   const componentFilterRef = useRef<HTMLDivElement>(null);
   const {
-    range,
-    setRange,
     delinquencyResume,
     delinquencyResumeStatus,
     chartDistruibition,
-  } = useIndicators();
-
-  console.log("chart distruibition =>", chartDistruibition);
+    chartDistruibitionStatus,
+    delinquencyMonthlyEvolution,
+    delinquencyMonthlyEvolutionStatus,
+  } = useIndicators({
+    date,
+  });
 
   const indicatorsToDisplay = [
     {
@@ -68,75 +79,14 @@ export function Indicators({ mainRef }: IndicatorsTabProps) {
     },
     {
       label: "% Inadimplência (Mês)",
-      value: "Mockado 0%",
-    },
-    {
-      label: "% Inadimplência (Acum.)",
-      value: "Mockado 0%",
+      value: `${delinquencyResume?.delinquencyPercentage}%`,
     },
   ];
 
-  // Mock - evolução mensal
-  const monthlyEvolution = [
-    { mes: "Jan", valor: 3.2 },
-    { mes: "Fev", valor: 6.1 },
-    { mes: "Mar", valor: 4.0 },
-    { mes: "Abr", valor: 7.2 },
-    { mes: "Mai", valor: 5.9 },
-    { mes: "Jun", valor: 6.5 },
-  ];
-
-  // Mock - distribuição por tipo
-  const distribution = [
-    { name: "Taxa Condominial", value: 68.6 },
-    { name: "Fundo de Reserva", value: 11.8 },
-    { name: "Multa", value: 14.4 },
-    { name: "Outros", value: 5.2 },
-  ];
   const COLORS = ["#EF4444", "#F59E0B", "#3B82F6", "#10B981"];
-
-  // Mock - tabela de pendências
-  const tableData = [
-    {
-      unidade: "101-B",
-      mes: "Junho/2025",
-      tipo: "Taxa Condominial",
-      valor: "R$ 850,00",
-      atraso: "15",
-    },
-    {
-      unidade: "203-A",
-      mes: "Maio/2025",
-      tipo: "Taxa Condominial",
-      valor: "R$ 850,00",
-      atraso: "46",
-    },
-    {
-      unidade: "203-A",
-      mes: "Junho/2025",
-      tipo: "Multa",
-      valor: "R$ 50,00",
-      atraso: "15",
-    },
-    {
-      unidade: "405-C",
-      mes: "Junho/2025",
-      tipo: "Taxa Condominial",
-      valor: "R$ 920,00",
-      atraso: "12",
-    },
-    {
-      unidade: "301-A",
-      mes: "Abril/2025",
-      tipo: "Fundo de Reserva",
-      valor: "R$ 120,00",
-      atraso: "75",
-    },
-  ];
 
   return (
     <div className="space-y-6 pb-6">
-      <h1 className="text-4xl text-red-400 font-bold">DADOS MOCKADOS</h1>
       {/* Filtros */}
       <div
         ref={componentFilterRef}
@@ -144,13 +94,9 @@ export function Indicators({ mainRef }: IndicatorsTabProps) {
       >
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Intervalo de Tempo
+            Mês de referência
           </label>
-          <DatePickRange
-            range={range}
-            setRange={setRange}
-            className="text-gray-800"
-          />
+          <MonthYearPicker selectedDate={date} onChange={setDate} />
         </div>
 
         <Button
@@ -190,8 +136,8 @@ export function Indicators({ mainRef }: IndicatorsTabProps) {
       </Card>
 
       {/* Gráficos */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+        <Card className="col-span-3">
           <CardHeader>
             <CardTitle className="text-lg font-medium">
               Evolução Mensal da Inadimplência (%)
@@ -199,13 +145,18 @@ export function Indicators({ mainRef }: IndicatorsTabProps) {
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={250}>
-              <LineChart data={monthlyEvolution}>
-                <XAxis dataKey="mes" />
+              <LineChart data={delinquencyMonthlyEvolution}>
+                <XAxis dataKey="month" />
                 <YAxis />
-                <Tooltip />
+                <Tooltip
+                  formatter={(value: number, name: string) => [
+                    `${value}%`,
+                    "Inadimplência",
+                  ]}
+                />
                 <Line
                   type="monotone"
-                  dataKey="valor"
+                  dataKey="delinquencyPercentage"
                   stroke="#EF4444"
                   strokeWidth={2}
                   dot={{ r: 4 }}
@@ -215,7 +166,7 @@ export function Indicators({ mainRef }: IndicatorsTabProps) {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="col-span-2">
           <CardHeader>
             <CardTitle className="text-lg font-medium">
               Distribuição por Tipo de Pendência
@@ -270,24 +221,52 @@ export function Indicators({ mainRef }: IndicatorsTabProps) {
           <Table className="min-w-full border-collapse">
             <TableHeader className="sticky top-0 bg-white shadow-md z-10">
               <TableRow>
-                <TableHead>Unidade</TableHead>
-                <TableHead>Mês</TableHead>
+                <TableHead>Vencimento</TableHead>
+                <TableHead>Apartamento</TableHead>
                 <TableHead>Tipo</TableHead>
-                <TableHead className="text-left">Valor Pendente</TableHead>
-                <TableHead className="text-center">Dias em Atraso</TableHead>
-                <TableHead className="text-center">Ações</TableHead>
+                <TableHead className="text-left">Valor</TableHead>
+                <TableHead>Data de Pagamento</TableHead>
+                <TableHead className="text-left">Valor Pago</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-center">Dias de Atraso</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {tableData.map((row, idx) => (
-                <TableRow key={idx}>
-                  <TableCell className="font-medium">{row.unidade}</TableCell>
-                  <TableCell>{row.mes}</TableCell>
-                  <TableCell>{row.tipo}</TableCell>
-                  <TableCell className="text-left">{row.valor}</TableCell>
-                  <TableCell className="text-center">{row.atraso}</TableCell>
+              {delinequencyRegisters?.map((delinquencyRegister) => (
+                <TableRow key={delinquencyRegister.id}>
+                  <TableCell>{delinquencyRegister.dueDate}</TableCell>
+                  <TableCell>{delinquencyRegister.apartamentId}</TableCell>
+                  <TableCell>{delinquencyRegister.categoryName}</TableCell>
+                  <TableCell className="text-left">
+                    {delinquencyRegister.amount.toLocaleString("pt-br", {
+                      currency: "BRL",
+                      style: "currency",
+                    })}
+                  </TableCell>
+                  <TableCell>
+                    {delinquencyRegister.paymentDate
+                      ? delinquencyRegister.paymentDate
+                      : "-"}
+                  </TableCell>
+                  <TableCell className="text-left">
+                    {delinquencyRegister.amountPaid?.toLocaleString("pt-br", {
+                      currency: "BRL",
+                      style: "currency",
+                    })}
+                  </TableCell>
+                  <TableCell>
+                    <span
+                      className={`px-2 py-1 rounded text-xs font-semibold ${
+                        delinquencyRegister.paymentDate
+                          ? "text-green-500 bg-green-100"
+                          : "text-red-500 bg-red-100"
+                      }`}
+                    >
+                      {delinquencyRegister.paymentDate ? "Pago" : "Pendente"}
+                    </span>
+                  </TableCell>
                   <TableCell className="text-center">
-                    <Pencil className="w-4 h-4 text-gray-500 cursor-pointer" />
+                    {delinquencyRegister.daysLate}
                   </TableCell>
                 </TableRow>
               ))}

@@ -14,6 +14,7 @@ export type Summary = {
   totalAmountToReceive: number;
   totalDaysOverdue: number;
   uniqueApartamentsLength: number;
+  delinquencyPercentage: string;
 };
 
 // Exemplo

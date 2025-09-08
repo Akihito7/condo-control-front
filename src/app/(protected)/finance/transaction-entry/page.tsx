@@ -5,9 +5,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
-import {
-  FileDown,
-} from "lucide-react";
+import { FileDown } from "lucide-react";
 import { useTransaction } from "./use-transaction";
 import Select, { MultiValue } from "react-select";
 import { useUserContext } from "@/providers/use-user-context";
@@ -199,6 +197,10 @@ export default function Finance() {
 
           <TabsContent value="indicators">
             <IndicatorsTab
+              cardsTransaction={cardsTransaction}
+              cardsTransactionStatus={cardsTransactionStatus}
+              isMobile={isMobile}
+              selectedDate={selectedDate}
               chartExpense={chartExpense}
               chartExpenseStatus={chartExpenseStatus}
               chartExpensiveFixedVsVariable={chartExpensiveFixedVsVariable}

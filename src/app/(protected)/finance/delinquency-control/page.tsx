@@ -318,7 +318,12 @@ export default function DelinquencyControl() {
             </div>
           </TabsContent>
           <TabsContent value="indicators">
-            <Indicators mainRef={componentMainRef} />
+            <Indicators
+              mainRef={componentMainRef}
+              date={date}
+              setDate={setDate}
+              delinequencyRegisters={delinequencyRegisters}
+            />
           </TabsContent>
         </div>
       </Tabs>

@@ -1,42 +1,50 @@
 import { fetchDistruibitionByType } from "@/api/fetch-delinquency-distruibition-by-type";
-import { fetchDeliquencyRegisters } from "@/api/fetch-delinquency-registers";
+import { fetchDelinquencyMonthlyEvolution } from "@/api/fetch-delinquency-monthly-evolution";
 import { fetchResumeDelinquency } from "@/api/fetch-resume-delinquency";
+import { getFullMonthInterval } from "@/utils/get-full-month-interval";
 import { useQuery } from "@tanstack/react-query";
-import { format } from "date-fns";
-import { useState } from "react";
 
-export function useIndicators() {
-  const [range, setRange] = useState({
-    from: new Date(),
-    to: new Date(),
-  });
+interface UseIndicatorsProps {
+  date: Date;
+}
+export function useIndicators({
+  date
+}: UseIndicatorsProps) {
 
-  const startDateFormatted = format(range.from, 'yyyy-MM-dd');
-  const endDateFormatted = format(range.to, 'yyyy-MM-dd');
+  const {
+    startDate,
+    endDate
+  } = getFullMonthInterval(date.toISOString());
+
 
   const { data: delinquencyResume, status: delinquencyResumeStatus } = useQuery({
-    queryKey: [range, 'delinquency-resume'],
+    queryKey: [startDate, endDate, 'delinquency-resume'],
     queryFn: async () => fetchResumeDelinquency({
-      startDate: startDateFormatted,
-      endDate: endDateFormatted,
+      startDate,
+      endDate
     })
   })
 
   const { data: chartDistruibition, status: chartDistruibitionStatus } = useQuery({
-    queryKey: [range, 'distruibition-type'],
+    queryKey: [startDate, endDate, 'distruibition-type'],
     queryFn: async () => fetchDistruibitionByType({
-      startDate: startDateFormatted,
-      endDate: endDateFormatted,
+      startDate,
+      endDate,
     })
+  })
+
+  const { data: delinquencyMonthlyEvolution, status: delinquencyMonthlyEvolutionStatus } = useQuery({
+    queryKey: [startDate, 'deliquency-monthly'],
+    queryFn: () => fetchDelinquencyMonthlyEvolution(startDate),
   })
 
 
   return {
-    range,
-    setRange,
     delinquencyResume,
     delinquencyResumeStatus,
     chartDistruibition,
-    chartDistruibitionStatus
+    chartDistruibitionStatus,
+    delinquencyMonthlyEvolution,
+    delinquencyMonthlyEvolutionStatus
   }
 }
