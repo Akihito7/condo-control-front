@@ -187,7 +187,7 @@ export default function VirtualAssembly() {
                     <TableCell>{poll.status}</TableCell>
                     <TableCell>{poll.totalVotes}</TableCell>
                     <TableCell className="text-center">{winnerName}</TableCell>
-                    <TableCell>-</TableCell>
+                    <TableCell>{poll.percentageParticipation}</TableCell>
                     <TableCell className="text-center">
                       <DropdownMenu
                         open={
