@@ -86,10 +86,9 @@ export default function MaintenanceBacklog() {
     interventions,
     interventionsCards,
     interventionsCardsStatus,
-    interventionsStatus, 
+    interventionsStatus,
     handleDeleteIntervention,
   } = useMaintenanceBacklog({
-    date,
     year,
   });
 
@@ -109,9 +108,8 @@ export default function MaintenanceBacklog() {
         <div className="flex gap-2">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Mês e Ano de referência
+              Ano de referência
             </label>
-            <MonthYearPicker selectedDate={date} onChange={setDate} />
 
             <YearSelect yearSelected={year} setYearSelected={setYear} />
           </div>

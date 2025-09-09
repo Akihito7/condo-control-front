@@ -18,8 +18,9 @@ export function YearSelect({ setYearSelected, yearSelected }: YearSelectProps) {
     <Select
       value={yearSelected}
       onValueChange={(value) => setYearSelected(value)}
+
     >
-      <SelectTrigger className="w-[180px]">
+      <SelectTrigger className="w-[250px]">
         <SelectValue placeholder="Selecione o ano" />
       </SelectTrigger>
       <SelectContent>
