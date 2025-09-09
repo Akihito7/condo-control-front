@@ -99,7 +99,7 @@ export default function VirtualAssembly() {
 
           <CardContent className="flex flex-col gap-1">
             <span className="text-2xl md:text-3xl font-bold dark:text-foreground">
-              {polls?.length}
+              {polls?.data?.length}
             </span>
             <span className="text-[12px] dark:text-foreground">
               Total de novas enquetes neste mês.
@@ -119,10 +119,10 @@ export default function VirtualAssembly() {
 
           <CardContent className="flex flex-col gap-1">
             <span className="text-2xl md:text-3xl font-bold dark:text-foreground">
-              0.0%
+              {polls?.accuracyPercentageParticipation}
             </span>
             <span className="text-[12px] dark:text-foreground">
-              Média de participação nas enquetes encerradas.
+              Média de participação nas enquetes.
             </span>
           </CardContent>
         </Card>
@@ -164,7 +164,7 @@ export default function VirtualAssembly() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {polls?.map((poll) => {
+              {polls?.data.map((poll) => {
                 const sorted = [...poll.votesInfo].sort(
                   (a, b) => b.total - a.total
                 );

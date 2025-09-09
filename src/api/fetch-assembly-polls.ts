@@ -5,6 +5,11 @@ interface FetchAssemblyVirtualPollsProps {
   condominiumId: number
 }
 
+
+export interface Response {
+  accuracyPercentageParticipation: number;
+  data: PollWithStats[]
+}
 export type PollWithStats = {
   id: number;
   startDate: string;
@@ -34,7 +39,7 @@ export type PollWithStats = {
 export async function fetchAssemblyVirtualPolls({
   date,
   condominiumId
-}: FetchAssemblyVirtualPollsProps): Promise<PollWithStats[]> {
+}: FetchAssemblyVirtualPollsProps): Promise<Response> {
   const response = await api.get(`communication/assembly-virtual/polls/${condominiumId}/${date}`);
   const data = response.data;
   return data;
