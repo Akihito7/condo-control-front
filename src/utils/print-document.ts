@@ -3,7 +3,7 @@ import jsPDF from "jspdf";
 
 export const printDocument = async (
   componentToPrint: HTMLElement,
-  componentToHidden: HTMLElement | HTMLDivElement
+  componentToHidden: HTMLElement | HTMLDivElement,
 ) => {
   componentToHidden.style.display = "none";
 
@@ -44,6 +44,6 @@ export const printDocument = async (
     }
 
     pdf.save("transaction-entry.pdf");
-    componentToHidden.style.display = "flex";
+    componentToHidden.style.display = 'flex'
   }
 };

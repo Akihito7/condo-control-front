@@ -2,7 +2,7 @@
 
 import { Breadcrumb } from "@/components/breadcrumb";
 import { ButtonOpenSidebar } from "@/components/button-open-sidebar";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { EventDetailsModal } from "./event-details-modal";
 import { userPagePermission } from "@/utils/user-page-permission";
 import { redirect } from "next/navigation";
@@ -13,6 +13,8 @@ import { useCondominiumSchedule } from "./use-condominium-schedule";
 import { ModalAddEvent } from "../../structure/management-of-common-spaces/modal-add-event";
 import { AddEventModal } from "./add-event-modal";
 import { NotificationDropdown } from "@/components/notification";
+import { FileDown } from "lucide-react";
+import { printDocument } from "@/utils/print-document";
 
 export default function CondominiumSchedule() {
   const { read, edit } = userPagePermission({ pageId: 9 });
@@ -41,8 +43,14 @@ export default function CondominiumSchedule() {
     ...new Set(condominiumSchedule?.map((day) => day.dayName)),
   ];
 
+  const mainComponentRef = useRef<HTMLDivElement | null>(null);
+  const filterComponentRef = useRef<HTMLDivElement | null>(null);
+
   return (
-    <div className="bg-gray-50 h-screen w-full p-6 md:p-10 flex flex-col gap-6 overflow-y-auto">
+    <div
+      ref={mainComponentRef}
+      className="bg-gray-50 h-screen w-full p-6 md:p-10 flex flex-col gap-6 overflow-y-auto"
+    >
       <EventDetailsModal
         isOpen={modalEventDetailsIsOpen}
         setIsOpen={setModalEventDetailsIsOpen}
@@ -70,7 +78,10 @@ export default function CondominiumSchedule() {
         </h1>
       </div>
 
-      <div className="flex  flex-col gap-4 md:items-end md:flex-row ">
+      <div
+        ref={filterComponentRef}
+        className="flex  flex-col gap-4 md:items-end md:flex-row "
+      >
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Selecione o mes e ano
@@ -81,6 +92,19 @@ export default function CondominiumSchedule() {
             justFutureMonths={false}
           />
         </div>
+
+        <Button
+          variant="outline"
+          className="ml-auto flex items-center gap-2 h-10 cursor-pointer"
+          onClick={() => {
+            if (!mainComponentRef.current || !filterComponentRef.current)
+              return;
+            printDocument(mainComponentRef.current, filterComponentRef.current);
+          }}
+        >
+          <FileDown className="w-6 h-6" />
+          Exportar PDF
+        </Button>
       </div>
 
       <div className="bg-white shadow-md rounded-xl border border-gray-200">
