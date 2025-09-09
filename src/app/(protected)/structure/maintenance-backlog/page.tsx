@@ -181,7 +181,7 @@ export default function MaintenanceBacklog() {
         />
         <CardMaintenance
           amount={interventionsCards?.approvedImprovementsCost ?? 0}
-          title="Custo Melhorias Aprov./Inic."
+          title="Custo Melhorias"
           icon={<TrendingUp className="text-orange-400" />}
         />
         <CardMaintenance

@@ -11,7 +11,8 @@ export function useCondominiumSchedule() {
   const [daySelected, setDaySelected] = useState<DaySchedule>();
   const [modalEventDetailsIsOpen, setModalEventDetailsIsOpen] = useState(false);
   const [eventSelected, setEventSelected] = useState<Event | undefined>();
-  const dateFormatted = format(date, 'yyyy-MM-dd')
+  const dateFormatted = format(date, 'yyyy-MM-dd');
+  const [daysOut, setDaysOut] = useState(0);
 
   function handleDateSelected(date: Date) {
     setDate(date)
@@ -38,6 +39,8 @@ export function useCondominiumSchedule() {
     modalEventDetailsIsOpen,
     setModalEventDetailsIsOpen,
     eventSelected,
-    setEventSelected
+    setEventSelected,
+    daysOut,
+    setDaysOut
   }
 }
