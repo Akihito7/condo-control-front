@@ -43,6 +43,7 @@ import { userPagePermission } from "@/utils/user-page-permission";
 import { redirect } from "next/navigation";
 import { useUserContext } from "@/providers/use-user-context";
 import { format } from "date-fns";
+import { YearSelect } from "@/components/year-select";
 
 export default function MaintenanceBacklog() {
   const { read, edit } = userPagePermission({ pageId: 4 });
@@ -53,6 +54,7 @@ export default function MaintenanceBacklog() {
     redirect("/home");
   }
   const [date, setDate] = useState(new Date());
+  const [year, setYear] = useState(new Date().getFullYear().toString());
   const [typeSelected, setTypeSelected] = useState("-1");
   const [statusSelected, setStatusSelected] = useState("-1");
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -84,10 +86,11 @@ export default function MaintenanceBacklog() {
     interventions,
     interventionsCards,
     interventionsCardsStatus,
-    interventionsStatus,
+    interventionsStatus, 
     handleDeleteIntervention,
   } = useMaintenanceBacklog({
     date,
+    year,
   });
 
   return (
@@ -109,6 +112,8 @@ export default function MaintenanceBacklog() {
               Mês e Ano de referência
             </label>
             <MonthYearPicker selectedDate={date} onChange={setDate} />
+
+            <YearSelect yearSelected={year} setYearSelected={setYear} />
           </div>
 
           <div>

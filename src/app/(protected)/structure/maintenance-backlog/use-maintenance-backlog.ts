@@ -13,10 +13,12 @@ import { format } from 'date-fns'
 
 interface UseMaintenanceBacklogProps {
   date: Date;
+  year: string;
 }
 
 export function useMaintenanceBacklog({
-  date
+  date,
+  year,
 }: UseMaintenanceBacklogProps) {
   const {
     user
@@ -24,6 +26,8 @@ export function useMaintenanceBacklog({
   const { condominiumId } = user;
   const dateFormatted = format(date, 'yyyy-MM-dd');
   const queryClient = useQueryClient();
+
+  console.log("YEAR", year)
 
   const { data: priorityOptions, status: priorityOptionsStatus } = useQuery({
     queryKey: ['priority-options'],
