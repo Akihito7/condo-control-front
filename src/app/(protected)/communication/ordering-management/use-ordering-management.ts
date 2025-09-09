@@ -36,6 +36,8 @@ export function useOrderingManagement({
     queryKey: ['statusOptions'],
     queryFn: fetchDeliveryStatus
   })
+
+
   return {
     deliveries,
     deliveriesStatus,

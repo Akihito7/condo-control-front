@@ -5,7 +5,7 @@ import { ButtonOpenSidebar } from "@/components/button-open-sidebar";
 import { DatePickRange } from "@/components/date-pick-ranger";
 import { Button } from "@/components/ui/button";
 import { FileDown, Pencil } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useOrderingManagement } from "./use-ordering-management";
 import { format, parseISO } from "date-fns";
 import {
@@ -43,6 +43,7 @@ import { userPagePermission } from "@/utils/user-page-permission";
 import { redirect } from "next/navigation";
 import { useUserContext } from "@/providers/use-user-context";
 import { NotificationDropdown } from "@/components/notification";
+import { ModalMarkAsDelivered } from "./modal-mark-as-delivered";
 
 export default function OrderingManagement() {
   const { read, edit } = userPagePermission({ pageId: 10 });
@@ -68,6 +69,7 @@ export default function OrderingManagement() {
   });
 
   const [statusSelected, setStatusSelected] = useState<string>("-1");
+  const [modalMarkAsDelivered, setModalAsDeliverd] = useState(false);
   const [packageModalIsOpen, setPackageModalIsOpen] = useState(false);
   const [modalGalleryIsOpen, setModalGalleryIsOpen] = useState(false);
   const [dropdownOpenToThisItem, setDropdownOpenToThisItem] = useState<
@@ -269,11 +271,12 @@ export default function OrderingManagement() {
                           <DropdownMenuContent>
                             {!delivery.pickedUpAt && (
                               <DropdownMenuItem
-                                onClick={() =>
-                                  handleMarkAsDeliverd(delivery.id)
-                                }
+                                onClick={() => {
+                                  setDeliverySelected(delivery);
+                                  setModalAsDeliverd(true);
+                                }}
                               >
-                                Marcar como entregue
+                                Confirmar Entrega
                               </DropdownMenuItem>
                             )}
 
@@ -323,6 +326,13 @@ export default function OrderingManagement() {
           imageUrls={photosUrls}
         />
       )}
+
+      <ModalMarkAsDelivered
+        isOpen={modalMarkAsDelivered}
+        setIsOpen={setModalAsDeliverd}
+        deliverySelected={deliverySelected}
+        setDeliverySelected={setDeliverySelected}
+      />
     </div>
   );
 }
