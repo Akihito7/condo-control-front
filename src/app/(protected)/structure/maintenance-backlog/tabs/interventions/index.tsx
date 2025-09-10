@@ -49,7 +49,12 @@ interface InterventionsProps {
   interventions: Intervention[] | undefined;
   year: string;
   setYear: React.Dispatch<React.SetStateAction<string>>;
-  handleDeleteIntervention: UseMutateAsyncFunction<void, Error, number, unknown>;
+  handleDeleteIntervention: UseMutateAsyncFunction<
+    void,
+    Error,
+    number,
+    unknown
+  >;
 }
 export function Interventions({
   areasOptions,
@@ -80,7 +85,7 @@ export function Interventions({
   const [modalActionInvervationIsOpen, setModalActionIntervationIsOpen] =
     useState(false);
   return (
-    <>
+    <div className="space-y-6">
       <div className="flex  flex-col gap-4 md:items-end md:flex-row ">
         <div className="flex gap-2">
           <div>
@@ -387,6 +392,6 @@ export function Interventions({
           </Table>
         </div>
       </section>
-    </>
+    </div>
   );
 }
