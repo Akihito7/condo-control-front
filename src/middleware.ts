@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-const ROUTES_PROTECTED = ['finance'];
+const ROUTES_PROTECTED = ['finance', 'communication', 'structure', 'security', 'home'];
 
 export function middleware(request: NextRequest) {
 
@@ -10,7 +10,7 @@ export function middleware(request: NextRequest) {
   const token = cookies?.value;
 
   if (token && request.nextUrl.pathname.startsWith("/signin") || request.url.startsWith('/signup')) {
-    return NextResponse.redirect(new URL('finance/transaction-entry', request.url))
+    return NextResponse.redirect(new URL('/home', request.url))
   }
 
   const [, pathInital] = request.nextUrl.pathname.split('/')
