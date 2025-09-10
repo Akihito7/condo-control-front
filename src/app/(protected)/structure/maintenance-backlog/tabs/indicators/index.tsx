@@ -16,27 +16,10 @@ import {
 import { printDocument } from "@/utils/print-document";
 import { YearSelect } from "@/components/year-select";
 
-// mock de dados (substituir depois por api)
-const actionsSummary = {
-  maintenances: 42,
-  improvements: 8,
-};
-
-const costs = {
-  avgMaintenance: 1071.42,
-  avgImprovement: 9375.0,
-  avgExecutionTime: 15,
-};
-
 const impact = {
   maintenances: 5.2,
   improvements: 8.7,
 };
-
-const costByType = [
-  { name: "Manutenção", value: 45000 },
-  { name: "Melhoria", value: 75000 },
-];
 
 const improvementsByArea = [
   { area: "Garagem", value: 2 },
@@ -80,7 +63,10 @@ export function Indicators({
 
   const COLORS = ["#3B82F6", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6"];
 
-  console.log(indicatorsResume);
+  const costByTypeFormatted = [
+    { name: "Manutenção", value: indicatorsResume?.maintenanceCost },
+    { name: "Melhoria", value: indicatorsResume?.improvementsCost },
+  ];
 
   return (
     <div className="space-y-6 pb-6">
@@ -217,10 +203,19 @@ export function Indicators({
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={costByType} barSize={30}>
+              <BarChart data={costByTypeFormatted} barSize={30}>
                 <XAxis dataKey="name" />
                 <YAxis />
-                <Tooltip />
+                <Tooltip
+                  formatter={(value: number, name: string) => [
+                    value.toLocaleString("pt-BR", {
+                      currency: "BRL",
+                      style: "currency",
+                    }),
+                    "Valor",
+                  ]}
+                />
+
                 <Bar dataKey="value" fill="#3B82F6" />
               </BarChart>
             </ResponsiveContainer>
