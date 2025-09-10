@@ -6,6 +6,7 @@ import { fetchMaintenancesStatus } from "@/api/fetch-maintenances-status";
 import { fetchMaintenancesTypes } from "@/api/fetch-maintenances-types";
 import { fetchPaymentMethodOptions } from "@/api/fetch-payment-method.options";
 import { fetchPriorityOptions } from "@/api/fetch-priority-options";
+import { fetchResumeIndicatorsMaintenances } from "@/api/fetch-resume-indicators-maintenances";
 import { useUserContext } from "@/providers/use-user-context";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from 'date-fns'
@@ -82,6 +83,12 @@ export function useMaintenanceBacklog({
     }
   })
 
+  const { data: resumeIndicators, status: resumeIndicatorsStatus } = useQuery({
+    queryKey: ['resume-indicators', year],
+    queryFn: () => fetchResumeIndicatorsMaintenances(dateFormatted)
+
+  })
+
   return {
     priorityOptions,
     priorityOptionsStatus,
@@ -97,6 +104,8 @@ export function useMaintenanceBacklog({
     interventionsStatus,
     handleDeleteIntervention,
     interventionsCards,
-    interventionsCardsStatus
+    interventionsCardsStatus,
+    resumeIndicators,
+    resumeIndicatorsStatus
   }
 }

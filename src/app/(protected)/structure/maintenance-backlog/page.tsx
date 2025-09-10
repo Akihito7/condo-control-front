@@ -69,6 +69,8 @@ export default function MaintenanceBacklog() {
     interventionsCardsStatus,
     interventionsStatus,
     handleDeleteIntervention,
+    resumeIndicators,
+    resumeIndicatorsStatus,
   } = useMaintenanceBacklog({
     year,
   });
@@ -117,7 +119,11 @@ export default function MaintenanceBacklog() {
           </TabsContent>
 
           <TabsContent value="indicators">
-            <Indicators />
+            <Indicators
+              setYear={setYear}
+              year={year}
+              indicatorsResume={resumeIndicators}
+            />
           </TabsContent>
         </div>
       </Tabs>
