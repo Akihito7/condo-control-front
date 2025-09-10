@@ -3,7 +3,7 @@ import { api } from "@/services/api";
 interface FetchInterventionCardsProps {
   date: string
 }
-type FinancialSummary = {
+export type FinancialSummary = {
   newMonthlyFixedCosts: number;
   approvedImprovementsCost: number;
   balance: number;

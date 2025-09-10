@@ -3,14 +3,7 @@
 import { Breadcrumb } from "@/components/breadcrumb";
 import { ButtonOpenSidebar } from "@/components/button-open-sidebar";
 import { Button } from "@/components/ui/button";
-import {
-  CardSim,
-  CreditCard,
-  FileDown,
-  Pencil,
-  TrendingUp,
-  Wallet,
-} from "lucide-react";
+import { CreditCard, FileDown, Pencil, TrendingUp, Wallet } from "lucide-react";
 import { useState } from "react";
 import { CardMaintenance } from "./card-maintenance";
 import {
@@ -34,7 +27,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { MonthYearPicker } from "@/components/month-year-select";
 import { useMaintenanceBacklog } from "./use-maintenance-backlog";
 import { ModalActionIntervention } from "./modal-action-intervation";
 import { Intervention } from "@/api/fetch-interventions";
@@ -44,6 +36,11 @@ import { redirect } from "next/navigation";
 import { useUserContext } from "@/providers/use-user-context";
 import { format } from "date-fns";
 import { YearSelect } from "@/components/year-select";
+
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Interventions } from "./tabs/interventions";
+import { Indicators } from "./tabs/indicators";
+import { PagesRouteModule } from "next/dist/server/route-modules/pages/module.compiled";
 
 export default function MaintenanceBacklog() {
   const { read, edit } = userPagePermission({ pageId: 4 });
@@ -55,22 +52,6 @@ export default function MaintenanceBacklog() {
   }
   const [date, setDate] = useState(new Date());
   const [year, setYear] = useState(new Date().getFullYear().toString());
-  const [typeSelected, setTypeSelected] = useState("-1");
-  const [statusSelected, setStatusSelected] = useState("-1");
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [dropdownOpenToThisItem, setDropdownOpenToThisItem] = useState<
-    number | undefined
-  >();
-
-  const [interventionSelected, setInterventionSelected] =
-    useState<Intervention>();
-
-  const [modalTypeAction, setModalTypeAction] = useState<
-    "create" | "edit" | "view"
-  >("create");
-
-  const [modalActionInvervationIsOpen, setModalActionIntervationIsOpen] =
-    useState(false);
 
   const {
     areasOptions,
@@ -103,313 +84,43 @@ export default function MaintenanceBacklog() {
           Backlog de Manutenções
         </h1>
       </div>
+      <Tabs defaultValue="interventions" className="p-4">
+        <TabsList className="bg-gray-50 p-1.5 rounded-lg border border-gray-200">
+          <TabsTrigger
+            value="interventions"
+            className="data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-gray-900 px-4 py-2 rounded-md font-medium text-gray-600 transition-all"
+          >
+            Intervenções
+          </TabsTrigger>
+          <TabsTrigger
+            value="indicators"
+            className="data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-gray-900 px-4 py-2 rounded-md font-medium text-gray-600 transition-all"
+          >
+            Indicadores
+          </TabsTrigger>
+        </TabsList>
 
-      <div className="flex  flex-col gap-4 md:items-end md:flex-row ">
-        <div className="flex gap-2">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Ano de referência
-            </label>
+        <div className="mt-6">
+          <TabsContent value="interventions">
+            <Interventions
+              areasOptions={areasOptions}
+              interventions={interventions}
+              interventionsCards={interventionsCards}
+              maintenancesStatusOptions={maintenancesStatusOptions}
+              maintenancesTypes={maintenancesTypes}
+              paymentMethodsOptions={paymentMethodsOptions}
+              priorityOptions={priorityOptions}
+              setYear={setYear}
+              year={year}
+              handleDeleteIntervention={handleDeleteIntervention}
+            />
+          </TabsContent>
 
-            <YearSelect yearSelected={year} setYearSelected={setYear} />
-          </div>
-
-          <div>
-            <Label className="block text-sm font-medium text-gray-700 mb-2">
-              Tipo
-            </Label>
-            <Select
-              value={typeSelected}
-              onValueChange={(value) => setTypeSelected(value)}
-            >
-              <SelectTrigger
-                className="w-full"
-                style={{
-                  height: 40,
-                  width: 200,
-                }}
-              >
-                <SelectValue placeholder="Selecione o tipo" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="-1">Todos</SelectItem>
-                {maintenancesTypes?.map((type) => (
-                  <SelectItem value={String(type.id)}>{type.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <Label className="block text-sm font-medium text-gray-700 mb-2">
-              Status
-            </Label>
-            <Select
-              value={statusSelected}
-              onValueChange={(value) => setStatusSelected(value)}
-            >
-              <SelectTrigger
-                className="w-full"
-                style={{
-                  height: 40,
-                  width: 200,
-                }}
-              >
-                <SelectValue placeholder="Selecione o status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="-1">Todos</SelectItem>
-                {maintenancesStatusOptions?.map((type) => (
-                  <SelectItem value={String(type.id)}>{type.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          <TabsContent value="indicators">
+            <Indicators />
+          </TabsContent>
         </div>
-
-        <Button
-          variant="outline"
-          className="ml-auto flex items-center gap-2 h-10 cursor-pointer"
-        >
-          <FileDown className="w-6 h-6" />
-          Exportar PDF
-        </Button>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
-        <CardMaintenance
-          amount={interventionsCards?.balance ?? 0}
-          title="Saldo Atual"
-          icon={<Wallet className="text-blue-400" />}
-        />
-        <CardMaintenance
-          amount={interventionsCards?.approvedImprovementsCost ?? 0}
-          title="Custo Melhorias"
-          icon={<TrendingUp className="text-orange-400" />}
-        />
-        <CardMaintenance
-          amount={interventionsCards?.newMonthlyFixedCosts ?? 0}
-          title="Novos Custos Fixos Mensais"
-          icon={<CreditCard className="text-green-400" />}
-        />
-      </div>
-
-      <section className="rounded-xl overflow-auto border">
-        <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200">
-          <h2 className="font-medium text-gray-800 text-lg">
-            Backlog de Manutenções
-          </h2>
-
-          <ModalActionIntervention
-            isOpen={modalActionInvervationIsOpen}
-            setIsOpen={setModalActionIntervationIsOpen}
-            priorityOptions={priorityOptions}
-            paymentMethodsOptions={paymentMethodsOptions}
-            areasOptions={areasOptions}
-            typesOptions={maintenancesTypes}
-            statusOptions={maintenancesStatusOptions}
-            interventionSelected={interventionSelected}
-            setInterventionSelected={setInterventionSelected}
-            type={modalTypeAction}
-            setModalTypeAction={setModalTypeAction}
-          />
-        </div>
-
-        <div className="max-h-[70vh] overflow-y-auto border border-gray-300 rounded">
-          <Table className="min-w-full border-collapse">
-            <TableHeader className="sticky top-0 bg-white shadow-md z-10">
-              <TableRow>
-                <TableHead>Prioridade</TableHead>
-                <TableHead>Tipo</TableHead>
-                <TableHead>Descrição</TableHead>
-                <TableHead>Fornecedor</TableHead>
-                <TableHead className="text-left">Valor</TableHead>
-                <TableHead className="text-center">Nu. Parcelas</TableHead>
-                <TableHead className="text-left">Valor da Parcela</TableHead>
-                <TableHead>Forma de Pagamento</TableHead>
-                <TableHead>Data de Pagamento</TableHead>
-                <TableHead>Conclusão do Pagamento</TableHead>
-                <TableHead className="text-center">Inicio Planejado</TableHead>
-                <TableHead className="text-center">Inicio Real</TableHead>
-                <TableHead className="text-center">Fim Planejado</TableHead>
-                <TableHead className="text-center">Fim Real</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-center">Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {interventions && interventions.length > 0 ? (
-                interventions
-                  .filter((intervention) => {
-                    const statusMatch =
-                      statusSelected === "-1"
-                        ? true
-                        : statusSelected === String(intervention.statusId);
-                    const typeMatch =
-                      typeSelected === "-1"
-                        ? true
-                        : typeSelected === String(intervention.typeId);
-                    return statusMatch && typeMatch;
-                  })
-                  .map((item) => {
-                    return (
-                      <TableRow key={item.id}>
-                        <TableCell>
-                          <span
-                            className="px-2 py-1 rounded text-xs font-semibold"
-                            style={{
-                              backgroundColor: `${item.prioritiesColor}`,
-                            }}
-                          >
-                            {item.prioritiesName}
-                          </span>
-                        </TableCell>
-
-                        <TableCell>{item.maintenanceTypesName}</TableCell>
-
-                        <TableCell>{item.description}</TableCell>
-
-                        <TableCell>{item.supplier}</TableCell>
-
-                        <TableCell className="text-left">
-                          {item.amount.toLocaleString("pt-BR", {
-                            style: "currency",
-                            currency: "BRL",
-                          })}
-                        </TableCell>
-
-                        <TableCell className="text-center">
-                          {item.numberOfInstallments ?? "-"}
-                        </TableCell>
-
-                        <TableCell>
-                          {item.isInstallment
-                            ? (
-                                item.amount / item.numberOfInstallments
-                              ).toLocaleString("pt-BR", {
-                                style: "currency",
-                                currency: "BRL",
-                              })
-                            : "-"}
-                        </TableCell>
-
-                        <TableCell>{item.paymentMethodsName}</TableCell>
-
-                        <TableCell>
-                          {item.paymentDate
-                            ? new Date(item.paymentDate).toLocaleDateString(
-                                "pt-BR"
-                              )
-                            : "-"}
-                        </TableCell>
-
-                        <TableCell>
-                          {item.paymentCompletionDate
-                            ? new Date(
-                                item.paymentCompletionDate
-                              ).toLocaleDateString("pt-BR")
-                            : "-"}
-                        </TableCell>
-
-                        <TableCell className="text-center">
-                          {item.plannedStart
-                            ? format(
-                                item.plannedStart as any,
-                                "dd/MM/yyyy HH:ss"
-                              )
-                            : "-"}
-                        </TableCell>
-
-                        <TableCell className="text-center">
-                          {item.actualStart
-                            ? format(
-                                item.actualStart as any,
-                                "dd/MM/yyyy HH:ss"
-                              )
-                            : "-"}
-                        </TableCell>
-
-                        <TableCell className="text-center">
-                          {item.plannedEnd
-                            ? format(item.plannedEnd as any, "dd/MM/yyyy HH:ss")
-                            : "-"}
-                        </TableCell>
-
-                        <TableCell className="text-center">
-                          {item.actualEnd
-                            ? format(item.actualEnd as any, "dd/MM/yyyy HH:ss")
-                            : "-"}
-                        </TableCell>
-                        <TableCell>{item.maintenanceStatusesName}</TableCell>
-
-                        <TableCell className="text-center">
-                          <DropdownMenu
-                            open={
-                              dropdownOpen && dropdownOpenToThisItem === item.id
-                            }
-                            onOpenChange={(open) => {
-                              if (!open) {
-                                setDropdownOpenToThisItem(undefined);
-                              } else {
-                                setDropdownOpenToThisItem(item.id);
-                              }
-                              setDropdownOpen(open);
-                            }}
-                          >
-                            <DropdownMenuTrigger
-                              asChild
-                              className="outline-none ring-0 focus:outline-none focus:ring-0 cursor-pointer"
-                            >
-                              <Pencil className="w-4 h-4 text-gray-700" />
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent>
-                              <DropdownMenuItem
-                                onClick={() => {
-                                  setDropdownOpen(false);
-                                  setModalTypeAction("edit");
-                                  setInterventionSelected(item);
-                                  setModalActionIntervationIsOpen(true);
-                                }}
-                              >
-                                Editar
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() => {
-                                  setDropdownOpen(false);
-                                  setModalTypeAction("view");
-                                  setInterventionSelected(item);
-                                  setModalActionIntervationIsOpen(true);
-                                }}
-                              >
-                                Visualizar
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() => {
-                                  handleDeleteIntervention(item.id);
-                                }}
-                              >
-                                Deletar
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={10}
-                    className="text-center py-4 text-gray-500"
-                  >
-                    No interventions found.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-      </section>
+      </Tabs>
     </main>
   );
 }
