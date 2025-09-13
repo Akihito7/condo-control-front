@@ -164,7 +164,7 @@ export default function VirtualAssembly() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {polls?.data.map((poll) => {
+              {polls?.data?.map((poll) => {
                 const sorted = [...poll.votesInfo].sort(
                   (a, b) => b.total - a.total
                 );
