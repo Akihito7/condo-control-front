@@ -173,7 +173,7 @@ export default function VirtualAssembly() {
                 if (sorted.length) {
                   const topVotes = sorted[0].total;
                   const tied = sorted.filter((v) => v.total === topVotes);
-                  winnerName = tied.map((v) => v.optionName).join(" - ");
+                  winnerName = tied?.map((v) => v.optionName).join(" - ");
                 }
                 return (
                   <TableRow key={poll.id}>
