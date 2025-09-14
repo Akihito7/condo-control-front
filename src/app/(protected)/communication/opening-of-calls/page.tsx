@@ -12,9 +12,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { FileDown, Pencil } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { differenceInMinutes, format, parseISO } from "date-fns";
-import ReactSelect, { MultiValue } from "react-select";
 
 import {
   Table,
@@ -61,7 +60,7 @@ export default function OpeningOfCalls() {
     from: new Date(),
     to: new Date(),
   });
-  const [statusOptionSelected, setStatusOptionsSelected] = useState<number[]>();
+  const [statusOptionSelected, setStatusOptionSelected] = useState<string>();
   const [issueOptionSeleted, setIssueOptionSelected] = useState<string>("-1");
   const [openingRecordSelected, setOpeningRecordSelected] =
     useState<OpeningCall | null>(null);
@@ -135,46 +134,19 @@ export default function OpeningOfCalls() {
               Status chamados
             </label>
 
-            <ReactSelect
-              value={statusOptions
-                ?.map((option: any) => ({
-                  value: option.id,
-                  label: option.name,
-                }))
-                .filter((option: any) =>
-                  statusOptionSelected?.includes(option.value)
-                )}
-              className="w-[400px]"
-              isMulti
-              hideSelectedOptions={false}
-              onChange={(value) => {
-                if (value.length === 0) return;
-                setStatusOptionsSelected(
-                  value.map((value: any) => value.value)
-                );
-              }}
-              options={statusOptions?.map((option: any) => ({
-                value: option.id,
-                label: option.name,
-              }))}
-              placeholder="Selecione..."
-              styles={{
-                multiValue: (base) => ({
-                  ...base,
-                  marginRight: 8,
-                  display: "inline-flex",
-                  flexWrap: "nowrap",
-                  width: "100px",
-                }),
-                valueContainer: (base) => ({
-                  ...base,
-                  display: "flex",
-                  flexWrap: "nowrap",
-                  overflowX: "hidden",
-                  gap: "4px",
-                }),
-              }}
-            />
+            <Select onValueChange={(value) => setStatusOptionSelected(value)}>
+              <SelectTrigger className="bg-white w-[260px] min-h-[40px]">
+                <SelectValue placeholder="Selecione o status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="-1">Todos</SelectItem>
+                {statusOptions?.map((option: any, index: number) => (
+                  <SelectItem key={index} value={option.id}>
+                    {option.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         )}
 
@@ -308,9 +280,11 @@ export default function OpeningOfCalls() {
                         : String(openingRecord.issueTypeId) ===
                           String(issueOptionSeleted);
 
-                    const statusOptionsMatch = statusOptionSelected?.includes(
-                      openingRecord.statusId
-                    );
+                    const statusOptionsMatch =
+                      statusOptionSelected === "-1"
+                        ? true
+                        : String(openingRecord.statusId) ===
+                          statusOptionSelected;
                     return issueOptionsMatch && statusOptionsMatch;
                   })
                   .map((openingRecord: any) => (
