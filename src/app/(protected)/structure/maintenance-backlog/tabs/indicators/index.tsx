@@ -137,7 +137,7 @@ export function Indicators({
               </p>
               <p className="text-lg font-bold">
                 R${" "}
-                {indicatorsResume?.accuracyMaintenanceCost.toLocaleString(
+                {indicatorsResume?.accuracyMaintenanceCost?.toLocaleString(
                   "pt-BR",
                   {
                     minimumFractionDigits: 2,
@@ -151,7 +151,7 @@ export function Indicators({
               </p>
               <p className="text-lg font-bold">
                 R${" "}
-                {indicatorsResume?.improvementsCost.toLocaleString("pt-BR", {
+                {indicatorsResume?.improvementsCost?.toLocaleString("pt-BR", {
                   minimumFractionDigits: 2,
                 })}
               </p>
@@ -162,7 +162,7 @@ export function Indicators({
               </p>
               <p className="text-lg font-bold">
                 R${" "}
-                {indicatorsResume?.accuracyImprovementCost.toLocaleString(
+                {indicatorsResume?.accuracyImprovementCost?.toLocaleString(
                   "pt-BR",
                   {
                     minimumFractionDigits: 2,
@@ -182,11 +182,15 @@ export function Indicators({
               <p className="text-sm text-muted-foreground">
                 Impacto Manutenções
               </p>
-              <p className="text-lg font-bold">MOCKADO%</p>
+              <p className="text-lg font-bold">
+                {indicatorsResume?.percentageImpactMaintenances}%
+              </p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Impacto Melhorias</p>
-              <p className="text-lg font-bold">MOCKADO</p>
+              <p className="text-lg font-bold">
+                {indicatorsResume?.percentageImpactImprovements}%
+              </p>
             </div>
           </div>
         </CardContent>

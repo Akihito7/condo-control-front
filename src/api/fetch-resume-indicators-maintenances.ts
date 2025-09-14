@@ -8,7 +8,9 @@ export type IndicatorsResume = {
   improvementsCost: number;
   improvementsImplemented: number;
   maintenancePerfomed: number;
-  maintenanceCost : number
+  maintenanceCost: number;
+  percentageImpactImprovements: string;
+  percentageImpactMaintenances: string;
 };
 
 export async function fetchResumeIndicatorsMaintenances(date: string): Promise<IndicatorsResume> {
