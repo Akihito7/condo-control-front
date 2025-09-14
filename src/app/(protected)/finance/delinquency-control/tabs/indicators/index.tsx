@@ -56,7 +56,7 @@ export function Indicators({
 
   const indicatorsToDisplay = [
     {
-      label: "Mensalidades Pendentes",
+      label: "Pagamentos Pendentes",
       value: delinquencyResume?.totalInstallments ?? 0,
     },
     {
@@ -160,6 +160,7 @@ export function Indicators({
                   stroke="#EF4444"
                   strokeWidth={2}
                   dot={{ r: 4 }}
+                
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -192,7 +193,12 @@ export function Indicators({
                     />
                   ))}
                 </Pie>
-                <Tooltip />
+                <Tooltip
+                  formatter={(value, name) => [
+                    `${Number(value).toFixed(2)}%`,
+                    name,
+                  ]}
+                />
               </PieChart>
             </ResponsiveContainer>
             <ul className="mt-4 space-y-1 text-sm">

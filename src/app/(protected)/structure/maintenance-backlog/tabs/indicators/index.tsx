@@ -233,8 +233,8 @@ export function Indicators({
             <ResponsiveContainer width="100%" height={250}>
               <BarChart data={improvementsByArea} barSize={30}>
                 <XAxis dataKey="area" />
-                <YAxis />
-                <Tooltip />
+                <YAxis allowDecimals={false} />
+                <Tooltip formatter={(value, name) => [value, "Quantidade"]} />
                 <Bar dataKey="value">
                   {improvementsByArea.map((_, index) => (
                     <Cell key={index} fill={COLORS[index % COLORS.length]} />
