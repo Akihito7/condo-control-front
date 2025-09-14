@@ -119,7 +119,7 @@ export default function VirtualAssembly() {
 
           <CardContent className="flex flex-col gap-1">
             <span className="text-2xl md:text-3xl font-bold dark:text-foreground">
-              {polls?.accuracyPercentageParticipation}
+              {polls?.accuracyPercentageParticipation}%
             </span>
             <span className="text-[12px] dark:text-foreground">
               Média de participação nas enquetes.
@@ -187,7 +187,7 @@ export default function VirtualAssembly() {
                     <TableCell>{poll.status}</TableCell>
                     <TableCell>{poll.totalVotes}</TableCell>
                     <TableCell className="text-center">{winnerName}</TableCell>
-                    <TableCell>{poll.percentageParticipation}</TableCell>
+                    <TableCell>{poll.percentageParticipation}%</TableCell>
                     <TableCell className="text-center">
                       <DropdownMenu
                         open={
