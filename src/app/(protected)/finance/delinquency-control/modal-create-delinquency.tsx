@@ -81,6 +81,7 @@ export function ModalCreateDelinquency({
     getValues,
     setValue,
     reset,
+    watch,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(SchemaDeliquency),
@@ -154,7 +155,7 @@ export function ModalCreateDelinquency({
       paymentDate,
       dueDate,
     } = delinquencySelected;
-    
+
     const dueDateFormmated = parseISO(dueDate) ?? new Date();
     const paymentDateFormmated = paymentDate
       ? parseISO(paymentDate)

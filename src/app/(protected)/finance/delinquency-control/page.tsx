@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Breadcrumb } from "@/components/breadcrumb";
 import {
   Select,
@@ -218,7 +218,13 @@ export default function DelinquencyControl() {
                           <TableRow key={delinquencyRegister.id}>
                             <TableCell>{delinquencyRegister.dueDate}</TableCell>
                             <TableCell>
-                              {delinquencyRegister.apartamentId}
+                              {
+                                apartaments?.find(
+                                  (apartament) =>
+                                    apartament.id ===
+                                    delinquencyRegister.apartamentId
+                                )?.apartmentNumber
+                              }
                             </TableCell>
                             <TableCell>
                               {delinquencyRegister.categoryName}
