@@ -60,7 +60,8 @@ export default function OpeningOfCalls() {
     from: new Date(),
     to: new Date(),
   });
-  const [statusOptionSelected, setStatusOptionSelected] = useState<string>();
+  const [statusOptionSelected, setStatusOptionSelected] =
+    useState<string>("-1");
   const [issueOptionSeleted, setIssueOptionSelected] = useState<string>("-1");
   const [openingRecordSelected, setOpeningRecordSelected] =
     useState<OpeningCall | null>(null);
@@ -134,7 +135,10 @@ export default function OpeningOfCalls() {
               Status chamados
             </label>
 
-            <Select onValueChange={(value) => setStatusOptionSelected(value)}>
+            <Select
+              value={statusOptionSelected}
+              onValueChange={(value) => setStatusOptionSelected(value)}
+            >
               <SelectTrigger className="bg-white w-[260px] min-h-[40px]">
                 <SelectValue placeholder="Selecione o status" />
               </SelectTrigger>
