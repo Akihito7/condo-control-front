@@ -179,6 +179,13 @@ export function IndicatorsTab({ employees, workAreas }: IndicatorsTabProps) {
                       fontSize: "12px",
                       padding: "6px 10px",
                     }}
+                    formatter={(value, name) => [
+                      value.toLocaleString("pt-BR", {
+                        currency: "BRL",
+                        style: "currency",
+                      }),
+                      name,
+                    ]}
                   />
                   <Legend
                     wrapperStyle={{
