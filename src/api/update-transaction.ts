@@ -14,11 +14,10 @@ export interface UpdateRegisteProps {
   paymentDate: number | undefined,
 }
 
-export async function updateRegister({
+export async function updateRegister({  
   registerId,
   ...data
 }: UpdateRegisteProps) {
-
   const response = await api.put(
     `/finance/registers/${registerId}`, data
   );

@@ -57,7 +57,7 @@ export function Indicators({
   const indicatorsToDisplay = [
     {
       label: "Pagamentos Pendentes",
-      value: delinquencyResume?.totalInstallments ?? 0,
+      value: delinquencyResume?.unpaidCount ?? 0,
     },
     {
       label: "Unidades Inadimplentes",
