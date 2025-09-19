@@ -212,7 +212,7 @@ export function ModalActionEntry({
         : undefined;
       reset({
         incomeExpenseId: transactionSelected.incomeExpenseTypeId,
-        paymentStatusId: transactionSelected.paymentStatusId,
+        paymentStatusId: transactionSelected.status,
         amount: String(transactionSelected.amount),
         amountPaid: String(transactionSelected.amountPaid),
         apartmentId: transactionSelected.apartmentId,

@@ -34,6 +34,7 @@ export type FinancialRecord = {
   incomeExpenseTypeId: number;
   paymentMethodId: number;
   paymentStatusId: number;
+  status : number;  
   recordTypeId: number;
 };
 
