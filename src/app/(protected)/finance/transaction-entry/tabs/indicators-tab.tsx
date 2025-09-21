@@ -97,9 +97,10 @@ export function IndicatorsTab({
                     }
                   />
                   <Tooltip
-                    formatter={(value: number) =>
-                      `R$ ${value.toLocaleString("pt-BR")}`
-                    }
+                    formatter={(value: number, name: string) => [
+                      `R$ ${value.toLocaleString("pt-BR")}`,
+                      "Valor",
+                    ]}
                   />
                   <Bar
                     dataKey="value"
@@ -150,9 +151,10 @@ export function IndicatorsTab({
                     }
                   />
                   <Tooltip
-                    formatter={(value: number) =>
-                      `R$ ${value.toLocaleString("pt-BR")}`
-                    }
+                    formatter={(value: number, name: string) => [
+                      `R$ ${value.toLocaleString("pt-BR")}`,
+                      "Valor",
+                    ]}
                   />
                   <Bar
                     dataKey="value"

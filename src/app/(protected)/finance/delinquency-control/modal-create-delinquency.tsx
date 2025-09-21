@@ -175,9 +175,9 @@ export function ModalCreateDelinquency({
       open={modalIsOpen}
       onOpenChange={(open) => {
         setModalIsOpen(open);
-
-        if (!open && delinquencySelected) {
-          setDelinquencySelected(undefined);
+        if (!open) {
+          if (delinquencySelected) setDelinquencySelected(undefined);
+          handleResetForm();
         }
       }}
     >
