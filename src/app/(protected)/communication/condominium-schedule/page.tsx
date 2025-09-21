@@ -121,7 +121,36 @@ export default function CondominiumSchedule() {
           onClick={() => {
             if (!mainComponentRef.current || !filterComponentRef.current)
               return;
+
+            const dayElements = document.querySelectorAll(
+              ".day-event-wrapper"
+            ) as NodeListOf<HTMLDivElement>;
+
+            const buttonElements = document.querySelectorAll(
+              ".button-add"
+            ) as NodeListOf<HTMLButtonElement>;
+
+            const styleBeforeChange = dayElements?.[0].className;
+            const styleButtonBeforeChange = buttonElements?.[0].className;
+
+            dayElements.forEach((el) => {
+              el.className =
+                "day-event-wrapper border border-gray-200 p-2 flex flex-col gap-2 min-h-56";
+            });
+
+            buttonElements.forEach((button) => {
+              button.className = "hidden";
+            });
+
             printDocument(mainComponentRef.current, filterComponentRef.current);
+
+            dayElements.forEach((el) => {
+              el.className = styleBeforeChange;
+            });
+
+            buttonElements.forEach((button) => {
+              button.className = styleButtonBeforeChange;
+            });
           }}
         >
           <FileDown className="w-6 h-6" />
@@ -148,7 +177,7 @@ export default function CondominiumSchedule() {
           {condominiumSchedule?.map((day, index) => (
             <div
               key={index}
-              className="border border-gray-200 p-2 flex flex-col gap-2 min-h-56 overflow-auto max-h-56"
+              className="day-event-wrapper border border-gray-200 p-2 flex flex-col gap-2 min-h-56 overflow-auto max-h-56"
             >
               <span className="text-sm font-medium text-gray-700">
                 {day.dayNumber}
@@ -160,6 +189,7 @@ export default function CondominiumSchedule() {
                   setDaySelected(day);
                   setModalAddEventIsOpen(true);
                 }}
+                className="button-add"
               >
                 Adicionar Evento
               </Button>
