@@ -13,7 +13,12 @@ import {
 } from "@/components/ui/select";
 import { FileDown, Pencil } from "lucide-react";
 import { useState } from "react";
-import { differenceInMinutes, format, parseISO } from "date-fns";
+import {
+  differenceInHours,
+  differenceInMinutes,
+  format,
+  parseISO,
+} from "date-fns";
 
 import {
   Table,
@@ -105,6 +110,25 @@ export default function OpeningOfCalls() {
     startDate: rangeDate.from,
     endDate: rangeDate.to,
   });
+
+  const formatterToHoursMin = (
+    resolvedAte: string,
+    startedAt: string
+  ): string => {
+    const date1 = parseISO(resolvedAte);
+    const date2 = parseISO(startedAt);
+
+    // Converter para milissegundos com getTime() antes da subtração
+    const diffMs = Math.abs(date1.getTime() - date2.getTime());
+
+    const totalMinutes = Math.floor(diffMs / (1000 * 60));
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+
+    const padZero = (num: number) => (num < 10 ? "0" + num : num.toString());
+
+    return padZero(hours) + ":" + padZero(minutes);
+  };
 
   return (
     <div className="bg-gray-50 min-h-screen w-full p-8 flex flex-col gap-6">
@@ -262,7 +286,7 @@ export default function OpeningOfCalls() {
                 <TableHead className="text-left">Data início atuação</TableHead>
                 <TableHead>Data Resolução</TableHead>
                 <TableHead className="text-center">
-                  Tempo de Resolução (Min)
+                  Tempo de Resolução
                 </TableHead>
                 <TableHead className="text-center">Documentos</TableHead>
                 <TableHead className="text-center">Ações</TableHead>
@@ -320,9 +344,9 @@ export default function OpeningOfCalls() {
                       </TableCell>
                       <TableCell className="text-center">
                         {openingRecord.startedAt && openingRecord.resolvedAt
-                          ? differenceInMinutes(
-                              parseISO(openingRecord.resolvedAt),
-                              parseISO(openingRecord.startedAt)
+                          ? formatterToHoursMin(
+                              openingRecord.resolvedAt,
+                              openingRecord.startedAt
                             )
                           : "-"}
                       </TableCell>
