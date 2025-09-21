@@ -165,7 +165,7 @@ export function ModalActionIntervention({
     } else {
       await handleUpdateIntervention(data);
     }
-    reset();
+    cleanFormFields();
     setInterventionSelected(undefined);
     closeButtonRef.current?.click();
     queryClient.invalidateQueries({
@@ -250,16 +250,38 @@ export function ModalActionIntervention({
           interventionSelected.numberOfInstallments ?? undefined,
       });
     } else if (type === "create") {
-      reset(); // limpa o formulário para criação
+      cleanFormFields();
     }
   }, [interventionSelected, reset, type]);
+
+  function cleanFormFields() {
+    reset({
+      priority: "",
+      type: "",
+      area: "",
+      description: "",
+      provider: "",
+      value: "",
+      paymentMethod: "",
+      paymentDate: null,
+      paymentCompletionDate: null,
+      duration: "",
+      plannedStart: null,
+      plannedEnd: null,
+      actualStart: null,
+      actualEnd: null,
+      status: "",
+      isInstallment: false,
+      numberOfInstallments: undefined,
+    });
+  }
 
   return (
     <Dialog
       open={isOpen}
       onOpenChange={(open) => {
         if (!open) {
-          reset();
+          cleanFormFields();
           setInterventionSelected(undefined);
           setIsOpen(false);
           setModalTypeAction("create");

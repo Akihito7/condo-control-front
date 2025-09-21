@@ -56,7 +56,11 @@ export function IndicatorsTab({ employees, workAreas }: IndicatorsTabProps) {
       workAreaData.value += 1;
     });
 
-    setDataEmployeesByArea(employeesByWorkArea);
+    setDataEmployeesByArea(
+      employeesByWorkArea
+        .filter((employesByArea) => employesByArea.value > 0)
+        .sort((a, b) => b.value - a.value)
+    );
   }
 
   useEffect(() => {
