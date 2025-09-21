@@ -208,7 +208,7 @@ export function Indicators({
                     className="w-3 h-3 rounded-full"
                     style={{ backgroundColor: COLORS[i % COLORS.length] }}
                   />
-                  {d.categoryName} — {d.categoryPercentage}%
+                  {d.categoryName} — {d.categoryPercentage.toFixed(2)}%
                 </li>
               ))}
             </ul>
