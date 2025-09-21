@@ -64,7 +64,7 @@ export function IndicatorsTab({
         selectedDate={selectedDate}
       />
       <section className="grid grid-cols-2 grid-rows-3 gap-2">
-        <div className="w-full  bg-white rounded-xl shadow-md p-4">
+        <div className="w-full h-[600px] bg-white rounded-xl shadow-md p-4">
           <div className="mb-4 border-b pb-2">
             <h2 className="text-gray-800 font-semibold text-lg">
               Receitas por Categoria
@@ -118,7 +118,7 @@ export function IndicatorsTab({
           </div>
         </div>
 
-        <div className="w-full  bg-white rounded-xl shadow-md p-4">
+        <div className="w-full h-[600px]  bg-white rounded-xl shadow-md p-4">
           <div className="mb-4 border-b pb-2">
             <h2 className="text-gray-800 font-semibold text-lg">
               Despesas por Categoria
@@ -172,7 +172,7 @@ export function IndicatorsTab({
           </div>
         </div>
 
-        <div className="w-full l bg-white rounded-xl shadow-md p-4">
+        <div className="w-full h-[600px] bg-white rounded-xl shadow-md p-4">
           <div className="mb-4 border-b pb-2">
             <h2 className="text-gray-800 font-semibold text-lg">
               Tipos de Receita
@@ -240,7 +240,7 @@ export function IndicatorsTab({
           </div>
         </div>
 
-        <div className="w-full  bg-white rounded-xl shadow-md p-4">
+        <div className="w-full h-[600px] bg-white rounded-xl shadow-md p-4">
           <div className="mb-4 border-b pb-2">
             <h2 className="text-gray-800 font-semibold text-lg">
               Tipos de despesas

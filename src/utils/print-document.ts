@@ -14,8 +14,8 @@ export const printDocument = async (
       logging: false,
       scrollX: 0,
       scrollY: -window.scrollY,
-      windowWidth: componentToPrint.scrollWidth,
-      windowHeight: componentToPrint.scrollHeight,
+      windowWidth: componentToPrint.scrollWidth * 1.5,
+      windowHeight: componentToPrint.scrollHeight * 1.5,
     });
 
     const imgData = canvas.toDataURL("image/png", 1.0);
@@ -24,26 +24,31 @@ export const printDocument = async (
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = pdf.internal.pageSize.getHeight();
 
-    // altura proporcional da imagem em relação à largura do PDF
+    // Pegando as dimensões reais da imagem
+    const imgProps = pdf.getImageProperties(imgData);
+
+    // Calcula largura da imagem no PDF = largura da página PDF
     const imgWidth = pdfWidth;
-    const imgHeight = (canvas.height * pdfWidth) / canvas.width;
+    // Calcula a altura proporcional para manter a proporção da imagem
+    const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
     let heightLeft = imgHeight;
     let position = 0;
 
-    // primeira página
-    pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight, undefined, "FAST");
+    // Primeira página posiciona no topo
+    pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+
     heightLeft -= pdfHeight;
 
-    // páginas adicionais, se precisar
+    // Adiciona páginas enquanto sobra altura da imagem
     while (heightLeft > 0) {
-      position = heightLeft - imgHeight;
+      position -= pdfHeight; // Move a imagem para cima para mostrar próxima parte
       pdf.addPage();
-      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight, undefined, "FAST");
+      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
       heightLeft -= pdfHeight;
     }
 
     pdf.save("transaction-entry.pdf");
-    componentToHidden.style.display = 'flex'
+    componentToHidden.style.display = "flex";
   }
 };
