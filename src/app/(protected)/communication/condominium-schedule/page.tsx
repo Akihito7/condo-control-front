@@ -164,63 +164,68 @@ export default function CondominiumSchedule() {
                 Adicionar Evento
               </Button>
 
-              {day.events?.map((event, index) => {
-                const colors = [
-                  "bg-blue-100 text-blue-800 border-blue-300",
-                  "bg-green-100 text-green-800 border-green-300",
-                  "bg-purple-100 text-purple-800 border-purple-300",
-                  "bg-pink-100 text-pink-800 border-pink-300",
-                  "bg-yellow-100 text-yellow-800 border-yellow-300",
-                  "bg-red-100 text-red-800 border-red-300",
-                  "bg-indigo-100 text-indigo-800 border-indigo-300",
-                ];
+              {day.events
+                ?.sort(
+                  (a, b) =>
+                    new Date(a.startTime).getTime() -
+                    new Date(b.startTime).getTime()
+                )
+                .map((event, index) => {
+                  const colors = [
+                    "bg-blue-100 text-blue-800 border-blue-300",
+                    "bg-green-100 text-green-800 border-green-300",
+                    "bg-purple-100 text-purple-800 border-purple-300",
+                    "bg-pink-100 text-pink-800 border-pink-300",
+                    "bg-yellow-100 text-yellow-800 border-yellow-300",
+                    "bg-red-100 text-red-800 border-red-300",
+                    "bg-indigo-100 text-indigo-800 border-indigo-300",
+                  ];
 
-                const colorClass = colors[event.id % colors.length];
+                  const colorClass = colors[event.id % colors.length];
 
-                const startTime = new Date(event.startTime).toLocaleTimeString(
-                  "pt-BR",
-                  {
+                  const startTime = new Date(
+                    event.startTime
+                  ).toLocaleTimeString("pt-BR", {
                     hour: "2-digit",
                     minute: "2-digit",
-                  }
-                );
+                  });
 
-                const endTime = new Date(event.endTime).toLocaleTimeString(
-                  "pt-BR",
-                  {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  }
-                );
+                  const endTime = new Date(event.endTime).toLocaleTimeString(
+                    "pt-BR",
+                    {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    }
+                  );
 
-                return (
-                  <div
-                    key={event.id}
-                    className={`shadow-sm rounded-xl p-2 hover:shadow-md transition cursor-pointer flex flex-col gap-1 border ${colorClass}`}
-                    onClick={() => {
-                      setEventSelected(event);
-                      setModalEventDetailsIsOpen(true);
-                    }}
-                  >
-                    {/* Título */}
-                    <span className="font-semibold text-sm truncate">
-                      {event.title}
-                    </span>
+                  return (
+                    <div
+                      key={event.id}
+                      className={`shadow-sm rounded-xl p-2 hover:shadow-md transition cursor-pointer flex flex-col gap-1 border ${colorClass}`}
+                      onClick={() => {
+                        setEventSelected(event);
+                        setModalEventDetailsIsOpen(true);
+                      }}
+                    >
+                      {/* Título */}
+                      <span className="font-semibold text-sm truncate">
+                        {event.title}
+                      </span>
 
-                    {/* Horário simplificado */}
-                    <span className="text-[11px] text-gray-700 opacity-90">
-                      {startTime} - {endTime}
-                    </span>
+                      {/* Horário simplificado */}
+                      <span className="text-[11px] text-gray-700 opacity-90">
+                        {startTime} - {endTime}
+                      </span>
 
-                    {/* Descrição */}
-                    {event.description && (
-                      <p className="text-[11px] text-gray-600 truncate">
-                        {event.description}
-                      </p>
-                    )}
-                  </div>
-                );
-              })}
+                      {/* Descrição */}
+                      {event.description && (
+                        <p className="text-[11px] text-gray-600 truncate">
+                          {event.description}
+                        </p>
+                      )}
+                    </div>
+                  );
+                })}
             </div>
           ))}
         </div>
