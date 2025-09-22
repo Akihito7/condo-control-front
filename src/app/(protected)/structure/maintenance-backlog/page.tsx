@@ -2,55 +2,25 @@
 
 import { Breadcrumb } from "@/components/breadcrumb";
 import { ButtonOpenSidebar } from "@/components/button-open-sidebar";
-import { Button } from "@/components/ui/button";
-import { CreditCard, FileDown, Pencil, TrendingUp, Wallet } from "lucide-react";
 import { useState } from "react";
-import { CardMaintenance } from "./card-maintenance";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
 import { useMaintenanceBacklog } from "./use-maintenance-backlog";
-import { ModalActionIntervention } from "./modal-action-intervation";
-import { Intervention } from "@/api/fetch-interventions";
-import { Label } from "@radix-ui/react-label";
 import { userPagePermission } from "@/utils/user-page-permission";
 import { redirect } from "next/navigation";
 import { useUserContext } from "@/providers/use-user-context";
-import { format } from "date-fns";
-import { YearSelect } from "@/components/year-select";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Interventions } from "./tabs/interventions";
 import { Indicators } from "./tabs/indicators";
-import { PagesRouteModule } from "next/dist/server/route-modules/pages/module.compiled";
 
 export default function MaintenanceBacklog() {
-  const { read, edit } = userPagePermission({ pageId: 4 });
+  const { read } = userPagePermission({ pageId: 4 });
 
   const { userIsLoading } = useUserContext();
 
   if (!read && !userIsLoading) {
     redirect("/home");
   }
-  const [date, setDate] = useState(new Date());
   const [year, setYear] = useState(new Date().getFullYear().toString());
 
   const {
@@ -71,10 +41,13 @@ export default function MaintenanceBacklog() {
     handleDeleteIntervention,
     resumeIndicators,
     resumeIndicatorsStatus,
+    chartImprovementsByArea,
+    chartMonthlyExpensesSummary,
   } = useMaintenanceBacklog({
     year,
   });
 
+  console.log("chart", chartMonthlyExpensesSummary);
   return (
     <main className="bg-gray-50 overflow-x-hidden min-h-screen w-full p-0 py-8 px-2 sm:p-8 flex flex-col gap-6">
       <div className="space-y-2">
@@ -123,6 +96,8 @@ export default function MaintenanceBacklog() {
               setYear={setYear}
               year={year}
               indicatorsResume={resumeIndicators}
+              chartImprovementsByArea={chartImprovementsByArea}
+              chartMonthlyExpensesSummary={chartMonthlyExpensesSummary}
             />
           </TabsContent>
         </div>

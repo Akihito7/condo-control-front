@@ -1,4 +1,6 @@
 import { deleteIntervention } from "@/api/delete-intervention";
+import { fetchChartImprovementsByArea } from "@/api/fetch-chart-improvements-by-area";
+import { fetchChartMonthlyExpensesSummary } from "@/api/fetch-chart-monthly-expenses-summary";
 import { fetchCondominiumAreas } from "@/api/fetch-condominium-areas";
 import { fetchInterventionCards } from "@/api/fetch-intervention-cards";
 import { fetchInterventions } from "@/api/fetch-interventions";
@@ -89,6 +91,17 @@ export function useMaintenanceBacklog({
 
   })
 
+  const { data: chartImprovementsByArea } = useQuery({
+    queryKey: ['improvements-by-area', dateFormatted],
+    queryFn: () => fetchChartImprovementsByArea(dateFormatted)
+  })
+
+
+  const { data: chartMonthlyExpensesSummary } = useQuery({
+    queryKey: ['monthly-expenses-summary', dateFormatted],
+    queryFn: () => fetchChartMonthlyExpensesSummary(dateFormatted)
+  })
+
   return {
     priorityOptions,
     priorityOptionsStatus,
@@ -106,6 +119,8 @@ export function useMaintenanceBacklog({
     interventionsCards,
     interventionsCardsStatus,
     resumeIndicators,
-    resumeIndicatorsStatus
+    resumeIndicatorsStatus,
+    chartImprovementsByArea,
+    chartMonthlyExpensesSummary
   }
 }

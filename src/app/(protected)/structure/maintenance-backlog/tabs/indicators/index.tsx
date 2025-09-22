@@ -16,21 +16,10 @@ import {
 import { printDocument } from "@/utils/print-document";
 import { YearSelect } from "@/components/year-select";
 
-const impact = {
-  maintenances: 5.2,
-  improvements: 8.7,
-};
-
-const improvementsByArea = [
-  { area: "Garagem", value: 2 },
-  { area: "Fachada", value: 1 },
-  { area: "Piscina", value: 1 },
-  { area: "Elevador", value: 1 },
-  { area: "Jardim", value: 3 },
-];
-
 import { ComposedChart, Line, CartesianGrid, Legend } from "recharts";
 import { IndicatorsResume } from "@/api/fetch-resume-indicators-maintenances";
+import { AreaData } from "@/api/fetch-chart-improvements-by-area";
+import { MonthlyExpense } from "@/api/fetch-chart-monthly-expenses-summary";
 
 // mock de dados mensais (substituir depois pela API)
 const monthlyExpenses = [
@@ -52,12 +41,16 @@ interface DashboardProps {
   year: string;
   setYear: React.Dispatch<React.SetStateAction<string>>;
   indicatorsResume: IndicatorsResume | undefined;
+  chartImprovementsByArea: AreaData[] | undefined;
+  chartMonthlyExpensesSummary: MonthlyExpense[] | undefined;
 }
 
 export function Indicators({
   year,
   setYear,
   indicatorsResume,
+  chartImprovementsByArea,
+  chartMonthlyExpensesSummary,
 }: DashboardProps) {
   const componentFilterRef = useRef<HTMLDivElement>(null);
 
@@ -66,7 +59,7 @@ export function Indicators({
   const costByTypeFormatted = [
     { name: "Manutenção", value: indicatorsResume?.maintenanceCost },
     { name: "Melhoria", value: indicatorsResume?.improvementsCost },
-  ];
+  ].sort((a, b) => (b.value ?? 0) - (a.value ?? 0));
 
   return (
     <div className="space-y-6 pb-6">
@@ -209,7 +202,15 @@ export function Indicators({
             <ResponsiveContainer width="100%" height={250}>
               <BarChart data={costByTypeFormatted} barSize={30}>
                 <XAxis dataKey="name" />
-                <YAxis />
+                <YAxis
+                  tickFormatter={(value: number) =>
+                    value.toLocaleString("pt-BR", {
+                      style: "currency",
+                      currency: "BRL",
+                    })
+                  }
+                  tick={{  fontSize: 10, fill: "#6B7280", fontWeight: 500 }}
+                />
                 <Tooltip
                   formatter={(value: number, name: string) => [
                     value.toLocaleString("pt-BR", {
@@ -235,12 +236,12 @@ export function Indicators({
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={improvementsByArea} barSize={30}>
-                <XAxis dataKey="area" />
+              <BarChart data={chartImprovementsByArea} barSize={30}>
+                <XAxis dataKey="areaName" />
                 <YAxis allowDecimals={false} />
                 <Tooltip formatter={(value, name) => [value, "Quantidade"]} />
-                <Bar dataKey="value">
-                  {improvementsByArea.map((_, index) => (
+                <Bar dataKey="count">
+                  {chartImprovementsByArea?.map((item, index) => (
                     <Cell key={index} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Bar>
@@ -262,7 +263,7 @@ export function Indicators({
         <CardContent>
           <ResponsiveContainer width="100%" height={320}>
             <ComposedChart
-              data={monthlyExpenses}
+              data={chartMonthlyExpensesSummary}
               margin={{ top: 20, right: 40, left: 20, bottom: 0 }}
             >
               <CartesianGrid
@@ -271,7 +272,7 @@ export function Indicators({
                 vertical={false}
               />
               <XAxis
-                dataKey="month"
+                dataKey="nameMonth"
                 tick={{ fill: "#6B7280", fontSize: 12, fontWeight: 500 }}
                 axisLine={{ stroke: "#D1D5DB" }}
               />
@@ -309,7 +310,7 @@ export function Indicators({
               />
               <Bar
                 yAxisId="left"
-                dataKey="gasto"
+                dataKey="totalCoustMaintenances"
                 fill="#F59E0B"
                 name="Gasto Mensal"
                 radius={[6, 6, 0, 0]}
@@ -319,7 +320,7 @@ export function Indicators({
               <Line
                 yAxisId="right"
                 type="monotone"
-                dataKey="acumulado"
+                dataKey="accumulatedBalance"
                 stroke="#EF4444"
                 strokeWidth={3}
                 dot={{ r: 5, stroke: "#EF4444", strokeWidth: 2, fill: "#FFF" }}
