@@ -7,6 +7,15 @@ import { useAssetReport } from "./use-asset-report";
 import { ButtonOpenSidebar } from "@/components/button-open-sidebar";
 import { Breadcrumb } from "@/components/breadcrumb";
 import { NotificationDropdown } from "@/components/notification";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { updateStatusAssetReport } from "@/api/update-status-asset-report";
 
 // Tipagens simplificadas
 interface Photo {
@@ -21,6 +30,7 @@ interface Report {
   createdAt: string;
   reporterName?: string;
   photos: Photo[];
+  status: string;
 }
 
 export default function ReportsPage({ params }: any) {
@@ -34,6 +44,8 @@ export default function ReportsPage({ params }: any) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [currentPhotos, setCurrentPhotos] = useState<Photo[]>([]);
+
+  const queryClient = useQueryClient();
 
   const formatDate = (dateStr: string) =>
     new Date(dateStr).toLocaleString("pt-BR", {
@@ -56,6 +68,7 @@ export default function ReportsPage({ params }: any) {
       createdAt: r.createdAt,
       reporterName: r.reportedBy?.toString(),
       photos: r.photos || [],
+      status: r.status,
     }));
 
     setReports(mappedReports);
@@ -86,6 +99,16 @@ export default function ReportsPage({ params }: any) {
     );
   };
 
+  const { mutateAsync: handleUpdateStatusAssetReport } = useMutation({
+    mutationFn: ({ reportId, status }: { reportId: number; status: string }) =>
+      updateStatusAssetReport({ reportId, status }),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: ["assets", assetId],
+      });
+    },
+  });
+
   return (
     <main className="bg-gray-50 min-h-screen overflow-auto w-full p-0 py-8 px-2 sm:p-8 flex flex-col gap-6">
       <div className="space-y-2">
@@ -108,18 +131,32 @@ export default function ReportsPage({ params }: any) {
       </section>
 
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-
         {status === "pending" && (
           <>
             {[...Array(3)].map((_, i) => (
               <div
                 key={i}
-                className="bg-white rounded-lg shadow-md overflow-hidden animate-pulse"
+                className="bg-white rounded-2xl shadow-sm border overflow-hidden animate-pulse"
               >
-                <div className="h-48 w-full bg-gray-300"></div>
-                <div className="p-4 space-y-2">
-                  <div className="h-4 bg-gray-300 rounded w-3/4"></div>
-                  <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                {/* Foto */}
+                <div className="h-48 w-full bg-gray-200" />
+
+                {/* Conteúdo */}
+                <div className="p-4 flex flex-col gap-4">
+                  {/* Descrição */}
+                  <div className="h-4 bg-gray-300 rounded w-5/6" />
+
+                  {/* Usuário + Data */}
+                  <div className="flex justify-between">
+                    <div className="h-3 bg-gray-200 rounded w-1/4" />
+                    <div className="h-3 bg-gray-200 rounded w-1/3" />
+                  </div>
+
+                  {/* Status */}
+                  <div className="flex flex-col gap-2">
+                    <div className="h-3 bg-gray-200 rounded w-1/5" />
+                    <div className="h-9 bg-gray-300 rounded-lg w-full" />
+                  </div>
                 </div>
               </div>
             ))}
@@ -143,25 +180,26 @@ export default function ReportsPage({ params }: any) {
         {/* SUCCESS + LISTA */}
         {status === "success" &&
           reports.map(
-            ({ id, description, photos, reporterName, createdAt }) => (
+            ({ id, description, photos, reporterName, createdAt, status }) => (
               <div
                 key={id}
-                className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-200"
+                className="bg-white rounded-2xl shadow-sm border hover:shadow-md transition-shadow duration-200 overflow-hidden"
               >
-                <div className="relative h-48 w-full bg-gray-200 flex items-center justify-center">
+                {/* Foto */}
+                <div className="relative h-48 w-full bg-gray-100">
                   {photos.length > 0 ? (
                     <>
                       <img
                         key={photos[0].id}
                         src={photos[0].publicUrl}
                         alt={`Foto do report ${id}`}
-                        className="object-contain w-full h-full cursor-pointer"
+                        className="object-cover w-full h-full cursor-pointer"
                         onClick={() => openModal(photos, 0)}
                       />
                       {photos.length > 1 && (
                         <div
                           onClick={() => openModal(photos, 0)}
-                          className="absolute bottom-2 right-2 bg-black bg-opacity-60 text-white text-xs px-2 py-1 rounded cursor-pointer"
+                          className="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded cursor-pointer"
                         >
                           +{photos.length - 1} fotos
                         </div>
@@ -171,16 +209,51 @@ export default function ReportsPage({ params }: any) {
                     <img
                       src="/placeholder-image.png"
                       alt="Sem foto"
-                      className="object-contain w-full h-full"
+                      className="object-cover w-full h-full"
                     />
                   )}
                 </div>
 
-                <div className="p-4 flex flex-col gap-2">
-                  <p className="text-gray-700">{description}</p>
-                  <div className="text-sm text-gray-500 flex justify-between">
+                {/* Conteúdo */}
+                <div className="p-4 flex flex-col gap-4">
+                  {/* Descrição */}
+                  <p className="text-gray-800 font-medium text-base leading-snug">
+                    {description}
+                  </p>
+
+                  {/* Usuário + Data */}
+                  <div className="flex items-center justify-between text-xs text-gray-500">
                     <span>{reporterName ?? "Desconhecido"}</span>
                     <span>{formatDate(createdAt)}</span>
+                  </div>
+
+                  {/* Status */}
+                  <div className="flex flex-col gap-2">
+                    <label className="text-sm font-medium text-gray-600">
+                      Status
+                    </label>
+                    <Select
+                      value={status ? status.toLowerCase() : "-"}
+                      onValueChange={(status) => {
+                        handleUpdateStatusAssetReport({ reportId: id, status });
+                      }}
+                    >
+                      <SelectTrigger className="w-full rounded-lg border-gray-300 text-sm focus:ring-2 focus:ring-indigo-500">
+                        <SelectValue placeholder="Selecione um status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="sem-status">
+                          ⚪ Sem Status
+                        </SelectItem>
+                        <SelectItem value="atuando">🟡 Atuando</SelectItem>
+                        <SelectItem value="em-analise">
+                          🔵 Em análise
+                        </SelectItem>
+                        <SelectItem value="finalizado">
+                          🟢 Finalizado
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
               </div>

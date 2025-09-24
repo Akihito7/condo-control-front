@@ -15,6 +15,7 @@ interface AssetReport {
   createdAt: string;
   reportedBy: number;
   photos: Photo[];
+  status: string;
 }
 
 interface Asset {

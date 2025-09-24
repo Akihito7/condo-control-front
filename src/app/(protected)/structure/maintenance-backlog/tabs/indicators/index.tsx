@@ -21,21 +21,6 @@ import { IndicatorsResume } from "@/api/fetch-resume-indicators-maintenances";
 import { AreaData } from "@/api/fetch-chart-improvements-by-area";
 import { MonthlyExpense } from "@/api/fetch-chart-monthly-expenses-summary";
 
-// mock de dados mensais (substituir depois pela API)
-const monthlyExpenses = [
-  { month: "jan/24", gasto: 15000, acumulado: 15000 },
-  { month: "fev/24", gasto: 8000, acumulado: 23000 },
-  { month: "mar/24", gasto: 8000, acumulado: 31000 },
-  { month: "abr/24", gasto: 9000, acumulado: 40000 },
-  { month: "mai/24", gasto: 15000, acumulado: 55000 },
-  { month: "jun/24", gasto: 10000, acumulado: 65000 },
-  { month: "jul/24", gasto: 12000, acumulado: 77000 },
-  { month: "ago/24", gasto: 10000, acumulado: 87000 },
-  { month: "set/24", gasto: 9000, acumulado: 96000 },
-  { month: "out/24", gasto: 8000, acumulado: 104000 },
-  { month: "nov/24", gasto: 13000, acumulado: 117000 },
-  { month: "dez/24", gasto: 10000, acumulado: 127000 },
-];
 
 interface DashboardProps {
   year: string;
