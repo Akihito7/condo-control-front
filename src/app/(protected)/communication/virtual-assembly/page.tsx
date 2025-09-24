@@ -212,7 +212,7 @@ export default function VirtualAssembly() {
                               setVoteModalIsOpen(true);
                             }}
                           >
-                            Visualizar
+                            Votar
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => {
