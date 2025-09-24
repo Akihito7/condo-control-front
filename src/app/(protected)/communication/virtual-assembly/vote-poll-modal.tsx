@@ -94,9 +94,9 @@ export function VotePollModal({
     if (choice) {
       if (alreadyVoted) {
         await handleUpdateVote({ choice });
-        return;
+      } else {
+        await handleCreateVote({ pollId: pollSelected!.id, choice });
       }
-      await handleCreateVote({ pollId: pollSelected!.id, choice });
     }
     setIsOpen(false);
     setPollSelected(undefined);
