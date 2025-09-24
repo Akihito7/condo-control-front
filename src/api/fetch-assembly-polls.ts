@@ -27,6 +27,7 @@ export type PollWithStats = {
   percentageNo: number;
   currentUserAlreadyVoted: boolean
   currentVoteUser: number | null
+  currentVoteUserId: number | null
   percentageParticipation: number;
   description: string;
   votesInfo: {

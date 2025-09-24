@@ -19,6 +19,7 @@ import { createVoteAssemblyVirtualPoll } from "@/api/create-vote-assembly-virtua
 import { isBefore } from "date-fns";
 import { Progress } from "@/components/ui/progress";
 import { getOptionsVote } from "@/api/get-options-vote";
+import { updateVoteAssemblyVirtualPoll } from "@/api/update-vote-assembly-virtual-poll";
 
 type VotePollModalProps = {
   pollTitle: string;
@@ -56,6 +57,20 @@ export function VotePollModal({
     },
   });
 
+  const { mutateAsync: handleUpdateVote } = useMutation({
+    mutationFn: async ({ choice }: any) =>
+      updateVoteAssemblyVirtualPoll({
+        voteId: pollSelected?.currentVoteUserId!,
+        choice,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["polls"],
+        exact: false,
+      });
+    },
+  });
+
   const { data: voteOptions } = useQuery({
     queryKey: ["options", pollSelected],
     queryFn: () => getOptionsVote(pollSelected?.id ?? -1),
@@ -68,7 +83,7 @@ export function VotePollModal({
     }
   }, [pollSelected, alreadyVoted]);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (alreadyFinished) {
       alert("Votação encerrada");
       queryClient.invalidateQueries({ queryKey: ["polls"] });
@@ -77,7 +92,11 @@ export function VotePollModal({
       return;
     }
     if (choice) {
-      handleCreateVote({ pollId: pollSelected!.id, choice });
+      if (alreadyVoted) {
+        await handleUpdateVote({ choice });
+        return;
+      }
+      await handleCreateVote({ pollId: pollSelected!.id, choice });
     }
     setIsOpen(false);
     setPollSelected(undefined);
@@ -134,7 +153,6 @@ export function VotePollModal({
               <RadioGroup
                 value={choice}
                 onValueChange={(val) => setChoice(val)}
-                disabled={alreadyVoted}
               >
                 {voteOptions?.map((option: any) => (
                   <div
@@ -145,7 +163,10 @@ export function VotePollModal({
                       value={String(option.id)}
                       id={String(option.id)}
                     />
-                    <Label htmlFor={String(option.id)} className="cursor-pointer">
+                    <Label
+                      htmlFor={String(option.id)}
+                      className="cursor-pointer"
+                    >
                       {option.name}
                     </Label>
                   </div>
@@ -240,7 +261,7 @@ export function VotePollModal({
               {alreadyVoted || alreadyFinished ? "Fechar" : "Cancelar"}
             </Button>
           </DialogClose>
-          {!alreadyVoted && !alreadyFinished && (
+          {!alreadyFinished && (
             <Button type="button" onClick={handleSubmit} disabled={!choice}>
               Confirmar Voto
             </Button>
