@@ -21,7 +21,6 @@ import { IndicatorsResume } from "@/api/fetch-resume-indicators-maintenances";
 import { AreaData } from "@/api/fetch-chart-improvements-by-area";
 import { MonthlyExpense } from "@/api/fetch-chart-monthly-expenses-summary";
 
-
 interface DashboardProps {
   year: string;
   setYear: React.Dispatch<React.SetStateAction<string>>;
@@ -38,6 +37,14 @@ export function Indicators({
   chartMonthlyExpensesSummary,
 }: DashboardProps) {
   const componentFilterRef = useRef<HTMLDivElement>(null);
+
+  const formatterToCurrency = (value: any) => {
+    const valueToFormatter = value ? value : 0;
+    return Number(valueToFormatter).toLocaleString("pt-BR", {
+      currency: "BRL",
+      style: "currency",
+    });
+  };
 
   const COLORS = ["#3B82F6", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6"];
 
@@ -103,10 +110,7 @@ export function Indicators({
                 Custo Total (Manutenção)
               </p>
               <p className="text-lg font-bold">
-                R${" "}
-                {indicatorsResume?.maintenanceCost?.toLocaleString("pt-BR", {
-                  minimumFractionDigits: 2,
-                })}
+                {formatterToCurrency(indicatorsResume?.maintenanceCost)}
               </p>
             </div>
             <div>
@@ -114,13 +118,7 @@ export function Indicators({
                 Custo Médio (Manutenção)
               </p>
               <p className="text-lg font-bold">
-                R${" "}
-                {indicatorsResume?.accuracyMaintenanceCost?.toLocaleString(
-                  "pt-BR",
-                  {
-                    minimumFractionDigits: 2,
-                  }
-                )}
+                {formatterToCurrency(indicatorsResume?.accuracyMaintenanceCost)}
               </p>
             </div>
             <div>
@@ -128,10 +126,7 @@ export function Indicators({
                 Custo Total (Melhoria)
               </p>
               <p className="text-lg font-bold">
-                R${" "}
-                {indicatorsResume?.improvementsCost?.toLocaleString("pt-BR", {
-                  minimumFractionDigits: 2,
-                })}
+                {formatterToCurrency(indicatorsResume?.improvementsCost)}
               </p>
             </div>
             <div>
@@ -139,13 +134,7 @@ export function Indicators({
                 Custo Médio (Melhoria)
               </p>
               <p className="text-lg font-bold">
-                R${" "}
-                {indicatorsResume?.accuracyImprovementCost?.toLocaleString(
-                  "pt-BR",
-                  {
-                    minimumFractionDigits: 2,
-                  }
-                )}
+                {formatterToCurrency(indicatorsResume?.accuracyImprovementCost)}
               </p>
             </div>
             <div>
@@ -194,7 +183,7 @@ export function Indicators({
                       currency: "BRL",
                     })
                   }
-                  tick={{  fontSize: 10, fill: "#6B7280", fontWeight: 500 }}
+                  tick={{ fontSize: 10, fill: "#6B7280", fontWeight: 500 }}
                 />
                 <Tooltip
                   formatter={(value: number, name: string) => [

@@ -17,6 +17,7 @@ import {
   DollarSign,
   PiggyBank,
   FileDown,
+  AlertCircle,
 } from "lucide-react";
 import { CardProjection } from "./card-projection";
 import { MonthYearPicker } from "@/components/month-year-select";
@@ -27,13 +28,17 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { ButtonOpenSidebar } from "@/components/button-open-sidebar";
 import { Swiper, SwiperSlide } from "swiper/react";
-import "swiper/css";
 import { useIsMobile } from "@/lib/use-is-mobile";
 import { userPagePermission } from "@/utils/user-page-permission";
 import { redirect } from "next/navigation";
 import { useUserContext } from "@/providers/use-user-context";
 import { printDocument } from "@/utils/print-document";
 import { NotificationDropdown } from "@/components/notification";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export default function FinancialForecast() {
   const { read, edit } = userPagePermission({
@@ -195,6 +200,7 @@ export default function FinancialForecast() {
                 <TableHead>Tipo</TableHead>
                 <TableHead>Categoria</TableHead>
                 <TableHead className="text-right">Valor Projetado</TableHead>
+                <TableHead className="text-center">Observação</TableHead>
               </TableRow>
             </TableHeader>
 
@@ -224,6 +230,20 @@ export default function FinancialForecast() {
                             currency: "BRL",
                             style: "currency",
                           })}
+                        </TableCell>
+                        <TableCell className="text-sm text-center">
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <AlertCircle size={20} />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>
+                                {projectionRegister.observation
+                                  ? projectionRegister.name
+                                  : "Sem observação"}
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
                         </TableCell>
                       </TableRow>
                     ))}
