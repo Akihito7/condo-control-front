@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { api } from "@/services/api";
 import { setCookies } from "@/actions/cookies";
 import { Checkbox } from "@/components/ui/checkbox";
+import Link from "next/link";
 
 type LoginFormData = {
   email: string;
@@ -110,12 +111,12 @@ export function LoginForm() {
             Lembrar-me
           </Label>
         </div>
-        <a
-          href="#"
+        <Link
+          href="forget-password"
           className="text-sm text-blue-600 font-semibold hover:underline"
         >
           Esqueci minha senha
-        </a>
+        </Link>
       </div>
 
       <Button
