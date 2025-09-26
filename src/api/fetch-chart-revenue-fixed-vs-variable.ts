@@ -6,10 +6,11 @@ interface FetchChartRevenueFixedVsVariableProps {
   endDate: string;
 }
 
-interface Chart {
+export interface Chart {
   name: string;
   value: number;
   id: number;
+  totalAmount: number;
 }
 export async function fetchChartRevenueFixedVsVariable({
   condominiumId,

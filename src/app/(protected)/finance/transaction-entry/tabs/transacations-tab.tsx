@@ -16,15 +16,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import "react-date-range/dist/styles.css";
-import "react-date-range/dist/theme/default.css";
-import { CardFinance } from "@/components/card-finance";
-import { DollarSign, Pencil, TrendingDown, TrendingUp } from "lucide-react";
+import { Pencil} from "lucide-react";
 
 import { CardSkeleton } from "@/components/card-skeleton";
 import { TableRowSkeleton } from "@/components/table-row-skeleton";
-import { Swiper, SwiperSlide } from "swiper/react";
-import "swiper/css";
 import { FinancialRecord } from "@/api/fetch-financial-records";
 import { ModalActionEntry } from "../modal-action-entry";
 import { useUserContext } from "@/providers/use-user-context";

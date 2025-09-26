@@ -19,6 +19,7 @@ import { Chart } from "@/api/fetch-chart-revenue-by-category";
 import { MonthlyBalanace } from "@/api/fetch-financial-summary-monthly-balance";
 import { Cards } from "../cards";
 import { FetchCardsTransactionEntryResponse } from "@/api/fetch-cards-transaction-entry";
+import { Chart as ChartExpense } from "../../../../../api/fetch-chart-expensive-fixed-vs-variable";
 
 const COLORS_INCOME = ["#4ade80", "#bbf7d0"];
 const COLORS_EXPENSE = ["#f87171", "#fca5a5"];
@@ -28,9 +29,9 @@ interface IndicatorsTabProps {
   chartRevenueStatus: "pending" | "error" | "success";
   chartExpense: Chart[] | undefined;
   chartExpenseStatus: "pending" | "error" | "success";
-  chartRevenueFixedVsVariable: Chart[] | undefined;
+  chartRevenueFixedVsVariable: ChartExpense[] | undefined;
   chartRevenueFixedVsVariableStatus: "pending" | "error" | "success";
-  chartExpensiveFixedVsVariable: Chart[] | undefined;
+  chartExpensiveFixedVsVariable: ChartExpense[] | undefined;
   chartExpensiveFixedVsVariableStatus: "pending" | "error" | "success";
   chartFinacialSummaryMonthlyBalance: MonthlyBalanace[] | undefined;
   chartFinacialSummaryMonthlyBalanceStatus: "pending" | "error" | "success";
@@ -217,10 +218,18 @@ export function IndicatorsTab({
                     )}
                   </Pie>
                   <Tooltip
-                    formatter={(value: number, name: string) => [
-                      `${value.toFixed(1)}%`,
-                      name,
-                    ]}
+                    formatter={(_, name, props: any) => {
+                      const amount = props.payload?.totalAmount
+                        ? Number(props.payload?.totalAmount)
+                        : 0;
+                      return [
+                        `${amount.toLocaleString("pt-BR", {
+                          currency: "BRL",
+                          style: "currency",
+                        })}`,
+                        name,
+                      ];
+                    }}
                   />
                   <Legend
                     verticalAlign="bottom"
@@ -285,10 +294,18 @@ export function IndicatorsTab({
                     )}
                   </Pie>
                   <Tooltip
-                    formatter={(value: number, name: string) => [
-                      `${value.toFixed(1)}%`,
-                      name,
-                    ]}
+                    formatter={(_, name, props: any) => {
+                      const amount = props.payload?.totalAmount
+                        ? Number(props.payload?.totalAmount)
+                        : 0;
+                      return [
+                        `${amount.toLocaleString("pt-BR", {
+                          currency: "BRL",
+                          style: "currency",
+                        })}`,
+                        name,
+                      ];
+                    }}
                   />
                   <Legend
                     verticalAlign="bottom"
