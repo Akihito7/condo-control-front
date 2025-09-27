@@ -1,4 +1,5 @@
 import { fetchApartaments } from "@/api/fetch-apartaments";
+import { fetchAreaAvailability } from "@/api/fetch-area-availability";
 import { fetchEventsByCondominiumArea } from "@/api/fetch-events-by-condominium-area";
 import { getManagementOfCommomSpaces } from "@/api/get-management-commom-spaces";
 import { useUserContext } from "@/providers/use-user-context";
@@ -32,9 +33,16 @@ export function useManagementOfCommomSpaces({
     enabled: !!condominiumAreaIdSelected
   })
 
+
   const { data: apartaments, status: apartamentsStatus } = useQuery({
     queryKey: ['apartaments'],
     queryFn: async () => fetchApartaments({ condominiumId })
+  })
+
+  const { data: areaAvailabilityOptions } = useQuery({
+    queryKey: ['options-availability', condominiumAreaIdSelected],
+    queryFn: () => fetchAreaAvailability(condominiumAreaIdSelected),
+    enabled: !!condominiumAreaIdSelected
   })
 
   return {
@@ -43,6 +51,7 @@ export function useManagementOfCommomSpaces({
     spacesEvents,
     spacesEventsStatus,
     apartaments,
-    apartamentsStatus
+    apartamentsStatus,
+    areaAvailabilityOptions
   }
 }

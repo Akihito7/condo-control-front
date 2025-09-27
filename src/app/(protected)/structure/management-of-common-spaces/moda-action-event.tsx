@@ -13,15 +13,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Plus, Trash2, Calendar, DollarSign, Clock } from "lucide-react";
-import { useForm, useFieldArray } from "react-hook-form";
-import React, { useEffect, useState, useMemo } from "react";
+import { useForm, useFieldArray, Controller } from "react-hook-form";
+import React, { useEffect } from "react";
 import { DayWithEvents, Event } from "@/api/fetch-events-by-condominium-area";
 import { format, parseISO } from "date-fns";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateSpaceEvent } from "@/api/update-space-event";
 import { deleteGuestSpaceEvent } from "@/api/delete-guest-space-event";
-import { cn } from "@/lib/utils";
 import { deleteSpaceEvent } from "@/api/delete-space-event";
+import ReactSelect from "react-select";
+import { AreaAvailability } from "@/api/fetch-area-availability";
+import { watch } from "fs";
 
 export interface Guest {
   guestId?: number | null;
@@ -31,10 +33,8 @@ export interface Guest {
 
 interface EventFormValues {
   eventId: number;
-  timeBlocks: string[];
-  startTime: string;
-  endTime: string;
   guests: Guest[];
+  periodSelecteds: string[];
 }
 
 interface ModalAddGuestsProps {
@@ -46,13 +46,8 @@ interface ModalAddGuestsProps {
   setDayWithEventSelected: React.Dispatch<
     React.SetStateAction<DayWithEvents | undefined>
   >;
+  areaAvailabilityOptions: AreaAvailability[] | undefined;
 }
-
-const generateTimeBlocks = () =>
-  Array.from(
-    { length: 24 },
-    (_, hour) => `${hour.toString().padStart(2, "0")}:00`
-  );
 
 export function ModalAddGuests({
   open,
@@ -61,6 +56,7 @@ export function ModalAddGuests({
   setEventSelected,
   setDayWithEventSelected,
   dayWithEventSelected,
+  areaAvailabilityOptions,
 }: ModalAddGuestsProps) {
   const {
     register,
@@ -68,13 +64,11 @@ export function ModalAddGuests({
     handleSubmit,
     reset,
     setValue,
+    watch,
     formState: { isSubmitting },
   } = useForm<EventFormValues>({
     defaultValues: {
       guests: [{ guestId: null, name: "", cpf: "" }],
-      timeBlocks: [],
-      startTime: "",
-      endTime: "",
     },
   });
 
@@ -83,25 +77,7 @@ export function ModalAddGuests({
     name: "guests",
   });
 
-  const [selectedBlocks, setSelectedBlocks] = useState<string[]>([]);
-  const timeBlocks = useMemo(() => generateTimeBlocks(), []);
   const events = dayWithEventSelected?.events || [];
-
-  const blockedBlocks = useMemo(() => {
-    const blocked: Set<string> = new Set();
-    events.forEach((event) => {
-      const startHour = parseInt(event.startTime.split(":")[0], 10);
-      const endHour = parseInt(event.endTime.split(":")[0], 10);
-
-      for (let hour = startHour; hour < endHour; hour++) {
-        const block = `${hour.toString().padStart(2, "0")}:00`;
-        if (event.id !== eventSelected?.id) {
-          blocked.add(block);
-        }
-      }
-    });
-    return Array.from(blocked);
-  }, [events, eventSelected]);
 
   const queryClient = useQueryClient();
 
@@ -109,14 +85,12 @@ export function ModalAddGuests({
     mutationFn: ({
       eventId,
       guests,
-      startTime,
-      endTime,
+      periodSelectedIds,
     }: {
       eventId: number;
       guests: Guest[];
-      startTime: string;
-      endTime: string;
-    }) => updateSpaceEvent({ eventId, guests, startTime, endTime }),
+      periodSelectedIds: string[];
+    }) => updateSpaceEvent({ eventId, guests, periodSelectedIds }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["events"], exact: false });
     },
@@ -140,27 +114,11 @@ export function ModalAddGuests({
     setIsOpen(false);
     setDayWithEventSelected(undefined);
     setEventSelected(undefined);
-    setSelectedBlocks([]);
     reset();
   };
 
   useEffect(() => {
     if (eventSelected) {
-      const blocks = [];
-      const startHour = parseInt(eventSelected.startTime.split(":")[0], 10);
-      const endHour = parseInt(eventSelected.endTime.split(":")[0], 10);
-
-      for (let hour = startHour; hour < endHour; hour++) {
-        blocks.push(`${hour.toString().padStart(2, "0")}:00`);
-      }
-
-      setSelectedBlocks(blocks);
-      setValue("timeBlocks", blocks);
-
-      const lastIndex = timeBlocks.indexOf(blocks[blocks.length - 1]);
-      setValue("startTime", blocks[0]);
-      setValue("endTime", timeBlocks[lastIndex + 1] || "23:59");
-
       reset({
         eventId: eventSelected.id,
         guests: eventSelected.spaceEventGuests.map((guest) => ({
@@ -168,37 +126,10 @@ export function ModalAddGuests({
           name: guest.name,
           cpf: guest.cpf,
         })),
-        timeBlocks: blocks,
-        startTime: blocks[0],
-        endTime: timeBlocks[lastIndex + 1] || "23:59",
+        periodSelecteds: eventSelected.areaAvailabilityIdSelecteds.map(String),
       });
     }
-  }, [eventSelected, reset, setValue, timeBlocks]);
-
-  const handleBlockClick = (block: string) => {
-    if (blockedBlocks.includes(block)) return;
-
-    let updated = selectedBlocks.includes(block)
-      ? selectedBlocks.filter((b) => b !== block)
-      : [...selectedBlocks, block].sort();
-
-    const blockIndexes = updated.map((b) => timeBlocks.indexOf(b));
-    const isConsecutive = blockIndexes.every(
-      (val, i, arr) => i === 0 || val === arr[i - 1] + 1
-    );
-
-    if (isConsecutive) {
-      setSelectedBlocks(updated);
-      setValue("timeBlocks", updated);
-
-      const firstBlock = updated[0];
-      const lastBlock = updated[updated.length - 1];
-      const lastIndex = timeBlocks.indexOf(lastBlock);
-
-      setValue("startTime", firstBlock);
-      setValue("endTime", timeBlocks[lastIndex + 1] || "23:59");
-    }
-  };
+  }, [eventSelected, reset, setValue]);
 
   const onSubmit = async (data: EventFormValues) => {
     if (!eventSelected) return;
@@ -214,14 +145,30 @@ export function ModalAddGuests({
     });
 
     await handleUpdateSpaceEvent({
-      startTime: data.startTime,
-      endTime: data.endTime,
       eventId: eventSelected.id,
       guests: newGuests,
+      periodSelectedIds: data.periodSelecteds,
     });
 
     handleClose();
   };
+
+  console.log(eventSelected, events);
+
+  const eventsWithoutEventSelected = events.filter(
+    (event) => event.id !== eventSelected?.id
+  );
+
+  const hoursAlreadyReserved = eventsWithoutEventSelected.flatMap(
+    (event) => event.areaAvailabilityIdSelecteds
+  );
+
+  const totalPeriodSelected = watch("periodSelecteds")?.length;
+  const totalPriceByPeriod = eventSelected?.condominiumAreas?.hourlyRent;
+  const totalPrice =
+    totalPriceByPeriod && totalPeriodSelected
+      ? totalPriceByPeriod * totalPeriodSelected
+      : 0;
 
   return (
     <Dialog
@@ -236,7 +183,7 @@ export function ModalAddGuests({
           <DialogTitle className="text-lg font-semibold text-gray-800">
             Editar Evento
           </DialogTitle>
-        </DialogHeader>   
+        </DialogHeader>
 
         {eventSelected && (
           <div className="bg-white border  shadow-sm rounded-xl p-4 mb-4 text-sm space-y-4">
@@ -245,7 +192,12 @@ export function ModalAddGuests({
               <div>
                 <p className="text-xs text-gray-500">Dia Selecionado</p>
                 <p className="font-semibold text-gray-900">
-                  {format(new Date(eventSelected.eventDate), "dd/MM/yyyy")}
+                  {format(
+                    parseISO(
+                      eventSelected.eventDate as any
+                    ).toISOString() as any,
+                    "dd/MM/yyyy"
+                  )}
                 </p>
               </div>
             </div>
@@ -272,8 +224,28 @@ export function ModalAddGuests({
             <div className="flex items-center space-x-2">
               <DollarSign className="text-green-500" />
               <div>
-                <p className="text-xs text-gray-500">Valor por Hora</p>
-                <p className="font-semibold text-gray-900">R$ 100,00</p>
+                <p className="text-xs text-gray-500">Valor por Período</p>
+                <p className="font-semibold text-gray-900">
+                  {totalPriceByPeriod?.toLocaleString("pt-BR", {
+                    currency: "BRL",
+                    style: "currency",
+                  })}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <DollarSign className="text-green-500" />
+              <div>
+                <p className="text-xs text-gray-500">
+                  Valor total dos Períodos
+                </p>
+                <p className="font-semibold text-gray-900">
+                  {totalPrice.toLocaleString("pt-BR", {
+                    currency: "BRL",
+                    style: "currency",
+                  })}
+                </p>
               </div>
             </div>
 
@@ -298,27 +270,41 @@ export function ModalAddGuests({
           className="space-y-4 max-h-[80vh]"
         >
           <div className="grid gap-2">
-            <Label>Horários Disponíveis</Label>
-            <div className="grid grid-cols-4 gap-2">
-              {timeBlocks.map((block) => (
-                <button
-                  type="button"
-                  key={block}
-                  className={cn(
-                    "border rounded px-2 py-1 text-sm",
-                    blockedBlocks.includes(block)
-                      ? "bg-red-200 text-gray-500 cursor-not-allowed"
-                      : selectedBlocks.includes(block)
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-100 hover:bg-gray-200"
-                  )}
-                  disabled={blockedBlocks.includes(block)}
-                  onClick={() => handleBlockClick(block)}
-                >
-                  {block}
-                </button>
-              ))}
-            </div>
+            <Label>Periodos</Label>
+            <Controller
+              name="periodSelecteds"
+              control={control}
+              render={({ field: { value, onChange } }) => {
+                return (
+                  <ReactSelect
+                    placeholder="Selecione os períodos desejados"
+                    isMulti
+                    value={value
+                      ?.map((id) => {
+                        const period = areaAvailabilityOptions?.find(
+                          (p) => String(p.id) === String(id)
+                        );
+                        return period
+                          ? { label: period.name, value: String(period.id) }
+                          : null;
+                      })
+                      .filter((opt): opt is any => opt !== null)}
+                    onChange={(selected) => {
+                      if (selected.length === 0) return;
+                      onChange(selected.map((opt) => opt.value));
+                    }}
+                    options={areaAvailabilityOptions
+                      ?.filter(
+                        (period) => !hoursAlreadyReserved.includes(period.id)
+                      )
+                      .map((period) => ({
+                        label: period.name,
+                        value: String(period.id),
+                      }))}
+                  />
+                );
+              }}
+            />
           </div>
 
           <div className="flex items-center justify-between">

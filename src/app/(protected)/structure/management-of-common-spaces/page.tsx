@@ -43,6 +43,8 @@ export default function ManagementOfCommonSpaces() {
     spacesEvents,
     spacesEventsStatus,
     apartaments,
+    apartamentsStatus,
+    areaAvailabilityOptions,
   } = useManagementOfCommomSpaces({
     date,
     condominiumAreaIdSelected,
@@ -59,6 +61,8 @@ export default function ManagementOfCommonSpaces() {
     const parsed = parse(time, "HH:mm:ss", new Date());
     return format(parsed, "HH:mm");
   }
+
+  console.log("hours area", areaAvailabilityOptions);
   return (
     <main className="bg-gray-50 min-h-screen w-full p-0 py-8 px-2 sm:p-8 flex flex-col gap-6 overflow-x-auto">
       <div className="space-y-2">
@@ -174,6 +178,7 @@ export default function ManagementOfCommonSpaces() {
         dayWithEventSelected={dayWithEventSelected}
         setDayWithEventSelected={setDayWithEventSelected}
         apartaments={apartaments}
+        areaAvailabilityOptions={areaAvailabilityOptions}
       />
 
       <ModalAddGuests
@@ -183,6 +188,7 @@ export default function ManagementOfCommonSpaces() {
         setIsOpen={setModalActionIsOpen}
         dayWithEventSelected={dayWithEventSelected}
         setDayWithEventSelected={setDayWithEventSelected}
+        areaAvailabilityOptions={areaAvailabilityOptions}
       />
     </main>
   );

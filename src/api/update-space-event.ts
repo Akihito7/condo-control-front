@@ -3,21 +3,18 @@ import { api } from "@/services/api";
 
 interface UpdateSpaceEventProps {
   eventId: number,
-  startTime: string;
-  endTime: string;
-  guests: Guest[]
+  guests: Guest[],
+  periodSelectedIds: string[]
 }
 
 export async function updateSpaceEvent({
   eventId,
   guests,
-  startTime,
-  endTime
+  periodSelectedIds
 }: UpdateSpaceEventProps) {
   const response = await api.put(`structure/management-spaces/events/${eventId}`, {
-    startTime,
-    endTime,
-    guests
+    guests,
+    periodSelectedIds
   });
   return response.data
 }

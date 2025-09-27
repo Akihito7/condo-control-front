@@ -26,6 +26,9 @@ export type Event = {
     name: string;
     cpf: string;
   }[]
+  areaAvailabilityIdSelecteds: number[]
+  condominiumAreas: { hourlyRent: number }
+
 }
 
 
