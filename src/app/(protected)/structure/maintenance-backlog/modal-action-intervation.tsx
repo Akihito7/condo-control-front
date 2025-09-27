@@ -51,7 +51,6 @@ const interventionSchema = z
       .min(1, "Por favor, selecione um método de pagamento"),
     paymentDate: z.date().optional().nullable(),
     paymentCompletionDate: z.date().optional().nullable(),
-    duration: z.string().optional(),
     plannedStart: z.date().optional().nullable(),
     plannedEnd: z.date().optional().nullable(),
     actualStart: z.date().optional().nullable(),
@@ -141,7 +140,6 @@ export function ModalActionIntervention({
       paymentMethod: "",
       paymentDate: null,
       paymentCompletionDate: null,
-      duration: "",
       plannedStart: null,
       plannedEnd: null,
       actualStart: null,
@@ -231,7 +229,6 @@ export function ModalActionIntervention({
         paymentCompletionDate: interventionSelected.paymentCompletionDate
           ? new Date(interventionSelected.paymentCompletionDate)
           : null,
-        duration: interventionSelected.executionTime ?? "",
         plannedStart: interventionSelected.plannedStart
           ? new Date(interventionSelected.plannedStart)
           : null,
@@ -265,7 +262,6 @@ export function ModalActionIntervention({
       paymentMethod: "",
       paymentDate: null,
       paymentCompletionDate: null,
-      duration: "",
       plannedStart: null,
       plannedEnd: null,
       actualStart: null,
@@ -568,17 +564,6 @@ export function ModalActionIntervention({
                 )}
               />
             </div>
-          </div>
-
-          {/* Duration */}
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Duração</Label>
-            <Input
-              {...register("duration")}
-              className="col-span-3"
-              placeholder="Ex: 3 dias"
-              disabled={isDisabled}
-            />
           </div>
 
           {/* Planned Start */}
