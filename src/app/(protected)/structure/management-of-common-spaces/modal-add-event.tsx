@@ -11,8 +11,8 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { CalendarIcon, DollarSign } from "lucide-react";
-import { Controller, useForm } from "react-hook-form";
+import { CalendarIcon, DollarSign, Plus, Trash2 } from "lucide-react";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { CondominiumArea } from "@/api/get-management-commom-spaces";
 import React, { useEffect } from "react";
 import { DayWithEvents } from "@/api/fetch-events-by-condominium-area";
@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/select";
 import { useUserContext } from "@/providers/use-user-context";
 import { AreaAvailability } from "@/api/fetch-area-availability";
+import { Input } from "@/components/ui/input";
 
 interface ModalAddEventProps {
   open: boolean;
@@ -49,7 +50,13 @@ type FormValues = {
   apartmentId: string;
   condominiumAreaId: string;
   periodSelecteds: string[];
+  guests: Guest[];
 };
+
+export interface Guest {
+  name: string;
+  cpf: string;
+}
 
 export function ModalAddEvent({
   open,
@@ -71,14 +78,20 @@ export function ModalAddEvent({
     setValue,
     getValues,
     control,
-    watch
+    watch,
   } = useForm<FormValues>({
     defaultValues: {
       eventDate: new Date(),
       condominiumAreaId: condominiumAreaId,
       apartmentId: "3",
       periodSelecteds: [],
+      guests: [{ name: "", cpf: "" }],
     },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "guests",
   });
 
   const currentCondominiumArea = spacesCommom?.find(
@@ -100,14 +113,21 @@ export function ModalAddEvent({
 
   const handleClose = () => {
     setIsOpen(false);
-    reset();
+    reset({
+      apartmentId: "",
+      condominiumAreaId: "",
+      eventDate: undefined,
+      guests: [],
+      periodSelecteds: [],
+    });
+
     setDayWithEventSelected(undefined);
   };
 
   const onSubmit = async (data: FormValues) => {
     const dataToSend = {
       ...data,
-      eventDate: dayWithEventSelected?.date,
+      eventDate: dayWithEventSelected?.date as unknown as Date,
     };
 
     const periodsSelected = getValues("periodSelecteds");
@@ -119,13 +139,14 @@ export function ModalAddEvent({
       return alert(
         "Você precisa selecionar um período antes de criar o evento."
       );
+
     await handleCreateSpaceEvent(dataToSend);
     handleClose();
   };
 
   const queryClient = useQueryClient();
   const { mutateAsync: handleCreateSpaceEvent } = useMutation({
-    mutationFn: async (data: any) => createSpaceEvent(data),
+    mutationFn: async (data: FormValues) => createSpaceEvent(data),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["events"],
@@ -140,6 +161,7 @@ export function ModalAddEvent({
       apartmentId: user.userAssociationApartmentId
         ? String(user.userAssociationApartmentId)
         : "",
+      guests: [],
     });
   }, [user, condominiumAreaId]);
 
@@ -264,6 +286,56 @@ export function ModalAddEvent({
                 );
               }}
             />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <Label>Convidados</Label>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => append({ name: "", cpf: "" })}
+            >
+              <Plus className="w-4 h-4 mr-1" />
+              Adicionar Convidado
+            </Button>
+          </div>
+
+          <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2">
+            {fields.map((field, index) => (
+              <div
+                key={field.id}
+                className="grid grid-cols-12 gap-2 items-end bg-gray-50 p-3 rounded-md border"
+              >
+                <div className="col-span-5">
+                  <Label>Nome</Label>
+                  <Input
+                    {...register(`guests.${index}.name`, { required: true })}
+                    placeholder="Nome do convidado"
+                  />
+                </div>
+
+                <div className="col-span-5">
+                  <Label>CPF</Label>
+                  <Input
+                    {...register(`guests.${index}.cpf`, { required: true })}
+                    placeholder="000.000.000-00"
+                  />
+                </div>
+
+                <div className="col-span-2 flex justify-end">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={async () => {
+                      remove(index);
+                    }}
+                  >
+                    <Trash2 className="w-5 h-5 text-red-500" />
+                  </Button>
+                </div>
+              </div>
+            ))}
           </div>
 
           <DialogFooter className="pt-4 flex justify-between">
