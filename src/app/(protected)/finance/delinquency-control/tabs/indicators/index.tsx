@@ -50,6 +50,8 @@ export function Indicators({
     chartDistruibitionStatus,
     delinquencyMonthlyEvolution,
     delinquencyMonthlyEvolutionStatus,
+    delinquencyRegistersAllPeriodStatus,
+    delinquencyRegistersAllPeriod,
   } = useIndicators({
     date,
   });
@@ -160,7 +162,6 @@ export function Indicators({
                   stroke="#EF4444"
                   strokeWidth={2}
                   dot={{ r: 4 }}
-                
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -219,7 +220,7 @@ export function Indicators({
       <section className="rounded-xl overflow-auto border">
         <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200">
           <h2 className="font-medium text-gray-800 text-lg">
-            Unidades com Pendências
+            Unidades com Pendências na Atualidade
           </h2>
         </div>
 
@@ -238,7 +239,7 @@ export function Indicators({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {delinequencyRegisters?.map((delinquencyRegister) => (
+              {delinquencyRegistersAllPeriod?.map((delinquencyRegister) => (
                 <TableRow key={delinquencyRegister.id}>
                   <TableCell>{delinquencyRegister.dueDate}</TableCell>
                   <TableCell>{delinquencyRegister.apartamentId}</TableCell>

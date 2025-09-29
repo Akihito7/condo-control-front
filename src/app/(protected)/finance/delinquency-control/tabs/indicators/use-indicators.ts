@@ -1,6 +1,8 @@
 import { fetchDistruibitionByType } from "@/api/fetch-delinquency-distruibition-by-type";
 import { fetchDelinquencyMonthlyEvolution } from "@/api/fetch-delinquency-monthly-evolution";
+import { fetchDeliquencyRegistersAllPeriod } from "@/api/fetch-delinquency-registers-all-period";
 import { fetchResumeDelinquency } from "@/api/fetch-resume-delinquency";
+import { useUserContext } from "@/providers/use-user-context";
 import { getFullMonthInterval } from "@/utils/get-full-month-interval";
 import { useQuery } from "@tanstack/react-query";
 
@@ -15,6 +17,9 @@ export function useIndicators({
     startDate,
     endDate
   } = getFullMonthInterval(date.toISOString());
+
+  const { user } = useUserContext();
+  const { condominiumId } = user;
 
 
   const { data: delinquencyResume, status: delinquencyResumeStatus } = useQuery({
@@ -39,12 +44,20 @@ export function useIndicators({
   })
 
 
+  const { data: delinquencyRegistersAllPeriod, status: delinquencyRegistersAllPeriodStatus } = useQuery({
+    queryKey: ['delinquency-registers-all-period', condominiumId],
+    queryFn: () => fetchDeliquencyRegistersAllPeriod({ condominiumId })
+  })
+
+
   return {
     delinquencyResume,
     delinquencyResumeStatus,
     chartDistruibition,
     chartDistruibitionStatus,
     delinquencyMonthlyEvolution,
-    delinquencyMonthlyEvolutionStatus
+    delinquencyMonthlyEvolutionStatus,
+    delinquencyRegistersAllPeriod,
+    delinquencyRegistersAllPeriodStatus
   }
 }
