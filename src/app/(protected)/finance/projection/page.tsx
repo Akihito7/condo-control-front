@@ -239,7 +239,7 @@ export default function FinancialForecast() {
                             <TooltipContent>
                               <p>
                                 {projectionRegister.observation
-                                  ? projectionRegister.name
+                                  ? projectionRegister.observation
                                   : "Sem observação"}
                               </p>
                             </TooltipContent>
