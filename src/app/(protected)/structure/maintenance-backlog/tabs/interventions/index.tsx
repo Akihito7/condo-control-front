@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/select";
 
 import { Label } from "@radix-ui/react-label";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { YearSelect } from "@/components/year-select";
 import { ModalActionIntervention } from "../../modal-action-intervation";
 import { CardMaintenance } from "../../card-maintenance";
@@ -115,8 +115,10 @@ export function Interventions({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="-1">Todos</SelectItem>
-                {maintenancesTypes?.map((type: any) => (
-                  <SelectItem value={String(type.id)}>{type.name}</SelectItem>
+                {maintenancesTypes?.map((type: any, index) => (
+                  <SelectItem key={index} value={String(type.id)}>
+                    {type.name}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -279,7 +281,7 @@ export function Interventions({
 
                         <TableCell>
                           {item.paymentDate
-                            ? new Date(item.paymentDate).toLocaleDateString(
+                            ? parseISO(item.paymentDate).toLocaleDateString(
                                 "pt-BR"
                               )
                             : "-"}

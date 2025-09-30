@@ -45,10 +45,14 @@ const interventionSchema = z
     provider: z.string().optional(),
     value: z
       .string()
-      .regex(/^\d+(\.\d{1,2})?$/, "Por favor, insira um valor válido"),
+      .regex(/^\d+(\.\d{1,2})?$/, "Por favor, insira um valor válido")
+      .optional()
+      .or(z.literal("")),
     paymentMethod: z
       .string()
-      .min(1, "Por favor, selecione um método de pagamento"),
+      .min(1, "Por favor, selecione um método de pagamento")
+      .optional()
+      .or(z.literal("")),
     paymentDate: z.date().optional().nullable(),
     paymentCompletionDate: z.date().optional().nullable(),
     plannedStart: z.date().optional().nullable(),
@@ -127,6 +131,7 @@ export function ModalActionIntervention({
     reset,
     setValue,
     getValues,
+    watch,
     formState: { errors },
   } = useForm<InterventionFormData>({
     resolver: zodResolver(interventionSchema),
@@ -190,7 +195,6 @@ export function ModalActionIntervention({
         data: data,
       }),
   });
-
   const isDisabled = type === "view";
 
   const modalTitle =
@@ -222,7 +226,7 @@ export function ModalActionIntervention({
         description: interventionSelected.description,
         provider: interventionSelected.supplier || "",
         value: interventionSelected.amount.toFixed(2),
-        paymentMethod: interventionSelected.paymentMethod.toString(),
+        paymentMethod: interventionSelected?.paymentMethod?.toString(),
         paymentDate: interventionSelected.paymentDate
           ? new Date(interventionSelected.paymentDate)
           : null,
@@ -271,6 +275,20 @@ export function ModalActionIntervention({
       numberOfInstallments: undefined,
     });
   }
+
+  const isInstallmentRef = useRef<boolean>(isInstallment);
+
+  const watchIsInstallmentFormField = watch("isInstallment");
+  useEffect(() => {
+    if (isInstallmentRef.current && !watchIsInstallmentFormField) {
+      isInstallmentRef.current = false;
+      setValue("numberOfInstallments", "");
+    }
+
+    if (!isInstallmentRef.current && watchIsInstallmentFormField) {
+      isInstallmentRef.current = true;
+    }
+  }, [watchIsInstallmentFormField]);
 
   return (
     <Dialog
