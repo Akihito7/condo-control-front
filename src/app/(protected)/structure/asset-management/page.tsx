@@ -74,7 +74,6 @@ export default function AssetManagement() {
   >();
   const [updatingImage, setUpdatingImaged] = useState(false);
 
-  // Filtros
   const [areaSelected, setAreaSelected] = useState("-1");
   const [codeSearch, setCodeSearch] = useState("");
   const [modalReportIsOpen, setModalReportIsOpen] = useState(false);
@@ -88,7 +87,6 @@ export default function AssetManagement() {
     }
   }, [newPhoto]);
 
-  // Aplica os filtros
   const filteredAssets = assets?.filter((asset) => {
     const matchArea =
       areaSelected === "-1" || String(asset.areaId) === areaSelected;
@@ -99,6 +97,11 @@ export default function AssetManagement() {
 
     return matchArea && matchCode;
   });
+
+  function applyStylesIfHasReportNotFinished(hasReportNotFinished: boolean) {
+    if (!hasReportNotFinished) return "";
+    return "border-1 border-red-500 text-red-400";
+  }
 
   return (
     <main className="bg-gray-50 min-h-screen overflow-auto w-full p-0 py-8 px-2 sm:p-8 flex flex-col gap-6">
@@ -233,9 +236,18 @@ export default function AssetManagement() {
                     <TableCell>
                       <Link
                         href={`asset-management/${asset.id}`}
-                        className="flex items-center justify-center gap-1 px-2 py-1 bg-gray-100 rounded hover:bg-gray-200 transition w-12 h-12"
+                        className={`flex items-center justify-center gap-1 px-2 py-1 bg-gray-100 rounded hover:bg-gray-200 transition w-12 h-12 
+                          ${applyStylesIfHasReportNotFinished(
+                            asset.hasReportNotFinished
+                          )}`}
                       >
-                        <Paperclip className="w-4 h-4 text-gray-700" />{" "}
+                        <Paperclip
+                          className={`w-4 h-4${
+                            asset.hasReportNotFinished
+                              ? "text-red-400"
+                              : "text-gray-700 "
+                          }`}
+                        />
                         <span>{asset.reportCount ?? 0}</span>
                       </Link>
                     </TableCell>

@@ -26,6 +26,7 @@ export interface Asset {
   condominiumAreasName: string
   condominiumAreasType: string;
   reportCount: number;
+  hasReportNotFinished: boolean
 }
 
 
