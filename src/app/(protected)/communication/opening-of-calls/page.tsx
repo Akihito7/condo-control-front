@@ -51,6 +51,7 @@ import { deleteOpeningCallRecord } from "@/api/delete-opening-call-record";
 import { userPagePermission } from "@/utils/user-page-permission";
 import { redirect } from "next/navigation";
 import { NotificationDropdown } from "@/components/notification";
+import { MonthYearPicker } from "@/components/month-year-select";
 
 export default function OpeningOfCalls() {
   const { read, edit } = userPagePermission({ pageId: 8 });
@@ -61,10 +62,6 @@ export default function OpeningOfCalls() {
     redirect("/home");
   }
 
-  const [rangeDate, setRangeDate] = useState({
-    from: new Date(),
-    to: new Date(),
-  });
   const [statusOptionSelected, setStatusOptionSelected] =
     useState<string>("-1");
   const [issueOptionSeleted, setIssueOptionSelected] = useState<string>("-1");
@@ -105,11 +102,9 @@ export default function OpeningOfCalls() {
     statusOptions,
     employeesOptions,
     employeesOptionsStatus,
-  } = useOpeningCalls({
-    condominiumId,
-    startDate: rangeDate.from,
-    endDate: rangeDate.to,
-  });
+    date,
+    setDate,
+  } = useOpeningCalls();
 
   const formatterToHoursMin = (
     resolvedAte: string,
@@ -150,7 +145,7 @@ export default function OpeningOfCalls() {
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Intervalo de datas
           </label>
-          <DatePickRange range={rangeDate} setRange={setRangeDate} />
+          <MonthYearPicker selectedDate={date} onChange={setDate} />
         </div>
 
         {statusOptions && (

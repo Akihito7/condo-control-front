@@ -4,28 +4,33 @@ import { fetchOptionsStatusOpeningCalls } from "@/api/fetch-options-status-openi
 import { getCardsOpeningCalls } from "@/api/get-cards-opening-calls";
 import { getOpeningCallsRecords } from "@/api/get-opening-calls-records";
 import { useUserContext } from "@/providers/use-user-context";
+import { getFullMonthInterval } from "@/utils/get-full-month-interval";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns"
+import { useState } from "react";
 
-interface UseOpeningCallsProps {
-  condominiumId: number;
-  startDate: Date;
-  endDate: Date;
-}
-export function useOpeningCalls({ condominiumId, startDate, endDate }: UseOpeningCallsProps) {
 
-  const startDateFormmated = format(startDate, 'yyyy-MM-dd')
-  const endDateFormmated = format(endDate, 'yyyy-MM-dd')
+export function useOpeningCalls() {
+  const [date, setDate] = useState(new Date());
+  const { startDate, endDate } = getFullMonthInterval(format(date, 'yyyy-MM-dd'));
+
+  const {
+    user
+  } = useUserContext();
+  const { condominiumId } = user;
+  /* 
+    const startDateFormmated = format(startDate, 'yyyy-MM-dd')
+    const endDateFormmated = format(endDate, 'yyyy-MM-dd') */
 
   const { data: openingRecords, status: openingRecordsStatus } = useQuery({
     queryKey: ['openingCallsRecords', startDate, endDate],
-    queryFn: async () => getOpeningCallsRecords({ condominiumId, startDate: startDateFormmated, endDate: endDateFormmated }),
+    queryFn: async () => getOpeningCallsRecords({ condominiumId, startDate, endDate }),
     enabled: !!condominiumId && !!startDate && !!endDate
   })
 
   const { data: openingCards, status: openingCardsStatus } = useQuery({
     queryKey: ['openingCards', startDate, endDate],
-    queryFn: async () => getCardsOpeningCalls({ condominiumId, startDate: startDateFormmated, endDate: endDateFormmated }),
+    queryFn: async () => getCardsOpeningCalls({ condominiumId, startDate, endDate }),
     enabled: !!condominiumId && !!startDate && !!endDate
   })
 
@@ -55,6 +60,8 @@ export function useOpeningCalls({ condominiumId, startDate, endDate }: UseOpenin
     issuesOptions,
     optionsIssuesStatus,
     employeesOptions,
-    employeesOptionsStatus
+    employeesOptionsStatus,
+    date,
+    setDate
   }
 }
