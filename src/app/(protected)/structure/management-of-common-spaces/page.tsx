@@ -6,6 +6,8 @@ import { DatePicker } from "@/components/date-picker";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { useManagementOfCommomSpaces } from "./use-management-of-common-spaces";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 import {
   Select,
   SelectContent,
@@ -21,6 +23,8 @@ import { userPagePermission } from "@/utils/user-page-permission";
 import { redirect } from "next/navigation";
 import { useUserContext } from "@/providers/use-user-context";
 import { MonthYearPicker } from "@/components/month-year-select";
+import { ScheduleTab } from "./tabs/schedule-tab";
+import { IndicatorsTab } from "./tabs/indicators-tab";
 
 export default function ManagementOfCommonSpaces() {
   const { read, edit } = userPagePermission({ pageId: 6 });
@@ -30,6 +34,9 @@ export default function ManagementOfCommonSpaces() {
     redirect("/home");
   }
 
+  const [tabSelected, setTabSelected] = useState<"schedule" | "indicators">(
+    "schedule"
+  );
   const [date, setDate] = useState(new Date());
   const [modalAddEventIsOpen, setModalAddEventIsOpen] = useState(false);
   const [modalActionIsOpen, setModalActionIsOpen] = useState(false);
@@ -56,13 +63,7 @@ export default function ManagementOfCommonSpaces() {
       setCondominiumAreaIdSelected(firstSpace);
     }
   }, [spacesCommom]);
-  const uniqueDays = [...new Set(spacesEvents?.map((day) => day.dayName))];
-  function formatTimeWithoutSeconds(time: string) {
-    const parsed = parse(time, "HH:mm:ss", new Date());
-    return format(parsed, "HH:mm");
-  }
 
-  console.log("hours area", areaAvailabilityOptions);
   return (
     <main className="bg-gray-50 min-h-screen w-full p-0 py-8 px-2 sm:p-8 flex flex-col gap-6 overflow-x-auto">
       <div className="space-y-2">
@@ -86,89 +87,70 @@ export default function ManagementOfCommonSpaces() {
             justFutureMonths={false}
           />
         </div>
+        {tabSelected === "schedule" && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Selecione uma area
+            </label>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Selecione uma area
-          </label>
-
-          <Select
-            value={condominiumAreaIdSelected}
-            onValueChange={(value) => setCondominiumAreaIdSelected(value)}
-          >
-            <SelectTrigger className="col-span-3 w-[250px]">
-              <SelectValue placeholder="Selecione a area" />
-            </SelectTrigger>
-            <SelectContent>
-              {spacesCommom?.map((area) => (
-                <SelectItem key={area.id} value={String(area.id)}>
-                  {area.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      <div className="bg-white shadow-md rounded-xl border border-gray-200">
-        <div className="grid grid-cols-7 bg-gray-100 text-center text-sm font-medium text-gray-700 border-b border-gray-200">
-          {uniqueDays?.map((day, i) => (
-            <div key={i} className="py-2">
-              {day}
-            </div>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-7">
-          {spacesEvents?.map((day, index) => (
-            <div
-              key={index}
-              className="border border-gray-200 p-2 flex flex-col gap-2 min-h-56 overflow-auto max-h-56"
+            <Select
+              value={condominiumAreaIdSelected}
+              onValueChange={(value) => setCondominiumAreaIdSelected(value)}
             >
-              <span className="text-sm font-medium text-gray-700">
-                {day.dayNumber.toString().padStart(2, "0")}
-              </span>
-              <div className="flex flex-col gap-2">
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setDayWithEventSelected(day);
-                    setModalAddEventIsOpen(true);
-                  }}
-                >
-                  Agendar Evento
-                </Button>
-
-                {day.events?.map((event) => (
-                  <div
-                    onClick={() => {
-                      setEventSelected(event);
-                      setDayWithEventSelected(day);
-                      setModalActionIsOpen(true);
-                    }}
-                    className="border border-bg-gray-700 shadow-md text-gray-800 text-xs rounded-lg px-3 py-1 cursor-pointer"
-                  >
-                    <span className="font-semibold">
-                      Apartamento :{" "}
-                      {
-                        apartaments?.find(
-                          (apartament) =>
-                            String(apartament.id).toLowerCase() ===
-                            String(event.apartmentId).toLowerCase()
-                        )?.apartmentNumber
-                      }
-                    </span>
-                    <div>
-                      Horario : {formatTimeWithoutSeconds(event.startTime)}-
-                      {formatTimeWithoutSeconds(event.endTime)}
-                    </div>
-                  </div>
+              <SelectTrigger className="col-span-3 w-[250px]">
+                <SelectValue placeholder="Selecione a area" />
+              </SelectTrigger>
+              <SelectContent>
+                {spacesCommom?.map((area) => (
+                  <SelectItem key={area.id} value={String(area.id)}>
+                    {area.name}
+                  </SelectItem>
                 ))}
-              </div>
-            </div>
-          ))}
-        </div>
+              </SelectContent>
+            </Select>
+          </div>
+        )}
       </div>
+
+      <Tabs
+        defaultValue="schedule"
+        onValueChange={(value) =>
+          setTabSelected(value as "indicators" | "schedule")
+        }
+      >
+        <TabsList className="bg-gray-50 p-1.5 rounded-lg border border-gray-200">
+          <TabsTrigger
+            value="schedule"
+            className="data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-gray-900 px-4 py-2 rounded-md font-medium text-gray-600 transition-all"
+          >
+           Calendário de Reservas
+          </TabsTrigger>
+          <TabsTrigger
+            value="indicators"
+            className="data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-gray-900 px-4 py-2 rounded-md font-medium text-gray-600 transition-all"
+          >
+            Indicadores
+          </TabsTrigger>
+        </TabsList>
+
+        <div className="mt-6">
+          <TabsContent value="schedule">
+            <ScheduleTab
+              apartaments={apartaments}
+              setDayWithEventSelected={setDayWithEventSelected}
+              setEventSelected={setEventSelected}
+              setModalActionIsOpen={setModalActionIsOpen}
+              setModalAddEventIsOpen={setModalAddEventIsOpen}
+              spacesEvents={spacesEvents}
+              key={1}
+            />
+          </TabsContent>
+
+          <TabsContent value="indicators">
+            <IndicatorsTab date={date} setDate={setDate} />
+          </TabsContent>
+        </div>
+      </Tabs>
 
       <ModalAddEvent
         open={modalAddEventIsOpen}
