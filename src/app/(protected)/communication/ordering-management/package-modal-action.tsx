@@ -52,7 +52,6 @@ const schema = z.object({
   apartment: z.string().min(1, "Apartment is required"),
   description: z.string().min(3, "Description is too short"),
   receivedDate: z.date(),
-  deliveredDate: z.date().optional().nullable(),
   attachment: z.any().optional(),
 });
 
@@ -84,7 +83,6 @@ export function PackageModalAction({
       apartment: "",
       description: "",
       receivedDate: new Date(),
-      deliveredDate: null,
       attachment: undefined,
     },
   });
@@ -100,10 +98,6 @@ export function PackageModalAction({
     formData.append("description", data.description);
     formData.append("receivedDate", data.receivedDate.toISOString());
     formData.append("condominiumId", String(condominiumId));
-
-    if (data.deliveredDate) {
-      formData.append("deliveredDate", data.deliveredDate.toISOString());
-    }
 
     if (Array.isArray(data.attachment)) {
       data.attachment.forEach((file: File) => {
@@ -156,7 +150,6 @@ export function PackageModalAction({
         apartment: deliverySelected?.apartmentId
           ? String(deliverySelected.apartmentId)
           : "",
-        deliveredDate: deliveryDateFormmated,
         description: deliverySelected?.description,
         receivedDate: receveidDateFormmated,
       });
@@ -165,7 +158,6 @@ export function PackageModalAction({
         apartment: "",
         description: "",
         receivedDate: new Date(),
-        deliveredDate: null,
         attachment: undefined,
       });
     }
@@ -267,19 +259,6 @@ export function PackageModalAction({
               </Label>
               <Controller
                 name="receivedDate"
-                control={control}
-                render={({ field: { onChange, value } }) => (
-                  <DatePickerWithHours date={value!} setDate={onChange} />
-                )}
-              />
-            </div>
-
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="deliveredDate" className="text-right">
-                Entregue
-              </Label>
-              <Controller
-                name="deliveredDate"
                 control={control}
                 render={({ field: { onChange, value } }) => (
                   <DatePickerWithHours date={value!} setDate={onChange} />
