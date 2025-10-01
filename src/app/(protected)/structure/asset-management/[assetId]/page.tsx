@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/select";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateStatusAssetReport } from "@/api/update-status-asset-report";
+import { useRouter } from "next/navigation";
 
 // Tipagens simplificadas
 interface Photo {
@@ -45,6 +46,7 @@ export default function ReportsPage({ params }: any) {
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [currentPhotos, setCurrentPhotos] = useState<Photo[]>([]);
 
+  const router = useRouter();
   const queryClient = useQueryClient();
 
   const formatDate = (dateStr: string) =>
@@ -119,9 +121,19 @@ export default function ReportsPage({ params }: any) {
             <NotificationDropdown />
           </div>
         </div>
-        <h1 className="text-2xl font-semibold text-gray-800">
-          Reports do Patrimônio
-        </h1>
+
+        <div className="flex items-center gap-4">
+          <div className="bg-gray-100 rounded-md p-2 cursor-pointer">
+            <ChevronLeft
+              className="text-gray-600"
+              size={24}
+              onClick={() => router.back()}
+            />
+          </div>
+          <h1 className="text-2xl font-semibold text-gray-800">
+            Reports do Patrimônio
+          </h1>
+        </div>
       </div>
 
       <section>
