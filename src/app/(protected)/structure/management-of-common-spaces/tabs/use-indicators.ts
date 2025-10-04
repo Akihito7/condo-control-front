@@ -1,4 +1,5 @@
 import { fetchManagementSpacesIndicatorsCards } from "@/api/fetch-management-spaces-indicators-cards";
+import { fetchManagementSpacesMontlhyRevenueAndOccupation } from "@/api/fetch-management-spaces-monthly-revenue-and-occupation";
 import { fetchManagementSpacesPercentageByArea } from "@/api/fetch-management-spaces-percentage-by-area";
 import { fetchSpacesAreasBookingsChart } from "@/api/fetch-spaces-areas-bookings-chart";
 import { useQuery } from "@tanstack/react-query";
@@ -25,12 +26,21 @@ export function useIndicators(date: Date) {
     enabled: !!dateFormatted
   });
 
+  const { data: montlhyRevenueAndOccupation, status: montlhyRevenueAndOccupationStatus } = useQuery({
+    queryKey: ['monthly-revenue-and-occupation', dateFormatted],
+    queryFn: () => fetchManagementSpacesMontlhyRevenueAndOccupation(dateFormatted),
+    enabled: !!dateFormatted
+  });
+
+
   return {
     indicatorsCards,
     indicatorsStatus,
     bookingsChart,
     bookingsChartStatus,
     percentageByAreaChart,
-    percentageByAreaChartStatus
+    percentageByAreaChartStatus,
+    montlhyRevenueAndOccupation,
+    montlhyRevenueAndOccupationStatus
   }
 } 

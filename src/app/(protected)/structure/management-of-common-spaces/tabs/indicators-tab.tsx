@@ -24,23 +24,10 @@ export interface IndicatorsTabProps {
 }
 const COLORS = ["#4273fc", "#60a5fa", "#93c5fd", "#2563eb", "#1e40af"];
 
-const receitaPercentual = [
-  { name: "Salão de Festa", value: 42, color: "#3b82f6" },
-  { name: "Salão Gourmet", value: 19, color: "#facc15" },
-  { name: "Quadra", value: 14, color: "#a855f7" },
-  { name: "Churrasqueira 1", value: 14, color: "#22c55e" },
-  { name: "Churrasqueira 2", value: 12, color: "#f97316" },
-];
-
-const evolucaoData = [
-  { mes: "Jan", ocupacao: 78, receita: 20000 },
-  { mes: "Fev", ocupacao: 62, receita: 15000 },
-  { mes: "Mar", ocupacao: 55, receita: 12000 },
-  { mes: "Abr", ocupacao: 58, receita: 12500 },
-  { mes: "Mai", ocupacao: 70, receita: 18000 },
-  { mes: "Jun", ocupacao: 65, receita: 16000 },
-  { mes: "Jul", ocupacao: 60, receita: 10000 },
-];
+const mapperNames = {
+  totalOccupation: "Ocupação",
+  totalRevenue: "Renda",
+};
 
 export function IndicatorsTab({ date, setDate }: IndicatorsTabProps) {
   const [typePercentageChart, setTypePercentageChart] = useState<
@@ -53,11 +40,11 @@ export function IndicatorsTab({ date, setDate }: IndicatorsTabProps) {
     bookingsChartStatus,
     percentageByAreaChart,
     percentageByAreaChartStatus,
+    montlhyRevenueAndOccupation,
   } = useIndicators(date);
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
         <Card className="min-w-[210px]cursor-pointer">
           <CardHeader className="flex items-center justify-between pb-2">
@@ -111,9 +98,7 @@ export function IndicatorsTab({ date, setDate }: IndicatorsTabProps) {
         </Card>
       </div>
 
-      {/* Gráficos */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Barras */}
         <Card>
           <CardHeader>
             <CardTitle className="text-lg font-medium">
@@ -188,13 +173,13 @@ export function IndicatorsTab({ date, setDate }: IndicatorsTabProps) {
                   data={percentageByAreaChart}
                   dataKey={
                     typePercentageChart === "amount" ? "total" : "percentual"
-                  } // alterna aqui
+                  }
                   nameKey="areaName"
                   outerRadius={100}
                   innerRadius={60}
                   paddingAngle={3}
                 >
-                  {receitaPercentual.map((entry, index) => (
+                  {percentageByAreaChart?.map((entry, index) => (
                     <Cell
                       key={`cell-${index}`}
                       fill={COLORS[index % COLORS.length]}
@@ -228,7 +213,6 @@ export function IndicatorsTab({ date, setDate }: IndicatorsTabProps) {
         </Card>
       </div>
 
-      {/* Linha */}
       <Card>
         <CardHeader>
           <CardTitle>Evolução de Ocupação e Receita (Anual)</CardTitle>
@@ -236,10 +220,9 @@ export function IndicatorsTab({ date, setDate }: IndicatorsTabProps) {
         <CardContent className="h-80">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart
-              data={evolucaoData}
+              data={montlhyRevenueAndOccupation}
               margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
             >
-              {/* Grid suave para referência visual */}
               <CartesianGrid
                 stroke="#60a5fa"
                 strokeDasharray="3 3"
@@ -247,7 +230,7 @@ export function IndicatorsTab({ date, setDate }: IndicatorsTabProps) {
               />
 
               <XAxis
-                dataKey="mes"
+                dataKey="monthName"
                 axisLine={false}
                 tickLine={false}
                 tick={{ fill: "#6b7280", fontSize: 12 }}
@@ -271,27 +254,30 @@ export function IndicatorsTab({ date, setDate }: IndicatorsTabProps) {
                         style: "currency",
                         currency: "BRL",
                       })
-                    : value,
-                  name,
+                    : `${value}%`,
+                  mapperNames[name as keyof typeof mapperNames],
                 ]}
               />
               <Legend
                 wrapperStyle={{
                   fontSize: "12px",
                 }}
+                formatter={(name) => (
+                  <span>{mapperNames[name as keyof typeof mapperNames]}</span>
+                )}
               />
               <Line
                 type="monotone"
-                dataKey="ocupacao"
-                stroke={COLORS[1]} // cor neutra da paleta
+                dataKey="totalOccupation"
+                stroke={COLORS[1]}
                 strokeWidth={2}
                 dot={{ r: 4 }}
                 activeDot={{ r: 6 }}
               />
               <Line
                 type="monotone"
-                dataKey="receita"
-                stroke={COLORS[3]} // outra cor neutra da paleta
+                dataKey="totalRevenue"
+                stroke={COLORS[3]}
                 strokeWidth={2}
                 dot={{ r: 4 }}
                 activeDot={{ r: 6 }}
