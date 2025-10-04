@@ -132,7 +132,8 @@ export function ScheduleEmployeeTab({
               divTableRef.current.className = "";
               await printDocument(
                 componentMainRef.current,
-                componentFilterRef.current
+                componentFilterRef.current,
+                "l"
               );
 
               divTableRef.current.className = classNameBefore;

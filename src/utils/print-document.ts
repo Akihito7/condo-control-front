@@ -1,9 +1,12 @@
 import html2canvas from "html2canvas-pro";
 import jsPDF from "jspdf";
+import React from "react";
 
 export const printDocument = async (
   componentToPrint: HTMLElement,
   componentToHidden: HTMLElement | HTMLDivElement,
+  orientation: 'p' | 'l' = 'p',
+  setImage?: React.Dispatch<React.SetStateAction<string>>
 ) => {
   componentToHidden.style.display = "none";
 
@@ -14,12 +17,15 @@ export const printDocument = async (
       logging: false,
       scrollX: 0,
       scrollY: -window.scrollY,
-      windowWidth: componentToPrint.scrollWidth * 1.5,
-      windowHeight: componentToPrint.scrollHeight * 1.5,
+      windowWidth: componentToPrint.scrollWidth * 1.1,
+      windowHeight: componentToPrint.scrollHeight * 1.1
     });
 
-    const imgData = canvas.toDataURL("image/png", 1.0);
-    const pdf = new jsPDF("p", "mm", "a4");
+    const imgData = canvas.toDataURL("image/png", 2.0);
+
+    setImage?.(imgData)
+
+    const pdf = new jsPDF(orientation, "mm", "a4");
 
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = pdf.internal.pageSize.getHeight();
