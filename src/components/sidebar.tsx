@@ -298,7 +298,6 @@ function getModuleIcon(moduleName: string) {
   return icons[moduleName] || <FileText size={18} />;
 }
 
-// Labels amigáveis
 function getModuleLabel(moduleName: string) {
   const labels: Record<string, string> = {
     financial: "Finanças",
@@ -306,6 +305,7 @@ function getModuleLabel(moduleName: string) {
     communication: "Comunicação e Suporte",
     security: "Segurança",
     indicators: "Indicadores",
+    backoffice: "Backoffice",
   };
   return labels[moduleName] || moduleName;
 }
