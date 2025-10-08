@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Trash, Download, FileText } from "lucide-react";
 import { Attachment, FinancialRecord } from "@/api/fetch-financial-records";
 import { ModalAddAttachment } from "../../communication/opening-of-calls/modal-add-attachment";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addAttachmentTransactionEntry } from "@/api/add-attachment-transaction-entry";
 import { useUserContext } from "@/providers/use-user-context";
 import { deleteAttchmentTransacationEntry } from "@/api/delete-attchment-transaction-entry";
@@ -35,10 +35,19 @@ export function ModalAttachments({
   setTransactionSelected,
 }: ModalAttachmentsProps) {
   const { user } = useUserContext();
+  const queryClient = useQueryClient();
+
+  function invalidQueries() {
+    queryClient.invalidateQueries({
+      exact: false,
+      queryKey: ["transactions"],
+    });
+  }
 
   const { mutateAsync: addAttachments } = useMutation({
     mutationFn: (form: FormData) => addAttachmentTransactionEntry(form),
     onSuccess: (newAttachment) => {
+      invalidQueries();
       if (newAttachment) {
         const currentAttachments = transactionSelected?.attachments ?? [];
         const newAttachments = [...newAttachment, ...currentAttachments];
@@ -58,6 +67,7 @@ export function ModalAttachments({
   const { mutateAsync: handleDeleteAttchment } = useMutation({
     mutationFn: (fileId: number) => deleteAttchmentTransacationEntry(fileId),
     onSuccess: (fileId: number) => {
+      invalidQueries();
       const attachmentsFiltered =
         transactionSelected?.attachments.filter(
           (attachment) => attachment.id !== fileId
@@ -109,7 +119,7 @@ export function ModalAttachments({
         <DialogContent className="sm:max-w-md w-full rounded-lg">
           <DialogHeader>
             <DialogTitle className="text-xl font-semibold text-gray-800">
-              Anexos do chamado
+              Anexos
             </DialogTitle>
           </DialogHeader>
 
