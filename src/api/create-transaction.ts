@@ -1,6 +1,6 @@
 import { api } from "@/services/api";
 
-export interface CreateTransactionProps {
+export interface CreateTransaction {
   dueDate: Date
   recordTypeId: number
   categoryId: number
@@ -12,6 +12,11 @@ export interface CreateTransactionProps {
   type: number
   paymentDate: number | undefined,
 }
-export async function createTransaction(data: CreateTransactionProps) {
-  await api.post('finance/create-transaction', data);
+
+export interface CreateTransactionProps {
+  form: FormData
+}
+
+export async function createTransaction({ form }: CreateTransactionProps) {
+  await api.post('finance/create-transaction', form);
 }

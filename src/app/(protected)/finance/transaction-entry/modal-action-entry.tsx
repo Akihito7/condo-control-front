@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Paperclip } from "lucide-react";
+import { Paperclip, X } from "lucide-react";
 
 import {
   Dialog,
@@ -36,10 +36,7 @@ import * as z from "zod/v4";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
 
-import {
-  createTransaction,
-  CreateTransactionProps,
-} from "@/api/create-transaction";
+import { CreateTransaction, createTransaction } from "@/api/create-transaction";
 import { UpdateRegisteProps, updateRegister } from "@/api/update-transaction";
 import { FinancialRecord } from "@/api/fetch-financial-records";
 import { CurrencyInput } from "@/components/currency-input";
@@ -84,6 +81,7 @@ const SchemaCreateEntry = z.object({
   recurring: z.boolean(),
   type: z.coerce.number().min(0, { message: "Tipo inválido" }),
   paymentDate: z.date().optional(),
+  attachments: z.any(),
 });
 
 export function ModalActionEntry({
@@ -125,6 +123,7 @@ export function ModalActionEntry({
       recurring: false,
       type: -1,
       paymentDate: undefined,
+      attachments: [],
     },
   });
 
@@ -167,8 +166,44 @@ export function ModalActionEntry({
     });
   }
 
+  function convertDataToForm(data: any): FormData {
+    const form = new FormData();
+
+    form.append("amount", data.amount);
+    form.append("apartmentId", String(data.apartmentId));
+    form.append("categoryId", String(data.categoryId));
+    form.append("condominiumId", String(data.condominiumId));
+    form.append("incomeExpenseId", String(data.incomeExpenseId));
+    form.append("paymentMethodId", String(data.paymentMethodId));
+    form.append("paymentStatusId", String(data.paymentStatusId));
+    form.append("recurring", String(data.recurring));
+    form.append("type", String(data.type));
+
+
+    if (data.amountPaid !== undefined)
+      form.append("amountPaid", data.amountPaid);
+    if (data.notes) form.append("notes", data.notes);
+    if (data.paymentDate)
+      form.append("paymentDate", data.paymentDate.toISOString());
+
+    form.append("dueDate", data.dueDate.toISOString());
+
+    if (data.attachments && data.attachments.length > 0) {
+      Array.from(data.attachments).forEach((file: any) => {
+        form.append("attachments", file);
+      });
+    }
+
+    return form;
+  }
+
+  const attachments = watch("attachments");
+
   const { mutateAsync: handleCreateTransaction } = useMutation({
-    mutationFn: (data: CreateTransactionProps) => createTransaction(data),
+    mutationFn: (data: CreateTransaction) => {
+      const form = convertDataToForm(data);
+      return createTransaction({ form });
+    },
     onSuccess: () => {
       handleResetForm();
       buttonCloseRef.current?.click();
@@ -658,19 +693,69 @@ export function ModalActionEntry({
 
             <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 items-center">
               <Label className="text-left sm:text-right">Anexos</Label>
+
               <div className="sm:col-span-2 md:col-span-3">
-                <label className="flex flex-col items-center justify-center gap-2 rounded-md border-2 border-dashed border-gray-400 text-gray-600 cursor-pointer p-8 hover:border-gray-600">
-                  <Paperclip />
-                  Arraste e solte arquivos ou clique para selecionar.
-                  <input
-                    id="attachments"
-                    type="file"
-                    multiple
-                    className="hidden"
-                  />
-                </label>
+                <Controller
+                  name="attachments"
+                  control={control}
+                  render={({ field: { onChange, value } }) => (
+                    <label
+                      htmlFor="attachments"
+                      className="flex flex-col items-center justify-center gap-2 rounded-md border-2 border-dashed border-gray-400 text-gray-600 cursor-pointer p-8 hover:border-gray-600"
+                    >
+                      <Paperclip />
+                      Arraste e solte arquivos ou clique para selecionar.
+                      <input
+                        id="attachments"
+                        type="file"
+                        multiple
+                        className="hidden"
+                        onChange={(e) => {
+                          const files = e.target.files;
+                          if (files) {
+                            onChange(files);
+                          }
+                        }}
+                      />
+                    </label>
+                  )}
+                />
               </div>
             </div>
+
+            {attachments && Array.from(attachments).length > 0 && (
+              <div className="mt-4 flex flex-col gap-2">
+                {Array.from(attachments).map((file: any, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 shadow-sm hover:shadow-md transition-all"
+                  >
+                    <div className="flex items-center gap-2 overflow-hidden">
+                      <Paperclip className="text-gray-500 w-4 h-4 flex-shrink-0" />
+                      <span className="truncate text-sm text-gray-700 max-w-[200px] sm:max-w-[300px]">
+                        {file.name}
+                      </span>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const dataTransfer = new DataTransfer();
+                        Array.from(attachments)
+                          .filter((_, i) => i !== index)
+                          .forEach((file: any) => dataTransfer.items.add(file));
+
+                        setValue("attachments", dataTransfer.files);
+                      }}
+                      className="flex items-center gap-1 text-xs text-red-500 hover:text-red-700 font-medium transition-colors"
+                    >
+                      <X size={14} />
+                      Remover
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </fieldset>
 
           <DialogFooter className="flex flex-col sm:flex-row gap-2 justify-end">

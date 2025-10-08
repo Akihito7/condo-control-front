@@ -16,7 +16,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Pencil} from "lucide-react";
+import { Paperclip, Pencil } from "lucide-react";
 
 import { CardSkeleton } from "@/components/card-skeleton";
 import { TableRowSkeleton } from "@/components/table-row-skeleton";
@@ -30,6 +30,7 @@ import { ApartmentWithBlock } from "@/api/fetch-apartments";
 import { PaymentStatus } from "@/api/fetch-payment-status.options";
 import { FetchCardsTransactionEntryResponse } from "@/api/fetch-cards-transaction-entry";
 import { Cards } from "../cards";
+import { ModalAttachments } from "../modal-attachments";
 
 interface TransactionsTabProps {
   cardsTransaction: FetchCardsTransactionEntryResponse | undefined;
@@ -64,6 +65,7 @@ export function TransactionsTab({
 }: TransactionsTabProps) {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [modalAttchmentIsOpen, setModalAttchmentIsOpen] = useState(false);
   const [dropdownOpenToThisItem, setDropdownOpenToThisItem] = useState<
     number | undefined
   >();
@@ -137,6 +139,7 @@ export function TransactionsTab({
                 <TableHead>Data do Pagamento</TableHead>
                 <TableHead>Valor Pago</TableHead>
                 <TableHead>Observação</TableHead>
+                <TableHead className="text-left">Anexos</TableHead>
                 <TableHead>Ações</TableHead>
               </TableRow>
             </TableHeader>
@@ -191,6 +194,20 @@ export function TransactionsTab({
                         }) ?? "-"}
                       </TableCell>
                       <TableCell>{transaction.observation}</TableCell>
+
+                      <TableCell
+                        className="text-left"
+                        onClick={() => {
+                          setTransacationSelected(transaction);
+                          setModalAttchmentIsOpen(true);
+                        }}
+                      >
+                        <div className="cursor-pointer flex items-center justify-center gap-1 px-2 py-1 bg-gray-100 rounded hover:bg-gray-200 transition w-12 h-12">
+                          <Paperclip className="w-4 h-4 text-gray-700" />
+                          <span>{transaction.attachments.length ?? 0}</span>
+                        </div>
+                      </TableCell>
+
                       <TableCell>
                         <DropdownMenu
                           open={
@@ -237,6 +254,14 @@ export function TransactionsTab({
           </Table>
         </div>
       </section>
+
+      <ModalAttachments
+        isOpen={modalAttchmentIsOpen}
+        setIsOpen={setModalAttchmentIsOpen}
+        attachments={transactionSelected?.attachments}
+        transactionSelected={transactionSelected}
+        setTransactionSelected={setTransacationSelected}
+      />
     </div>
   );
 }

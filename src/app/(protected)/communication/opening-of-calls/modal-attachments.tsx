@@ -16,6 +16,8 @@ import { downloadAttchment } from "@/api/download-attachment";
 import { useState } from "react";
 import { ModalAddAttachment } from "./modal-add-attachment";
 import { deleteAttachmentOpeningCalls } from "@/api/delete-attachment-opening-calls";
+import { addAttachmentsOpeningCalls } from "@/api/add-attachment";
+import { useUserContext } from "@/providers/use-user-context";
 
 interface Attachment {
   id: number;
@@ -39,8 +41,8 @@ export function ModalAttachments({
   setIsOpen,
   openingRecordSelected,
 }: ModalAnexosProps) {
-  const [modalAddAttachmentIsOpen, setmodalAddAttachmentIsOpen] =
-    useState(false);
+  const { user } = useUserContext();
+  const { condominiumId } = user;
 
   const { mutateAsync: getLinkAttachment } = useMutation({
     mutationFn: async (fullPath: string) => downloadAttchment({ fullPath }),
@@ -95,6 +97,43 @@ export function ModalAttachments({
       alert("Erro ao baixar arquivo");
     }
   }
+
+  async function handleAddAttachments(files: File[]) {
+    const formData = new FormData();
+
+    formData.append("openingRecordId", String(openingRecordSelected.id));
+    formData.append("condominiumId", String(condominiumId));
+
+    if (files.length > 0) {
+      files.forEach((file) => {
+        formData.append("attachment", file);
+      });
+    }
+
+    await addAttachment(formData);
+  }
+
+  const { mutateAsync: addAttachment, status: addAttachmentStatus } =
+    useMutation({
+      mutationFn: async (formData: FormData) =>
+        addAttachmentsOpeningCalls({ formData }),
+      onSuccess: (attachments) => {
+        const newAttachments = attachments;
+        setOpeningRecordSelectted((prev) => {
+          if (prev) {
+            return {
+              ...prev,
+              attachments: [...prev.attachments, ...newAttachments],
+            };
+          }
+          return prev;
+        });
+        queryClient.invalidateQueries({
+          queryKey: ["openingCallsRecords"],
+          exact: false,
+        });
+      },
+    });
 
   return (
     <Dialog
@@ -161,12 +200,8 @@ export function ModalAttachments({
               Fechar
             </Button>
           </DialogClose>
-          <ModalAddAttachment
-            setOpeningRecordSelectted={setOpeningRecordSelectted}
-            open={modalAddAttachmentIsOpen}
-            setIsOpen={setmodalAddAttachmentIsOpen}
-            openingRecordSelected={openingRecordSelected}
-          />
+
+          <ModalAddAttachment onAddAttachments={handleAddAttachments} />
         </DialogFooter>
       </DialogContent>
     </Dialog>

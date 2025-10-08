@@ -11,31 +11,17 @@ import { Button } from "@/components/ui/button";
 import { Upload, FilePlus, X } from "lucide-react";
 import { DialogClose, DialogTrigger } from "@radix-ui/react-dialog";
 import { ChangeEvent, useRef, useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { addAttachmentsOpeningCalls } from "@/api/add-attachment";
-import { OpeningCall } from "@/api/get-opening-calls-records";
-import { useUserContext } from "@/providers/use-user-context";
 
 interface ModalAddAttachmentProps {
-  open: boolean;
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  openingRecordSelected: OpeningCall;
-  setOpeningRecordSelectted: React.Dispatch<
-    React.SetStateAction<OpeningCall | null>
-  >;
+  onAddAttachments: (files: File[]) => Promise<void>;
 }
 
 export function ModalAddAttachment({
-  open,
-  setIsOpen,
-  openingRecordSelected,
-  setOpeningRecordSelectted,
+  onAddAttachments,
 }: ModalAddAttachmentProps) {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const buttonCloseRef = useRef<HTMLButtonElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const { user } = useUserContext();
-  const condominiumId = user.condominiumId;
-  const queryClient = useQueryClient();
 
   function handleFileChange(e: ChangeEvent<HTMLInputElement>) {
     if (e.target.files) {
@@ -44,60 +30,21 @@ export function ModalAddAttachment({
     }
   }
 
-  async function handleConfirm() {
-    await handleAddAttachments();
-    setSelectedFiles([]);
-    setIsOpen(false);
-  }
-
-  async function handleAddAttachments() {
-    const formData = new FormData();
-
-    formData.append("openingRecordId", String(openingRecordSelected.id));
-    formData.append("condominiumId", String(condominiumId));
-
-    if (selectedFiles.length > 0) {
-      selectedFiles.forEach((file) => {
-        formData.append("attachment", file);
-      });
-    }
-
-    await addAttachment(formData);
-  }
-
   function handleRemoveFile(index: number) {
     const updatedFiles = [...selectedFiles];
     updatedFiles.splice(index, 1);
     setSelectedFiles(updatedFiles);
   }
 
-  const { mutateAsync: addAttachment, status: addAttachmentStatus } =
-    useMutation({
-      mutationFn: async (formData: FormData) =>
-        addAttachmentsOpeningCalls({ formData }),
-      onSuccess: (attachments) => {
-        const newAttachments = attachments;
-        setOpeningRecordSelectted((prev) => {
-          if (prev) {
-            return {
-              ...prev,
-              attachments: [...prev.attachments, ...newAttachments],
-            };
-          }
-          return prev;
-        });
-        queryClient.invalidateQueries({
-          queryKey: ["openingCallsRecords"],
-          exact: false,
-        });
-      },
-    });
+  async function handleConfirm(selectedFiles: File[]) {
+    await onAddAttachments(selectedFiles);
+    setSelectedFiles([]);
+    buttonCloseRef.current?.click();
+  }
 
   return (
     <Dialog
-      open={open}
       onOpenChange={(open) => {
-        setIsOpen(open);
         if (!open) {
           setSelectedFiles([]);
         }
@@ -156,13 +103,15 @@ export function ModalAddAttachment({
 
         <DialogFooter className="pt-4 flex justify-between">
           <DialogClose asChild>
-            <Button variant="secondary">Cancelar</Button>
+            <Button ref={buttonCloseRef} variant="secondary">
+              Cancelar
+            </Button>
           </DialogClose>
           <Button
-            onClick={handleConfirm}
-            disabled={
-              selectedFiles.length === 0 || addAttachmentStatus === "pending"
-            }
+            onClick={() => {
+              handleConfirm(selectedFiles);
+            }}
+            disabled={selectedFiles.length === 0}
             className="flex items-center gap-2"
           >
             <Upload className="w-4 h-4" />

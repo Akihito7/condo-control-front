@@ -34,9 +34,26 @@ export type FinancialRecord = {
   incomeExpenseTypeId: number;
   paymentMethodId: number;
   paymentStatusId: number;
-  status : number;  
+  status: number;
   recordTypeId: number;
+  attachments: Attachment[]
 };
+
+export interface Attachment {
+  id: number;
+  bucketName: string;
+  condominiumId: number;
+  createdAt: string;
+  updatedAt: string;
+  date: string;
+  originalName: string;
+  path: string;
+  relatedId: number;
+  relatedType: string;
+  screenOrigin: string;
+  supabaseId: string;
+}
+
 
 export async function fetchFinancialRecords(
   { condominiumId, selectedDate, incomeExpenseOptionsSelectedId }: FetchFinancialRecordsProps)
