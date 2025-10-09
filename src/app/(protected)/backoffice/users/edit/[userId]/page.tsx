@@ -18,13 +18,19 @@ import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChevronLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
+import React, { useEffect } from "react";
+import { fetchUserById } from "@/api/backoffice/fetch-user-by-id";
 
 export const SchemaCreateUserForm = z.object({
   name: z.string().min(1, "O nome é obrigatório"),
   documentNumber: z.string().min(1, "O número do documento é obrigatório"),
   phone: z.string().min(1, "O telefone é obrigatório"),
   email: z.string().email("E-mail inválido"),
-  password: z.string().min(6, "A senha deve ter pelo menos 6 caracteres"),
+  password: z
+    .string()
+    .min(6, "A senha deve ter pelo menos 6 caracteres")
+    .optional(),
   isSuper: z.boolean().optional(),
 
   apartment: z.string().optional(),
@@ -33,8 +39,11 @@ export const SchemaCreateUserForm = z.object({
 });
 
 export type CreateUserFormValues = z.infer<typeof SchemaCreateUserForm>;
-export default function EditUser() {
+export default function EditUser({ params }: any) {
   const router = useRouter();
+
+  const { userId } = React.use(params) as { userId: string };
+
   const {
     control,
     watch,
@@ -43,7 +52,48 @@ export default function EditUser() {
     formState: { errors },
   } = useForm<CreateUserFormValues>({
     resolver: zodResolver(SchemaCreateUserForm),
+    defaultValues: {
+      apartment: "",
+      condominium: "",
+      documentNumber: "",
+      email: "",
+      isSuper: false,
+      name: "",
+      password: undefined,
+      phone: "",
+      role: "",
+    },
   });
+
+  const { data: user, status: statusUser } = useQuery({
+    queryKey: ["user"],
+    queryFn: () => fetchUserById(userId),
+  });
+
+  useEffect(() => {
+    if (statusUser === "success") {
+      const setUserForm = () => {
+        const apartamentId = user.userAssociationApartmentId
+          ? String(user.userAssociationApartmentId)
+          : "";
+
+        const condominiumId = user.userAssociationCondominiumId
+          ? String(user.userAssociationCondominiumId)
+          : "";
+        reset({
+          name: user.name ?? "",
+          email: user.email ?? "",
+          apartment: apartamentId,
+          condominium: condominiumId,
+          isSuper: !!user.isSuper,
+          documentNumber: user.cpf ?? "",
+          phone: user.phone ?? "",
+          role: user.userAssociationRole ?? "",
+        });
+      };
+      setUserForm();
+    }
+  }, [statusUser]);
 
   async function handleCreateUser(data: CreateUserFormValues) {
     console.log("USUARIO EDITADO ", data);
@@ -171,6 +221,12 @@ export default function EditUser() {
                       type="password"
                       placeholder="Digite a senha"
                       {...field}
+                      onChange={(event) => {
+                        const value = event.target.value;
+                        if (value.length === 0)
+                          return field.onChange(undefined);
+                        field.onChange(value);
+                      }}
                     />
                     {errors.password && (
                       <p className="text-red-500 text-sm">

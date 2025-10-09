@@ -8,8 +8,14 @@ import { TabCondominiums } from "./tabs/tab-condominiums";
 import { TabTenants } from "./tabs/tab-tenants";
 import { TabPlans } from "./tabs/tab-plans";
 import { TabPages } from "./tabs/tab-pages";
+import { useManagementSystem } from "./use-management-system";
 
 export default function ManagementSystem() {
+  const { users, statusUsers, condominiums, statusCondominiums } =
+    useManagementSystem();
+
+  console.log("users =>", condominiums);
+
   return (
     <>
       <div className="space-y-2">
@@ -59,11 +65,11 @@ export default function ManagementSystem() {
 
         <div className="mt-6">
           <TabsContent value="users">
-            <TabUsers />
+            <TabUsers users={users} statusUsers={statusUsers} />
           </TabsContent>
 
           <TabsContent value="condominium">
-            <TabCondominiums />
+            <TabCondominiums condominiums={condominiums} />
           </TabsContent>
 
           <TabsContent value="tenants">
