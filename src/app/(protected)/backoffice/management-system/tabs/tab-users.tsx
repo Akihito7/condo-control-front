@@ -10,9 +10,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Edit, Trash } from "lucide-react";
-import { useManagementSystemContext } from "../../../contexts/management-system-context";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteUser } from "@/api/backoffice/delete-user";
+import { useManagementSystemContext } from "../../contexts/management-system-context";
 
 export function TabUsers() {
   const queryClient = useQueryClient();

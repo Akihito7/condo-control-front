@@ -3,11 +3,11 @@
 import { Breadcrumb } from "@/components/breadcrumb";
 import { ButtonOpenSidebar } from "@/components/button-open-sidebar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { TabUsers } from "./tabs/users/tab-users";
 import { TabCondominiums } from "./tabs/tab-condominiums";
 import { TabTenants } from "./tabs/tab-tenants";
 import { TabPlans } from "./tabs/tab-plans";
 import { TabPages } from "./tabs/tab-pages";
+import { TabUsers } from "./tabs/tab-users";
 
 export default function ManagementSystem() {
   return (
