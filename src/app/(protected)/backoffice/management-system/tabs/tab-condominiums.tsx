@@ -10,11 +10,10 @@ import {
 } from "@/components/ui/table";
 import { Edit, Trash } from "lucide-react";
 import Link from "next/link";
+import { useManagementSystemContext } from "../../contexts/management-system-context";
 
-interface TabCondominiumsProps {
-  condominiums: Condominium[] | undefined;
-}
-export function TabCondominiums({ condominiums }: TabCondominiumsProps) {
+export function TabCondominiums() {
+  const { condominiums, statusCondominiums } = useManagementSystemContext();
   return (
     <>
       <div className="flex justify-between items-center mb-6">

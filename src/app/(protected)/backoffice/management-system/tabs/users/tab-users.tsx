@@ -10,12 +10,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Edit, Trash } from "lucide-react";
+import { useManagementSystemContext } from "../../../contexts/management-system-context";
 
-interface TabUsersProps {
-  users: User[] | undefined;
-  statusUsers: "error" | "success" | "pending";
-}
-export function TabUsers({ users, statusUsers }: TabUsersProps) {
+export function TabUsers() {
+  const { users, statusUsers } = useManagementSystemContext();
   return (
     <>
       <div className="flex justify-between items-center mb-6">

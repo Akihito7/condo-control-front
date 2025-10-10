@@ -18,6 +18,8 @@ import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChevronLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useManagementSystemContext } from "../../contexts/management-system-context";
+import { useEffect } from "react";
 
 export const SchemaCreateUserForm = z.object({
   name: z.string().min(1, "O nome é obrigatório"),
@@ -35,19 +37,28 @@ export const SchemaCreateUserForm = z.object({
 export type CreateUserFormValues = z.infer<typeof SchemaCreateUserForm>;
 
 export default function UsersCreate() {
+  const { apartaments, apartamentsStatus, condominiums } =
+    useManagementSystemContext();
   const router = useRouter();
   const {
     control,
     watch,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<CreateUserFormValues>({
     resolver: zodResolver(SchemaCreateUserForm),
   });
 
+  const condominiumSelectedId = watch("condominium");
+
   async function handleCreateUser(data: CreateUserFormValues) {
     console.log("USUARIO CRIADO", data);
   }
+
+  useEffect(() => {
+    setValue("apartment", undefined)
+  }, [condominiumSelectedId]);
 
   return (
     <div className="p-6">
@@ -211,31 +222,6 @@ export default function UsersCreate() {
           <div className="flex gap-6 flex-wrap">
             <div className="space-y-2">
               <Controller
-                name="apartment"
-                control={control}
-                render={({ field }) => (
-                  <>
-                    <Label>Apartamento</Label>
-                    <Select
-                      {...field}
-                      onValueChange={field.onChange}
-                      value={field.value}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione um apartamento" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="101">Apartamento 101</SelectItem>
-                        <SelectItem value="102">Apartamento 102</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </>
-                )}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Controller
                 name="condominium"
                 control={control}
                 render={({ field }) => (
@@ -246,14 +232,55 @@ export default function UsersCreate() {
                       onValueChange={field.onChange}
                       value={field.value}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className="w-[250px]">
                         <SelectValue placeholder="Selecione um condomínio" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="residencial">
-                          Residencial Central
-                        </SelectItem>
-                        <SelectItem value="premium">Premium Towers</SelectItem>
+                        {condominiums?.map((condominium, index) => (
+                          <SelectItem
+                            key={index}
+                            value={String(condominium.id)}
+                          >
+                            {condominium.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </>
+                )}
+              />
+            </div>
+            <div className="space-y-2">
+              <Controller
+                name="apartment"
+                control={control}
+                render={({ field }) => (
+                  <>
+                    <Label>Apartamento</Label>
+                    <Select
+                      {...field}
+                      onValueChange={field.onChange}
+                      value={field.value}
+                      disabled={!condominiumSelectedId}
+                    >
+                      <SelectTrigger className="w-[250px]">
+                        <SelectValue placeholder="Selecione um apartamento" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {apartaments
+                          ?.filter(
+                            (apartament) =>
+                              apartament.condominiumId ===
+                              Number(condominiumSelectedId)
+                          )
+                          .map((apartament, index) => (
+                            <SelectItem
+                              key={index}
+                              value={String(apartament.id)}
+                            >
+                              {apartament.apartmentNumber}
+                            </SelectItem>
+                          ))}
                       </SelectContent>
                     </Select>
                   </>
@@ -273,13 +300,13 @@ export default function UsersCreate() {
                       onValueChange={field.onChange}
                       value={field.value}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className="w-[250px]">
                         <SelectValue placeholder="Selecione uma função" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="admin">Administrador</SelectItem>
-                        <SelectItem value="sindico">Síndico</SelectItem>
-                        <SelectItem value="porteiro">Porteiro</SelectItem>
+                        <SelectItem value="employee">Funcionario</SelectItem>
+                        <SelectItem value="resident">Morador</SelectItem>
                       </SelectContent>
                     </Select>
                   </>
