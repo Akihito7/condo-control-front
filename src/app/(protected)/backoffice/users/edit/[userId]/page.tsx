@@ -20,14 +20,14 @@ export default function EditUser({ params }: any) {
   });
 
   return (
-    <div className="p-6">
+    <>
       <div className="space-y-4 mb-10">
         <div className="flex items-center gap-3">
           <ButtonOpenSidebar />
           <Breadcrumb paths={["home", "backoffice", "create user"]} />
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center mb-8 gap-2">
           <div className="bg-gray-100 rounded-md p-2 cursor-pointer">
             <ChevronLeft
               className="text-gray-600"
@@ -41,6 +41,6 @@ export default function EditUser({ params }: any) {
         </div>
         <FormEdit key={user?.id} user={user} />
       </div>
-    </div>
+    </>
   );
 }

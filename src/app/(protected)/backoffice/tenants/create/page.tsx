@@ -74,7 +74,7 @@ export default function CreateTenants() {
   }
 
   return (
-    <div className="p-6">
+    <>
       {/* Header */}
       <div className="space-y-4 mb-10">
         <div className="flex items-center gap-3">
@@ -258,6 +258,6 @@ export default function CreateTenants() {
           </Button>
         </div>
       </form>
-    </div>
+    </>
   );
 }

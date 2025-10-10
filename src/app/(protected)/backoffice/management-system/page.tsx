@@ -8,8 +8,19 @@ import { TabTenants } from "./tabs/tab-tenants";
 import { TabPlans } from "./tabs/tab-plans";
 import { TabPages } from "./tabs/tab-pages";
 import { TabUsers } from "./tabs/tab-users";
+import { useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export default function ManagementSystem() {
+  const searchParams = useSearchParams();
+  const currentTab = searchParams.get("tab") ?? "users";
+  const router = useRouter();
+
+  function handleTabChange(value: string) {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("tab", value);
+    router.push(`?${params.toString()}`);
+  }
   return (
     <>
       <div className="space-y-2">
@@ -20,7 +31,7 @@ export default function ManagementSystem() {
         <h1 className="text-2xl font-semibold text-gray-800">Administrar</h1>
       </div>
 
-      <Tabs defaultValue="users">
+      <Tabs defaultValue={currentTab} onValueChange={handleTabChange}>
         <TabsList className="bg-gray-50 p-1.5 rounded-lg border border-gray-200">
           <TabsTrigger
             value="users"

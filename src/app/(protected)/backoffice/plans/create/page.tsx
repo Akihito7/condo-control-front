@@ -12,9 +12,8 @@ import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChevronLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 
-// === Schema ===
 export const SchemaCreatePlanForm = z.object({
   name: z.string().min(1, "O nome do plano é obrigatório"),
   description: z.string().optional(),
@@ -56,10 +55,10 @@ export default function CreatePlans() {
   }
 
   return (
-    <div className="p-6">
+    <>
       {/* Header */}
-      <div className="space-y-4 mb-10">
-        <div className="flex items-center gap-3">
+      <div className="space-y-4">
+        <div className="flex items-center mb-8 gap-2">
           <ButtonOpenSidebar />
           <Breadcrumb paths={["home", "backoffice", "create plan"]} />
         </div>
@@ -183,6 +182,6 @@ export default function CreatePlans() {
           </Button>
         </div>
       </form>
-    </div>
+    </>
   );
 }

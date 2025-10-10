@@ -78,9 +78,9 @@ export default function UsersCreate() {
   }, [condominiumSelectedId]);
 
   return (
-    <div className="p-6">
+    <>
       <div className="space-y-4 mb-10">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center mb-8 gap-2">
           <ButtonOpenSidebar />
           <Breadcrumb paths={["home", "backoffice", "create user"]} />
         </div>
@@ -339,6 +339,6 @@ export default function UsersCreate() {
           </Button>
         </div>
       </form>
-    </div>
+    </>
   );
 }
