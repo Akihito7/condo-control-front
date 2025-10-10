@@ -44,8 +44,6 @@ export function ManagementSystemContextProvider({
     queryFn: fetchApartaments,
   });
 
-  console.log(apartaments);
-
   return (
     <ManagementSystemContext.Provider
       value={{

@@ -11,9 +11,49 @@ import {
 } from "@/components/ui/table";
 import { Edit, Trash } from "lucide-react";
 import { useManagementSystemContext } from "../../../contexts/management-system-context";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { deleteUser } from "@/api/backoffice/delete-user";
 
 export function TabUsers() {
-  const { users, statusUsers } = useManagementSystemContext();
+  const queryClient = useQueryClient();
+  const { users, statusUsers, apartaments, condominiums } =
+    useManagementSystemContext();
+
+  function getApartament(apartamentId: number) {
+    const currentApartament = apartaments?.find(
+      (apartament) => apartament.id === apartamentId
+    );
+
+    return currentApartament;
+  }
+
+  function getCondominium(condominiumId: number) {
+    const currentCondominium = condominiums?.find(
+      (condominium) => condominium.id === condominiumId
+    );
+
+    return currentCondominium;
+  }
+
+  function getRole(role: string) {
+    const rolesMapper = {
+      resident: "Morador",
+      admin: "Administrador",
+      employee: "Funcionário",
+    };
+
+    return rolesMapper[role as keyof typeof rolesMapper];
+  }
+
+  const { mutateAsync: handleDeleteUser } = useMutation({
+    mutationFn: (userId: number) => deleteUser(userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        exact: false,
+        queryKey: ["users"],
+      });
+    },
+  });
   return (
     <>
       <div className="flex justify-between items-center mb-6">
@@ -54,19 +94,35 @@ export function TabUsers() {
                     <TableCell>{user.cpf ?? "-"}</TableCell>
                     <TableCell>{user.phone ?? "-"}</TableCell>
                     <TableCell>
-                      {user?.userAssociationApartmentId ?? "-"}
+                      {user?.userAssociationApartmentId
+                        ? getApartament(user.userAssociationApartmentId)
+                            ?.apartmentNumber
+                        : "-"}
                     </TableCell>
                     <TableCell>
-                      {user?.userAssociationCondominiumId ?? "-"}
+                      {user?.userAssociationCondominiumId
+                        ? getCondominium(user.userAssociationCondominiumId)
+                            ?.name
+                        : "-"}
                     </TableCell>
-                    <TableCell>{user?.userAssociationRole ?? "-"}</TableCell>
+                    <TableCell>
+                      {user?.userAssociationRole
+                        ? getRole(user?.userAssociationRole)
+                        : "-"}
+                    </TableCell>
                     <TableCell>
                       <Link href={`users/edit/${user.id}`}>
                         <Edit size={16} className="text-gray-700" />
                       </Link>
                     </TableCell>
                     <TableCell>
-                      <Trash size={16} className="text-red-400" />
+                      <Trash
+                        onClick={async () => {
+                          await handleDeleteUser(user.id);
+                        }}
+                        size={16}
+                        className="text-red-400"
+                      />
                     </TableCell>
                   </TableRow>
                 );

@@ -20,6 +20,8 @@ import { ChevronLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useManagementSystemContext } from "../../contexts/management-system-context";
 import { useEffect } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { createUser } from "@/api/backoffice/create-user";
 
 export const SchemaCreateUserForm = z.object({
   name: z.string().min(1, "O nome é obrigatório"),
@@ -39,7 +41,9 @@ export type CreateUserFormValues = z.infer<typeof SchemaCreateUserForm>;
 export default function UsersCreate() {
   const { apartaments, apartamentsStatus, condominiums } =
     useManagementSystemContext();
+
   const router = useRouter();
+
   const {
     control,
     watch,
@@ -50,14 +54,27 @@ export default function UsersCreate() {
     resolver: zodResolver(SchemaCreateUserForm),
   });
 
-  const condominiumSelectedId = watch("condominium");
+  const queryClient = useQueryClient();
+
+  const { mutateAsync: mutateCreateUser } = useMutation({
+    mutationFn: (data: CreateUserFormValues) => createUser(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        exact: false,
+        queryKey: ["users"],
+      });
+      router.back();
+    },
+  });
 
   async function handleCreateUser(data: CreateUserFormValues) {
-    console.log("USUARIO CRIADO", data);
+    await mutateCreateUser(data);
   }
 
+  const condominiumSelectedId = watch("condominium");
+
   useEffect(() => {
-    setValue("apartment", undefined)
+    setValue("apartment", undefined);
   }, [condominiumSelectedId]);
 
   return (

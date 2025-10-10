@@ -17,8 +17,12 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import React, { useEffect } from "react";
 import { useManagementSystemContext } from "../../../contexts/management-system-context";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { updateUser } from "@/api/backoffice/update-user";
+import { useRouter } from "next/navigation";
 
 export const SchemaCreateUserForm = z.object({
+  id: z.number(),
   name: z.string().min(1, "O nome é obrigatório"),
   documentNumber: z.string().min(1, "O número do documento é obrigatório"),
   phone: z.string().min(1, "O telefone é obrigatório"),
@@ -34,10 +38,11 @@ export const SchemaCreateUserForm = z.object({
   role: z.string().optional(),
 });
 
-export type CreateUserFormValues = z.infer<typeof SchemaCreateUserForm>;
+export type UpdateUserFormValues = z.infer<typeof SchemaCreateUserForm>;
 
-export function FormEdit({ user }: { user: User }) {
+export function FormEdit({ user }: { user: User | undefined }) {
   const { apartaments, condominiums } = useManagementSystemContext();
+  const router = useRouter();
   const {
     control,
     setValue,
@@ -45,25 +50,37 @@ export function FormEdit({ user }: { user: User }) {
     reset,
     formState: { errors },
     watch,
-  } = useForm<CreateUserFormValues>({
+  } = useForm<UpdateUserFormValues>({
     resolver: zodResolver(SchemaCreateUserForm),
     defaultValues: {
-      name: user.name,
-      documentNumber: user.cpf,
-      phone: user.phone,
-      email: user.email,
+      id: user?.id,
+      name: user?.name,
+      documentNumber: user?.cpf,
+      phone: user?.phone,
+      email: user?.email,
       password: undefined,
-      isSuper: !!user.isSuper,
+      isSuper: !!user?.isSuper,
       apartment: String(user?.userAssociationApartmentId ?? ""),
       condominium: String(user?.userAssociationCondominiumId ?? ""),
-      role: user.userAssociationRole,
+      role: user?.userAssociationRole,
     },
   });
 
+  const queryClient = useQueryClient();
   const condominiumSelectedId = watch("condominium");
 
-  async function handleCreateUser(data: CreateUserFormValues) {
-    console.log("USUARIO CRIADO", data);
+  const { mutateAsync: mutateUpdateUser } = useMutation({
+    mutationFn: (data: UpdateUserFormValues) => updateUser(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        exact: false,
+        queryKey: ["users"],
+      });
+      router.back();
+    },
+  });
+  async function handleCreateUser(data: UpdateUserFormValues) {
+    await mutateUpdateUser(data);
   }
 
   useEffect(() => {

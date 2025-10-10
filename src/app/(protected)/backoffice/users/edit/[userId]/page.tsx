@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import React from "react";
 import { fetchUserById } from "@/api/backoffice/fetch-user-by-id";
-import { useManagementSystemContext } from "../../../contexts/management-system-context";
 import { FormEdit } from "./form-edit";
 
 export default function EditUser({ params }: any) {
@@ -40,7 +39,7 @@ export default function EditUser({ params }: any) {
             Editar Usuário
           </h1>
         </div>
-        {user && <FormEdit user={user} />}
+        <FormEdit key={user?.id} user={user} />
       </div>
     </div>
   );
