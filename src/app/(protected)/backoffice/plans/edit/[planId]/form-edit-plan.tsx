@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useManagementSystemContext } from "../../../contexts/management-system-context";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import z from "zod";
@@ -12,6 +12,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Plan } from "@/api/backoffice/fetch-plan-by-id";
 import { Page } from "@/api/backoffice/fetch-pages";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { updatePlan } from "@/api/backoffice/update-plan";
+import { useRouter } from "next/navigation";
 
 interface FormEditPlanProps {
   plan: Plan;
@@ -34,7 +37,7 @@ const SchemeUpdatePlan = z.object({
   ),
 });
 
-type FormUpdatePlanValues = z.infer<typeof SchemeUpdatePlan>;
+export type FormUpdatePlanValues = z.infer<typeof SchemeUpdatePlan>;
 
 export function FormEditPlan({ plan, pages }: FormEditPlanProps) {
   const [pagesSelectedToDetach, setPagesSelectedToDetach] = useState<number[]>(
@@ -50,14 +53,16 @@ export function FormEditPlan({ plan, pages }: FormEditPlanProps) {
 
   const {
     control,
+    setValue,
     reset,
+    handleSubmit,
     formState: { errors },
   } = useForm<FormUpdatePlanValues>({
     resolver: zodResolver(SchemeUpdatePlan),
     defaultValues: {
       name: plan.name,
       description: plan.description ?? "",
-      is_custom: plan.isCustom,
+      is_custom: !!plan.isCustom,
       price: plan.price,
       pages: plan.planPage?.map((page) => ({
         pageId: page.pageId,
@@ -71,6 +76,24 @@ export function FormEditPlan({ plan, pages }: FormEditPlanProps) {
     name: "pages",
   });
 
+  const router = useRouter();
+  const queryClient = useQueryClient();
+
+  const { mutateAsync: mutateUpdatePlan } = useMutation({
+    mutationFn: (data: FormUpdatePlanValues) => updatePlan(plan.id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        exact: false,
+        queryKey: ["plans"],
+      });
+      router.back();
+    },
+  });
+
+  async function handleUpdatePlan(data: FormUpdatePlanValues) {
+    await mutateUpdatePlan(data);
+  }
+
   function pageIncludesToDetach(pageId: number) {
     return pagesSelectedToDetach.includes(pageId);
   }
@@ -83,6 +106,10 @@ export function FormEditPlan({ plan, pages }: FormEditPlanProps) {
     pages?.filter(
       (page) => !fields.map((field) => field.pageId).includes(page.id)
     ) || [];
+
+  useEffect(() => {
+    console.log(errors);
+  }, [errors]);
 
   return (
     <>
@@ -241,9 +268,7 @@ export function FormEditPlan({ plan, pages }: FormEditPlanProps) {
                 };
               });
 
-              reset({
-                pages: [...fields, ...newPages],
-              });
+              setValue("pages", [...fields, ...newPages]);
 
               setPagesSelectedToAttach([]);
             }}
@@ -264,7 +289,7 @@ export function FormEditPlan({ plan, pages }: FormEditPlanProps) {
                 pageName: getPageDetails(page.pageId)?.name ?? "",
               }));
 
-              reset({ pages: mappedPages });
+              setValue("pages", mappedPages);
               setPagesSelectedToDetach([]);
             }}
             className="flex items-center gap-2 bg-gray-200 text-sm px-4 py-2 rounded hover:bg-gray-300"
@@ -318,7 +343,10 @@ export function FormEditPlan({ plan, pages }: FormEditPlanProps) {
       </div>
 
       <div className="pt-4">
-        <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-5 text-base rounded-lg">
+        <Button
+          onClick={handleSubmit(handleUpdatePlan)}
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-5 text-base rounded-lg"
+        >
           Salvar
         </Button>
       </div>

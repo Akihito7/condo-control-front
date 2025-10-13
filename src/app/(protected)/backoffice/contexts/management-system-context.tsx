@@ -6,6 +6,7 @@ import {
   Condominium,
   fetchCondominiums,
 } from "@/api/backoffice/fetch-condominiums";
+import { fetchModules, Module } from "@/api/backoffice/fetch-modules";
 import { fetchPages, Page } from "@/api/backoffice/fetch-pages";
 import { fetchPlans, Plan } from "@/api/backoffice/fetch-plans";
 import { fetchTenants, Tenant } from "@/api/backoffice/fetch-tenants";
@@ -28,6 +29,8 @@ interface ManagementSystemContextProps {
   statusTenants: Status;
   pages: Page[] | undefined;
   statusPages: Status;
+  modules: Module[] | undefined;
+  statusModules: Status;
 }
 const ManagementSystemContext = createContext<ManagementSystemContextProps>(
   {} as ManagementSystemContextProps
@@ -68,6 +71,11 @@ export function ManagementSystemContextProvider({
     queryFn: fetchPages,
   });
 
+  const { data: modules, status: statusModules } = useQuery({
+    queryKey: ["modules"],
+    queryFn: fetchModules,
+  });
+
   return (
     <ManagementSystemContext.Provider
       value={{
@@ -83,6 +91,8 @@ export function ManagementSystemContextProvider({
         statusTenants,
         pages,
         statusPages,
+        modules,
+        statusModules,
       }}
     >
       {children}

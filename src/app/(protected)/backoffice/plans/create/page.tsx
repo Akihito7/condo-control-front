@@ -12,7 +12,8 @@ import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChevronLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { createPlan } from "@/api/backoffice/create-plan";
 
 export const SchemaCreatePlanForm = z.object({
   name: z.string().min(1, "O nome do plano é obrigatório"),
@@ -21,7 +22,7 @@ export const SchemaCreatePlanForm = z.object({
     .number()
     .min(0, "O preço deve ser maior ou igual a zero")
     .optional(),
-  is_custom: z.boolean().optional(),
+  isCustom: z.boolean().optional(),
 });
 
 export type CreatePlanFormValues = z.infer<typeof SchemaCreatePlanForm>;
@@ -38,7 +39,7 @@ export default function CreatePlans() {
     resolver: zodResolver(SchemaCreatePlanForm),
   });
 
-  /* const { mutateAsync: mutateCreatePlan } = useMutation({
+  const { mutateAsync: mutateCreatePlan } = useMutation({
     mutationFn: (data: CreatePlanFormValues) => createPlan(data),
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -47,11 +48,11 @@ export default function CreatePlans() {
       });
       router.back();
     },
-  }); */
+  });
 
   async function handleCreatePlan(data: CreatePlanFormValues) {
     console.log("CREATE PLAN", data);
-    // await mutateCreatePlan(data);
+    await mutateCreatePlan(data);
   }
 
   return (
@@ -133,17 +134,17 @@ export default function CreatePlans() {
             {/* Is Custom */}
             <div className="flex items-center gap-3 mt-6">
               <Controller
-                name="is_custom"
+                name="isCustom"
                 control={control}
                 render={({ field }) => (
                   <>
                     <Checkbox
-                      id="is_custom"
+                      id="isCustom"
                       checked={field.value || false}
                       onCheckedChange={field.onChange}
                     />
                     <label
-                      htmlFor="is_custom"
+                      htmlFor="isCustom"
                       className="text-sm font-medium text-gray-700"
                     >
                       Personalizado
