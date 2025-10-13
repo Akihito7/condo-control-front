@@ -15,7 +15,7 @@ import { useRouter } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createPlan } from "@/api/backoffice/create-plan";
 
-export const SchemaCreatePlanForm = z.object({
+ const SchemaCreatePlanForm = z.object({
   name: z.string().min(1, "O nome do plano é obrigatório"),
   description: z.string().optional(),
   price: z.coerce
