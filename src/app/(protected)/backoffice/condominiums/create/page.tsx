@@ -18,10 +18,9 @@ import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChevronLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect } from "react";
+import {useQueryClient } from "@tanstack/react-query";
 
-export const SchemaCreateCondominiumForm = z.object({
+ const SchemaCreateCondominiumForm = z.object({
   tenantId: z.string().min(1, "O locatário é obrigatório"),
   managerId: z.string().min(1, "O síndico é obrigatório"),
   name: z.string().min(1, "O nome é obrigatório"),
