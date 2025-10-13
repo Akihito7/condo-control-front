@@ -22,8 +22,7 @@ import { useManagementSystemContext } from "../../contexts/management-system-con
 import { useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createUser } from "@/api/backoffice/create-user";
-
-export const SchemaCreateUserForm = z.object({
+const SchemaCreateUserForm = z.object({
   name: z.string().min(1, "O nome é obrigatório"),
   documentNumber: z.string().min(1, "O número do documento é obrigatório"),
   phone: z.string().min(1, "O telefone é obrigatório"),

@@ -22,7 +22,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 
 // === Schema ===
-export const SchemaCreateTenantForm = z.object({
+const SchemaCreateTenantForm = z.object({
   name: z.string().min(1, "O nome é obrigatório"),
   plan_id: z.string().min(1, "O plano é obrigatório"),
   owner_id: z.string().min(1, "O proprietário é obrigatório"),
