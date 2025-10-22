@@ -31,6 +31,7 @@ import { PaymentStatus } from "@/api/fetch-payment-status.options";
 import { FetchCardsTransactionEntryResponse } from "@/api/fetch-cards-transaction-entry";
 import { Cards } from "../cards";
 import { ModalAttachments } from "../modal-attachments";
+import { format } from "date-fns";
 
 interface TransactionsTabProps {
   cardsTransaction: FetchCardsTransactionEntryResponse | undefined;
@@ -154,7 +155,7 @@ export function TransactionsTab({
                   {transactions?.map((transaction: any) => (
                     <TableRow key={transaction.id}>
                       <TableCell className="font-medium">
-                        {transaction.dueDate}
+                        {format(transaction.dueDate, "yyyy/MM/dd")}
                       </TableCell>
                       <TableCell className="capitalize text-sm">
                         {transaction.incomeExpenseTypeId === 4
@@ -179,19 +180,22 @@ export function TransactionsTab({
                         {transaction.paymentStatusName ?? "-"}
                       </TableCell>
                       <TableCell className="text-center font-semibold text-sm">
-                        {transaction.amount.toLocaleString("pt-BR", {
+                        {Number(transaction.amount).toLocaleString("pt-BR", {
                           currency: "BRL",
                           style: "currency",
                         })}
                       </TableCell>
                       <TableCell className="text-center">
-                        {transaction.paymentDate ?? "-"}
+                        {format(transaction.paymentDate, "yyyy/MM/dd") ?? "-"}
                       </TableCell>
                       <TableCell className="text-center">
-                        {transaction.amountPaid?.toLocaleString("pt-BR", {
-                          currency: "BRL",
-                          style: "currency",
-                        }) ?? "-"}
+                        {Number(transaction.amountPaid)?.toLocaleString(
+                          "pt-BR",
+                          {
+                            currency: "BRL",
+                            style: "currency",
+                          }
+                        ) ?? "-"}
                       </TableCell>
                       <TableCell>{transaction.observation}</TableCell>
 
