@@ -272,6 +272,7 @@ export default function OrderingManagement() {
                             {!delivery.pickedUpAt && (
                               <DropdownMenuItem
                                 onClick={() => {
+                                  setDropdownOpen(false);
                                   setDeliverySelected(delivery);
                                   setModalAsDeliverd(true);
                                 }}
