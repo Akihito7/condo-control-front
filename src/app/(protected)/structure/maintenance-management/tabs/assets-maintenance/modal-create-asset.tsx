@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 export function ModalCreateAsset() {
   return (
     <Dialog>
-      <DialogTrigger>
+      <DialogTrigger asChild>
         <Button variant="outline">Adicionar Ativo</Button>
       </DialogTrigger>
 
