@@ -5,6 +5,9 @@ import { ButtonOpenSidebar } from "@/components/button-open-sidebar";
 import { AssetsMaintenance } from "./tabs/assets-maintenance";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState } from "react";
+import { Maintenances } from "./tabs/maintenances";
+import { Indicators } from "./tabs/indicators";
+import { CalendarMaintenance } from "./tabs/calendar-maintenance";
 
 export default function MaintenanceManagement() {
   const [tabSelected, setTabSelected] = useState("assetMaintenance");
@@ -21,12 +24,50 @@ export default function MaintenanceManagement() {
       </div>
 
       <Tabs value={tabSelected} onValueChange={(tab) => setTabSelected(tab)}>
-        <TabsList>
-          <TabsTrigger value="assetMaintenance">Ativos</TabsTrigger>
+        <TabsList className="bg-gray-50 p-1.5 rounded-lg border border-gray-200">
+          <TabsTrigger
+            value="assetMaintenance"
+            className="data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-gray-900 px-4 py-2 rounded-md font-medium text-gray-600 transition-all"
+          >
+            Ativos
+          </TabsTrigger>
+
+          <TabsTrigger
+            value="maintenances"
+            className="data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-gray-900 px-4 py-2 rounded-md font-medium text-gray-600 transition-all"
+          >
+            Manutenções
+          </TabsTrigger>
+
+          <TabsTrigger
+            value="calendar-maintenance"
+            className="data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-gray-900 px-4 py-2 rounded-md font-medium text-gray-600 transition-all"
+          >
+            Calendário
+          </TabsTrigger>
+
+          <TabsTrigger
+            value="indicators"
+            className="data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-gray-900 px-4 py-2 rounded-md font-medium text-gray-600 transition-all"
+          >
+            Indicadores
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent className="mt-6" value="assetMaintenance">
           <AssetsMaintenance />
+        </TabsContent>
+
+        <TabsContent className="mt-6" value="maintenances">
+          <Maintenances />
+        </TabsContent>
+
+        <TabsContent className="mt-6" value="calendar-maintenance">
+          <CalendarMaintenance />
+        </TabsContent>
+
+        <TabsContent className="mt-6" value="indicators">
+          <Indicators />
         </TabsContent>
       </Tabs>
     </main>
