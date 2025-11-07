@@ -47,7 +47,6 @@ export default function MaintenanceBacklog() {
     year,
   });
 
-  console.log("chart", chartMonthlyExpensesSummary);
   return (
     <main className="bg-gray-50 overflow-x-hidden min-h-screen w-full p-0 py-8 px-2 sm:p-8 flex flex-col gap-6">
       <div className="space-y-2">
