@@ -26,25 +26,21 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal } from "lucide-react";
 import { ModalCreateAsset } from "./modal-create-asset";
-
-const ATIVOS_MOCKED = [
-  {
-    code: "ELV-001",
-    name: " Elevador Social Bloco A",
-    type: "Elevador",
-    supplier: "Atlas Schindler",
-    contact: "(11) 98765-4321",
-    frequency: "Mensal",
-    installationDate: "15/08/2015",
-    estimatedUsefulLife: "15 Anos",
-    remainingUsefulLife: "5 Anos",
-  },
-];
+import { useAssetsMaintenance } from "./use-assets-maintenance";
 
 export function AssetsMaintenance() {
   const [code, setCode] = useState<string>();
   const [usefulLifeLessThanTwoYears, setUsefulLifeLessThanTwoYears] =
     useState("2");
+
+  const { assetsTypes, assetsTypesStatus, assets, assetsStatus } =
+    useAssetsMaintenance();
+
+  const getType = (typeId: number): string => {
+    const type = assetsTypes?.find((asset) => asset.id === typeId);
+    return type?.name ?? "";
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex space-x-4">
@@ -90,7 +86,7 @@ export function AssetsMaintenance() {
         <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200">
           <h2 className="font-medium text-gray-800 text-lg">Ativos</h2>
 
-          <ModalCreateAsset />
+          <ModalCreateAsset assetsTypes={assetsTypes} />
         </div>
 
         <div className="max-h-[70vh] overflow-y-auto border border-gray-300 rounded">
@@ -110,15 +106,15 @@ export function AssetsMaintenance() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {ATIVOS_MOCKED.map((asset) => (
+              {assets?.map((asset) => (
                 <TableRow key={asset.code}>
                   <TableCell>{asset.code}</TableCell>
                   <TableCell>{asset.name}</TableCell>
-                  <TableCell>{asset.type}</TableCell>
+                  <TableCell>{getType(asset.type)}</TableCell>
                   <TableCell>{asset.supplier}</TableCell>
                   <TableCell>{asset.contact}</TableCell>
                   <TableCell>{asset.installationDate}</TableCell>
-                  <TableCell>{asset.frequency}</TableCell>
+                  <TableCell>{asset.maintenanceFrequency}</TableCell>
                   <TableCell>{asset.estimatedUsefulLife}</TableCell>
                   <TableCell>{asset.remainingUsefulLife}</TableCell>
 

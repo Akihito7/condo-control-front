@@ -16,6 +16,9 @@ import { Label } from "@/components/ui/label";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useRef } from "react";
+import { maintenanceManagementAssetsTypesCreate } from "@/api/maintenance-management-assets-types-create";
 
 const typeSchema = z.object({
   name: z.string().min(1, "Informe o nome do tipo"),
@@ -34,10 +37,25 @@ export function ModalCreateType() {
     defaultValues: { name: "" },
   });
 
-  function onSubmit(data: TypeFormData) {
-    console.log("Novo tipo criado:", data);
-    reset();
+  const buttonCloseRef = useRef<HTMLButtonElement>(null);
+  const query = useQueryClient();
+
+  async function onSubmit(form: TypeFormData) {
+    const { name } = form;
+    await handleCreateAsset(name);
   }
+
+  const { mutateAsync: handleCreateAsset } = useMutation({
+    mutationFn: (name: string) => maintenanceManagementAssetsTypesCreate(name),
+    onSuccess: (data) => {
+      reset({ name: "" });
+      query.invalidateQueries({
+        queryKey: ["assets-types"],
+        exact: false,
+      });
+      buttonCloseRef.current?.click();
+    },
+  });
 
   return (
     <Dialog>
@@ -72,7 +90,7 @@ export function ModalCreateType() {
 
           <DialogFooter className="pt-4">
             <DialogClose asChild>
-              <Button type="button" variant="ghost">
+              <Button type="button" variant="ghost" ref={buttonCloseRef}>
                 Cancelar
               </Button>
             </DialogClose>

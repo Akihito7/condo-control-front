@@ -23,15 +23,20 @@ import {
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Paperclip } from "lucide-react";
 import { DatePicker } from "@/components/date-picker";
 import { ModalCreateType } from "./modal-create-type";
+import { Type } from "@/api/fetch-maintenance-management-assets-types";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { createMaintenanceManagementAssets } from "@/api/create-maintenance-management-assets";
 
 const assetSchema = z.object({
   code: z.string().min(1, "Informe o código"),
   name: z.string().min(1, "Informe o nome"),
+  type: z.string().min(1, "Informe um  tipo valido."),
   frequency: z.string().min(1, "Selecione a frequência"),
+  contact: z.string().min(1, "Contato e obrigatorio"),
   supplier: z.string().min(1, "Informe o fornecedor"),
   lifespan: z
     .number({ invalid_type_error: "Informe um número" })
@@ -46,9 +51,13 @@ const assetSchema = z.object({
     .optional(),
 });
 
-type AssetFormData = z.infer<typeof assetSchema>;
+export type AssetFormData = z.infer<typeof assetSchema>;
 
-export function ModalCreateAsset() {
+interface ModalCreateAssetProps {
+  assetsTypes: Type[] | undefined;
+}
+
+export function ModalCreateAsset({ assetsTypes }: ModalCreateAssetProps) {
   const {
     control,
     register,
@@ -65,16 +74,66 @@ export function ModalCreateAsset() {
       lifespan: 0,
       installationDate: new Date(),
       documents: undefined,
+      contact: "",
     },
   });
-
   const [selectedDocs, setSelectedDocs] = useState<File[]>([]);
 
-  function onSubmit(data: AssetFormData) {
-    console.log("Ativo cadastrado:", data);
-    reset();
-    setSelectedDocs([]);
+  const buttonCloseRef = useRef<HTMLButtonElement>(null);
+
+  async function onSubmit(data: AssetFormData) {
+    const {
+      contact,
+      name,
+      code,
+      frequency,
+      installationDate,
+      lifespan,
+      supplier,
+      type,
+      documents,
+    } = data;
+    const form = new FormData();
+    form.append("name", name);
+    form.append("code", code);
+    form.append("frequency", frequency);
+    form.append("installationDate", installationDate as any);
+    form.append("lifespan", lifespan as any);
+    form.append("supplier", supplier);
+    form.append("type", type);
+    form.append("contact", contact);
+
+    const documentList = documents ? [...documents] : [];
+    if (documentList && documentList.length > 0) {
+      documentList.forEach((document: any) => {
+        form.append("attachment", document);
+      });
+    }
+    await handleCreateMaintenanceManagementAssets(form);
   }
+
+  const query = useQueryClient();
+
+  const { mutateAsync: handleCreateMaintenanceManagementAssets } = useMutation({
+    mutationFn: (form: FormData) => createMaintenanceManagementAssets({ form }),
+    onSuccess: () => {
+      query.invalidateQueries({
+        queryKey: ["assets"],
+        exact: false,
+      });
+      reset({
+        code: "",
+        documents: [],
+        frequency: "",
+        installationDate: new Date(),
+        lifespan: 0,
+        type: "",
+        name: "",
+        supplier: "",
+      });
+      buttonCloseRef.current?.click();
+    },
+  });
 
   return (
     <Dialog>
@@ -123,20 +182,32 @@ export function ModalCreateAsset() {
 
           {/* Type */}
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Tipo</Label>
-            <Select>
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione um tipo" />
-              </SelectTrigger>
+            <Controller
+              name="type"
+              control={control}
+              render={({ field: { value, onChange } }) => (
+                <>
+                  <Label className="text-right">Tipo</Label>
+                  <Select value={value} onValueChange={onChange}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione um tipo" />
+                    </SelectTrigger>
 
-              <SelectContent>
-                <SelectItem value="1">Bomba de água</SelectItem>
-              </SelectContent>
-            </Select>
+                    <SelectContent>
+                      {assetsTypes?.map((type) => (
+                        <SelectItem value={String(type.id)}>
+                          {type.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
 
-            <div className="ml-4">
-              <ModalCreateType />
-            </div>
+                  <div className="ml-4">
+                    <ModalCreateType />
+                  </div>
+                </>
+              )}
+            />
           </div>
 
           {/* Frequency */}
@@ -174,6 +245,21 @@ export function ModalCreateAsset() {
             <Label className="text-right">Fornecedor</Label>
             <Input
               {...register("supplier")}
+              placeholder="Ex: ABC Equipamentos Ltda"
+              className="col-span-3"
+            />
+          </div>
+          {errors.supplier && (
+            <p className="text-red-500 text-sm -mt-2 ml-[100px]">
+              {errors.supplier.message}
+            </p>
+          )}
+
+          {/* Contact */}
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label className="text-right">Contato</Label>
+            <Input
+              {...register("contact")}
               placeholder="Ex: ABC Equipamentos Ltda"
               className="col-span-3"
             />
@@ -267,7 +353,7 @@ export function ModalCreateAsset() {
 
           <DialogFooter className="pt-4">
             <DialogClose asChild>
-              <Button type="button" variant="ghost">
+              <Button type="button" variant="ghost" ref={buttonCloseRef}>
                 Cancelar
               </Button>
             </DialogClose>

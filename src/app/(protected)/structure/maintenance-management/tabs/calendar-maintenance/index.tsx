@@ -90,11 +90,7 @@ export function CalendarMaintenance() {
     "Domingo",
   ];
 
-  const uniqueDayNamesFromEvents = new Set(
-    MOCKED_EVENTS.map((event) => event.dayName)
-  );
-
-  const renderDaysOffset = () => {
+  const renderDaysOut = () => {
     const firstDayOfMonth = MOCKED_EVENTS[0]?.dayName;
     const numberDaysOut = dayHeaders.findIndex(
       (dayName) => dayName === firstDayOfMonth
@@ -110,7 +106,6 @@ export function CalendarMaintenance() {
     ));
   };
 
-  console.log(uniqueDayNamesFromEvents);
 
   return (
     <div>
@@ -124,7 +119,7 @@ export function CalendarMaintenance() {
         </div>
 
         <div className="grid grid-cols-7">
-          {renderDaysOffset()}
+          {renderDaysOut()}
           {MOCKED_EVENTS?.map((day, index) => (
             <div
               key={index}
