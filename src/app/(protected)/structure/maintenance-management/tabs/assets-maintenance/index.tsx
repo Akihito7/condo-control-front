@@ -30,6 +30,7 @@ import { useAssetsMaintenance } from "./use-assets-maintenance";
 
 export function AssetsMaintenance() {
   const [code, setCode] = useState<string>();
+  const [typeSelected, setTypeSelected] = useState("-1");
   const [usefulLifeLessThanTwoYears, setUsefulLifeLessThanTwoYears] =
     useState("2");
 
@@ -55,13 +56,23 @@ export function AssetsMaintenance() {
           />
         </div>
 
-        <div className=" space-y-2">
+        <div className="space-y-2">
           <Label>Tipo de ativo</Label>
-          <Select>
-            <SelectTrigger>
+          <Select
+            value={typeSelected}
+            onValueChange={(value) => setTypeSelected(value)}
+          >
+            <SelectTrigger className="w-[250px]">
               <SelectValue placeholder="Selecione o tipo do ativo" />
             </SelectTrigger>
-            <SelectContent></SelectContent>
+            <SelectContent>
+              <SelectItem value="-1">Todos</SelectItem>
+              {assetsTypes?.map((assetType) => (
+                <SelectItem value={String(assetType.id)}>
+                  {assetType.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
           </Select>
         </div>
 
@@ -106,32 +117,57 @@ export function AssetsMaintenance() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {assets?.map((asset) => (
-                <TableRow key={asset.code}>
-                  <TableCell>{asset.code}</TableCell>
-                  <TableCell>{asset.name}</TableCell>
-                  <TableCell>{getType(asset.type)}</TableCell>
-                  <TableCell>{asset.supplier}</TableCell>
-                  <TableCell>{asset.contact}</TableCell>
-                  <TableCell>{asset.installationDate}</TableCell>
-                  <TableCell>{asset.maintenanceFrequency}</TableCell>
-                  <TableCell>{asset.estimatedUsefulLife}</TableCell>
-                  <TableCell>{asset.remainingUsefulLife}</TableCell>
+              {assets
+                ?.filter((asset) => {
+                  const normalize = (str: string) =>
+                    str.trim().toLowerCase().replace(/-/g, "");
 
-                  <TableCell className="text-center">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger className="outline-none">
-                        <MoreHorizontal className="w-5 h-5 cursor-pointer text-gray-600" />
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        <DropdownMenuItem>Votar</DropdownMenuItem>
-                        <DropdownMenuItem>Editar</DropdownMenuItem>
-                        <DropdownMenuItem>Excluir</DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))}
+                  const matchesType =
+                    typeSelected === "-1" ||
+                    String(asset.type) === typeSelected;
+
+                  const normalizedAssetCode = normalize(asset.code);
+                  const normalizedSearchCode = normalize(code || "");
+
+                  const matchesCode =
+                    !code ||
+                    normalizedAssetCode.includes(normalizedSearchCode) ||
+                    asset.code.toLowerCase().includes(normalizedSearchCode);
+
+                  const remainingYears = Number(
+                    asset.remainingUsefulLife.split(" ")?.[0]
+                  );
+                  const matchesUsefulLife =
+                    usefulLifeLessThanTwoYears === "2" || remainingYears < 2;
+
+                  return matchesType && matchesCode && matchesUsefulLife;
+                })
+                .map((asset) => (
+                  <TableRow key={asset.code}>
+                    <TableCell>{asset.code}</TableCell>
+                    <TableCell>{asset.name}</TableCell>
+                    <TableCell>{getType(asset.type)}</TableCell>
+                    <TableCell>{asset.supplier}</TableCell>
+                    <TableCell>{asset.contact}</TableCell>
+                    <TableCell>{asset.installationDate}</TableCell>
+                    <TableCell>{asset.maintenanceFrequency}</TableCell>
+                    <TableCell>{asset.estimatedUsefulLife}</TableCell>
+                    <TableCell>{asset.remainingUsefulLife}</TableCell>
+
+                    <TableCell className="text-center">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger className="outline-none">
+                          <MoreHorizontal className="w-5 h-5 cursor-pointer text-gray-600" />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuItem>Votar</DropdownMenuItem>
+                          <DropdownMenuItem>Editar</DropdownMenuItem>
+                          <DropdownMenuItem>Excluir</DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
             </TableBody>
           </Table>
         </div>
