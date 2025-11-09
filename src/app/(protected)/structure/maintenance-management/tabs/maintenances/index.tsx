@@ -25,6 +25,9 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal } from "lucide-react";
+import { ModalCreateMaintenance } from "./modal-create-maintenance";
+import { useMaintenances } from "./use-maintenaces";
+import { format } from "date-fns";
 
 const ATIVOS_MOCKED = [
   {
@@ -44,6 +47,26 @@ export function Maintenances() {
   const [code, setCode] = useState<string>();
   const [usefulLifeLessThanTwoYears, setUsefulLifeLessThanTwoYears] =
     useState("2");
+
+  const {
+    priorityOptions,
+    priorityOptionsStatus,
+    maintenancesStatusOptions,
+    maintenancesStatusOptionsStatus,
+    assets,
+    assetsStatus,
+    maintenances,
+    maintenancesStatus,
+  } = useMaintenances();
+
+  const getStatusName = (statusId: number) => {
+    const status = maintenancesStatusOptions?.find(
+      (status) => Number(status.id) === Number(statusId)
+    );
+
+    return status?.name ?? "";
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex space-x-4">
@@ -88,37 +111,53 @@ export function Maintenances() {
       <section className="rounded-xl overflow-auto border">
         <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200">
           <h2 className="font-medium text-gray-800 text-lg">Ativos</h2>
+
+          <ModalCreateMaintenance
+            priorityOptions={priorityOptions}
+            maintenancesStatusOptions={maintenancesStatusOptions}
+            assets={assets}
+          />
         </div>
 
         <div className="max-h-[70vh] overflow-y-auto border border-gray-300 rounded">
           <Table className="min-w-full border-collapse">
             <TableHeader className="sticky top-0 bg-white shadow-md z-10">
               <TableRow>
-                <TableHead>Código</TableHead>
-                <TableHead>Nome</TableHead>
+                <TableHead>Ativo</TableHead>
                 <TableHead>Tipo</TableHead>
-                <TableHead>Fornecedor</TableHead>
+                <TableHead>Data</TableHead>
+                <TableHead>Responsavel</TableHead>
                 <TableHead className="text-left">Contato</TableHead>
-                <TableHead className="text-center">Data Instalação</TableHead>
-                <TableHead className="text-left">Frequência</TableHead>
-                <TableHead>Vida Útil Estimada</TableHead>
-                <TableHead>Vida Útil Restante</TableHead>
+                <TableHead className="text-center">Valor</TableHead>
+                <TableHead className="text-left">Status</TableHead>
+                <TableHead>Anexos</TableHead>
                 <TableHead className="text-center">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {ATIVOS_MOCKED.map((asset) => (
-                <TableRow key={asset.code}>
-                  <TableCell>{asset.code}</TableCell>
-                  <TableCell>{asset.name}</TableCell>
-                  <TableCell>{asset.type}</TableCell>
-                  <TableCell>{asset.supplier}</TableCell>
-                  <TableCell>{asset.contact}</TableCell>
-                  <TableCell>{asset.installationDate}</TableCell>
-                  <TableCell>{asset.frequency}</TableCell>
-                  <TableCell>{asset.estimatedUsefulLife}</TableCell>
-                  <TableCell>{asset.remainingUsefulLife}</TableCell>
-
+              {maintenances?.map((maintenance) => (
+                <TableRow key={maintenance.id}>
+                  <TableCell>{maintenance.assetsMaintenanceCode}</TableCell>
+                  <TableCell>
+                    {maintenance.typeMaintenance === "1"
+                      ? "Preventiva"
+                      : "Corretiva"}
+                  </TableCell>
+                  <TableCell>
+                    {maintenance.plannedStart
+                      ? format(maintenance.plannedStart, "yyyy/MM/dd")
+                      : ""}
+                  </TableCell>
+                  <TableCell>{maintenance.supplier}</TableCell>
+                  <TableCell>{maintenance.contact}</TableCell>
+                  <TableCell className="text-center">
+                    {maintenance.amount.toLocaleString("pt-BR", {
+                      currency: "BRL",
+                      style: "currency",
+                    })}
+                  </TableCell>
+                  <TableCell>{getStatusName(maintenance.statusId)}</TableCell>
+                  <TableCell>{}</TableCell>
                   <TableCell className="text-center">
                     <DropdownMenu>
                       <DropdownMenuTrigger className="outline-none">

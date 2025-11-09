@@ -185,7 +185,7 @@ export function ModalActionIntervention({
     mutationFn: async (payload: {
       condominiumId: number;
       data: InterventionFormData;
-    }) => createIntervention(payload),
+    }) => createIntervention<InterventionFormData>(payload),
   });
 
   const { mutateAsync: handleUpdateIntervention } = useMutation({

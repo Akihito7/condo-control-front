@@ -149,7 +149,9 @@ export function AssetsMaintenance() {
                     <TableCell>{getType(asset.type)}</TableCell>
                     <TableCell>{asset.supplier}</TableCell>
                     <TableCell>{asset.contact}</TableCell>
-                    <TableCell>{asset.installationDate}</TableCell>
+                    <TableCell className="text-center">
+                      {asset.installationDate}
+                    </TableCell>
                     <TableCell>{asset.maintenanceFrequency}</TableCell>
                     <TableCell>{asset.estimatedUsefulLife}</TableCell>
                     <TableCell>{asset.remainingUsefulLife}</TableCell>

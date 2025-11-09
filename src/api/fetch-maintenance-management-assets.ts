@@ -1,7 +1,7 @@
 import { api } from "@/services/api";
 
 
-interface Asset {
+export interface Asset {
   code: string;
   condominiumId: number;
   contact: string;
