@@ -5,11 +5,15 @@ import { fetchMaintenancesStatus } from "@/api/fetch-maintenances-status"
 import { fetchPriorityOptions } from "@/api/fetch-priority-options"
 import { useUserContext } from "@/providers/use-user-context"
 import { useQuery } from "@tanstack/react-query"
+import { format } from "date-fns"
+import { useState } from "react"
 
 export function useMaintenances() {
 
   const { user } = useUserContext()
   const { condominiumId } = user;
+  const [date, setDate] = useState(new Date());
+  const dateFormatted = format(date, 'yyyy-MM-dd')
 
   const { data: priorityOptions, status: priorityOptionsStatus } = useQuery({
     queryKey: ['priority-options'],
@@ -29,8 +33,8 @@ export function useMaintenances() {
   });
 
   const { data: maintenances, status: maintenancesStatus } = useQuery({
-    queryKey: ['maintenances', user.id],
-    queryFn: fetchMaintenaces
+    queryKey: ['maintenances', user.id, dateFormatted],
+    queryFn: () => fetchMaintenaces(dateFormatted)
   })
 
   return {
@@ -41,6 +45,8 @@ export function useMaintenances() {
     assets,
     assetsStatus,
     maintenances,
-    maintenancesStatus
+    maintenancesStatus,
+    date,
+    setDate
   }
 }

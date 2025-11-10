@@ -26,8 +26,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal } from "lucide-react";
 import { ModalCreateMaintenance } from "./modal-create-maintenance";
-import { useMaintenances } from "./use-maintenaces";
+import { useMaintenances } from "./use-maintenances";
 import { format } from "date-fns";
+import { MonthYearPicker } from "@/components/month-year-select";
 
 const ATIVOS_MOCKED = [
   {
@@ -57,6 +58,8 @@ export function Maintenances() {
     assetsStatus,
     maintenances,
     maintenancesStatus,
+    date,
+    setDate,
   } = useMaintenances();
 
   const getStatusName = (statusId: number) => {
@@ -70,6 +73,14 @@ export function Maintenances() {
   return (
     <div className="space-y-6">
       <div className="flex space-x-4">
+        <div className="space-y-2">
+          <Label>Selecione o mês e ano</Label>
+          <MonthYearPicker
+            selectedDate={date}
+            onChange={setDate}
+            justFutureMonths={false}
+          />
+        </div>
         <div className="w-[250px] space-y-2">
           <Label>Busca por Código</Label>
           <Input
@@ -81,10 +92,10 @@ export function Maintenances() {
           />
         </div>
 
-        <div className=" space-y-2">
+        <div className="space-y-2 ">
           <Label>Tipo de ativo</Label>
           <Select>
-            <SelectTrigger>
+            <SelectTrigger className="w-[250px]">
               <SelectValue placeholder="Selecione o tipo do ativo" />
             </SelectTrigger>
             <SelectContent></SelectContent>

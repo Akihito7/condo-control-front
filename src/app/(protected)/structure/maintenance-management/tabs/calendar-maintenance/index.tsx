@@ -1,103 +1,40 @@
-const MOCKED_EVENTS = [
-  { name: "Manutenção de bomba", dayName: "Sábado", date: "2025/11/01" },
-  { name: "Manutenção de bomba", dayName: "Domingo", date: "2025/11/02" },
-  {
-    name: "Manutenção de bomba",
-    dayName: "Segunda-feira",
-    date: "2025/11/03",
-  },
-  { name: "Manutenção de bomba", dayName: "Terça-feira", date: "2025/11/04" },
-  {
-    name: "Manutenção de bomba",
-    dayName: "Quarta-feira",
-    date: "2025/11/05",
-  },
-  {
-    name: "Manutenção de bomba",
-    dayName: "Quinta-feira",
-    date: "2025/11/06",
-  },
-  { name: "Manutenção de bomba", dayName: "Sexta-feira", date: "2025/11/07" },
-  { name: "Manutenção de bomba", dayName: "Sábado", date: "2025/11/08" },
-  { name: "Manutenção de bomba", dayName: "Domingo", date: "2025/11/09" },
-  {
-    name: "Manutenção de bomba",
-    dayName: "Segunda-feira",
-    date: "2025/11/10",
-  },
-  { name: "Manutenção de bomba", dayName: "Terça-feira", date: "2025/11/11" },
-  {
-    name: "Manutenção de bomba",
-    dayName: "Quarta-feira",
-    date: "2025/11/12",
-  },
-  {
-    name: "Manutenção de bomba",
-    dayName: "Quinta-feira",
-    date: "2025/11/13",
-  },
-  { name: "Manutenção de bomba", dayName: "Sexta-feira", date: "2025/11/14" },
-  { name: "Manutenção de bomba", dayName: "Sábado", date: "2025/11/15" },
-  { name: "Manutenção de bomba", dayName: "Domingo", date: "2025/11/16" },
-  {
-    name: "Manutenção de bomba",
-    dayName: "Segunda-feira",
-    date: "2025/11/17",
-  },
-  { name: "Manutenção de bomba", dayName: "Terça-feira", date: "2025/11/18" },
-  {
-    name: "Manutenção de bomba",
-    dayName: "Quarta-feira",
-    date: "2025/11/19",
-  },
-  {
-    name: "Manutenção de bomba",
-    dayName: "Quinta-feira",
-    date: "2025/11/20",
-  },
-  { name: "Manutenção de bomba", dayName: "Sexta-feira", date: "2025/11/21" },
-  { name: "Manutenção de bomba", dayName: "Sábado", date: "2025/11/22" },
-  { name: "Manutenção de bomba", dayName: "Domingo", date: "2025/11/23" },
-  {
-    name: "Manutenção de bomba",
-    dayName: "Segunda-feira",
-    date: "2025/11/24",
-  },
-  { name: "Manutenção de bomba", dayName: "Terça-feira", date: "2025/11/25" },
-  {
-    name: "Manutenção de bomba",
-    dayName: "Quarta-feira",
-    date: "2025/11/26",
-  },
-  {
-    name: "Manutenção de bomba",
-    dayName: "Quinta-feira",
-    date: "2025/11/27",
-  },
-  { name: "Manutenção de bomba", dayName: "Sexta-feira", date: "2025/11/28" },
-  { name: "Manutenção de bomba", dayName: "Sábado", date: "2025/11/29" },
-  { name: "Manutenção de bomba", dayName: "Domingo", date: "2025/11/30" },
+import { MonthYearPicker } from "@/components/month-year-select";
+import { useCalendarMaintenance } from "./use-calendar-maintenance";
+import { ModalViewMaintenance } from "./modal-view-maintenance-event";
+import { Skeleton } from "@/components/ui/skeleton"; // 👈 novo componente
+
+const DAY_HEADERS = [
+  "Segunda-feira",
+  "Terça-feira",
+  "Quarta-feira",
+  "Quinta-feira",
+  "Sexta",
+  "Sábado",
+  "Domingo",
 ];
 
 export function CalendarMaintenance() {
-  const dayHeaders = [
-    "Segunda-feira",
-    "Terça-feira",
-    "Quarta-feira",
-    "Quinta-feira",
-    "Sexta",
-    "Sábado",
-    "Domingo",
-  ];
+  const {
+    date,
+    setDate,
+    calendarMaintenances,
+    calendarStatus,
+    eventSelected,
+    setEventSelected,
+    modalIsOpen,
+    setModalIsOpen,
+  } = useCalendarMaintenance();
+
+  const getTypeName = (typeMaintenanceId: string) => {
+    return typeMaintenanceId === "1" ? "Preventiva" : "Corretiva";
+  };
 
   const renderDaysOut = () => {
-    const firstDayOfMonth = MOCKED_EVENTS[0]?.dayName;
-    const numberDaysOut = dayHeaders.findIndex(
+    const firstDayOfMonth = calendarMaintenances?.[0]?.dayName;
+    const numberDaysOut = DAY_HEADERS.findIndex(
       (dayName) => dayName === firstDayOfMonth
     );
-
     const daysOut = Array.from({ length: numberDaysOut });
-
     return daysOut.map((_, index) => (
       <div
         key={index}
@@ -106,32 +43,90 @@ export function CalendarMaintenance() {
     ));
   };
 
+  const renderSkeleton = () => (
+    <div className="grid grid-cols-7">
+      {Array.from({ length: 31 }).map((_, i) => (
+        <div
+          key={i}
+          className="border border-gray-200 p-2 flex flex-col gap-3 min-h-56 bg-gray-50"
+        >
+          <Skeleton className="h-4 w-16" />
+          <div className="space-y-2">
+            <Skeleton className="h-5 w-full rounded-md" />
+            <Skeleton className="h-5 w-2/3 rounded-md" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 
   return (
-    <div>
+    <div className="space-y-6">
+      <div className="flex flex-col gap-4 md:items-end md:flex-row">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Selecione o mês e ano
+          </label>
+          <MonthYearPicker
+            selectedDate={date}
+            onChange={setDate}
+            justFutureMonths={false}
+          />
+        </div>
+      </div>
+
       <div className="bg-white shadow-md rounded-xl border border-gray-200">
         <div className="grid grid-cols-7 bg-gray-100 text-center text-sm font-medium text-gray-700 border-b border-gray-200">
-          {dayHeaders.map((day, i) => (
+          {DAY_HEADERS.map((day, i) => (
             <div key={i} className="py-2">
               {day}
             </div>
           ))}
         </div>
 
-        <div className="grid grid-cols-7">
-          {renderDaysOut()}
-          {MOCKED_EVENTS?.map((day, index) => (
-            <div
-              key={index}
-              className="day-event-wrapper border border-gray-200 p-2 flex flex-col gap-2 min-h-56 overflow-auto max-h-56"
-            >
-              <span className="text-sm font-medium text-gray-700">
-                {day.date}
-              </span>
-            </div>
-          ))}
-        </div>
+        {calendarStatus === "pending" ? (
+          renderSkeleton()
+        ) : (
+          <div className="grid grid-cols-7">
+            {renderDaysOut()}
+            {calendarMaintenances?.map((day, index) => (
+              <div
+                key={index}
+                className="day-event-wrapper border border-gray-200 p-2 flex flex-col gap-2 min-h-56 overflow-auto max-h-56"
+              >
+                <span className="text-sm font-medium text-gray-700">
+                  {day.date}
+                </span>
+
+                <div className="space-y-4">
+                  {day.dayEvents?.map((event) => (
+                    <div
+                      key={event.id}
+                      className="rounded-md text-white bg-green-600 px-2 py-1 cursor-pointer hover:bg-green-700 transition"
+                      onClick={() => {
+                        setEventSelected(event);
+                        setModalIsOpen(true);
+                      }}
+                    >
+                      <span className="font-bold">
+                        {event.assetsMaintenance.code} -{" "}
+                      </span>
+                      <span>{getTypeName(event.typeMaintenance)}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
+
+      <ModalViewMaintenance
+        event={eventSelected}
+        isOpen={modalIsOpen}
+        setIsOpen={setModalIsOpen}
+        setEventSelected={setEventSelected}
+      />
     </div>
   );
 }

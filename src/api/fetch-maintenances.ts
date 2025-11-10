@@ -40,8 +40,7 @@ type Maintenance = {
   amount: number;
 };
 
-export async function fetchMaintenaces(): Promise<Maintenance[]> {
-  const response = await api.get("structure/maintenances");
-  console.log(response.data);
+export async function fetchMaintenaces(date: string): Promise<Maintenance[]> {
+  const response = await api.get(`structure/maintenances/${date}`);
   return response.data
 }
