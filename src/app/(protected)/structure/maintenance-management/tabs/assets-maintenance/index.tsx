@@ -24,13 +24,17 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, Paperclip, Pencil } from "lucide-react";
 import { ModalCreateAsset } from "./modal-create-asset";
 import { useAssetsMaintenance } from "./use-assets-maintenance";
+import { Asset } from "@/api/fetch-maintenance-management-assets";
+import { ModalAttachments } from "./modal-attachments";
 
 export function AssetsMaintenance() {
   const [code, setCode] = useState<string>();
   const [typeSelected, setTypeSelected] = useState("-1");
+  const [assetSelected, setAssetSelected] = useState<Asset | null>(null);
+  const [modalAttchamentIsOpen, setModalAttchamentIsOpen] = useState(false);
   const [usefulLifeLessThanTwoYears, setUsefulLifeLessThanTwoYears] =
     useState("2");
 
@@ -113,6 +117,8 @@ export function AssetsMaintenance() {
                 <TableHead className="text-left">Frequência</TableHead>
                 <TableHead>Vida Útil Estimada</TableHead>
                 <TableHead>Vida Útil Restante</TableHead>
+                <TableHead>Vida Útil Restante</TableHead>
+                <TableHead className="text-left">Anexos</TableHead>
                 <TableHead className="text-center">Ações</TableHead>
               </TableRow>
             </TableHeader>
@@ -155,6 +161,17 @@ export function AssetsMaintenance() {
                     <TableCell>{asset.maintenanceFrequency}</TableCell>
                     <TableCell>{asset.estimatedUsefulLife}</TableCell>
                     <TableCell>{asset.remainingUsefulLife}</TableCell>
+                    <TableCell></TableCell>
+                    <TableCell
+                      onClick={() => {
+                        setAssetSelected(asset);
+                        setModalAttchamentIsOpen(true);
+                      }}
+                    >
+                      <div className="cursor-pointer flex items-center justify-center gap-1 px-2 py-1 bg-gray-100 rounded hover:bg-gray-200 transition w-12 h-12">
+                        <Paperclip className="w-4 h-4 text-gray-700" />
+                      </div>
+                    </TableCell>
 
                     <TableCell className="text-center">
                       <DropdownMenu>
@@ -174,6 +191,13 @@ export function AssetsMaintenance() {
           </Table>
         </div>
       </section>
+
+      <ModalAttachments
+        assetSelected={assetSelected}
+        setAssetSelected={setAssetSelected}
+        isOpen={modalAttchamentIsOpen}
+        setIsOpen={setModalAttchamentIsOpen}
+      />
     </div>
   );
 }
