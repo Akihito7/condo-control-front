@@ -29,8 +29,11 @@ import { ModalCreateAsset } from "./modal-create-asset";
 import { useAssetsMaintenance } from "./use-assets-maintenance";
 import { Asset } from "@/api/fetch-maintenance-management-assets";
 import { ModalAttachments } from "./modal-attachments";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { deleteMaintenanceAsset } from "@/api/delete-maintenance-asset";
 
 export function AssetsMaintenance() {
+  const query = useQueryClient();
   const [code, setCode] = useState<string>();
   const [typeSelected, setTypeSelected] = useState("-1");
   const [assetSelected, setAssetSelected] = useState<Asset | null>(null);
@@ -45,6 +48,16 @@ export function AssetsMaintenance() {
     const type = assetsTypes?.find((asset) => asset.id === typeId);
     return type?.name ?? "";
   };
+
+  const { mutateAsync: handleDeleteMaintenanceAsset } = useMutation({
+    mutationFn: (assetId: number) => deleteMaintenanceAsset(assetId),
+    onSuccess: () => {
+      query.invalidateQueries({
+        queryKey: ["assets"],
+        exact: false,
+      });
+    },
+  });
 
   return (
     <div className="space-y-6">
@@ -179,9 +192,14 @@ export function AssetsMaintenance() {
                           <MoreHorizontal className="w-5 h-5 cursor-pointer text-gray-600" />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
-                          <DropdownMenuItem>Votar</DropdownMenuItem>
                           <DropdownMenuItem>Editar</DropdownMenuItem>
-                          <DropdownMenuItem>Excluir</DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() =>
+                              handleDeleteMaintenanceAsset(asset.id)
+                            }
+                          >
+                            Excluir
+                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
