@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import {
   Dialog,
   DialogContent,
@@ -49,6 +49,7 @@ const interventionSchema = z.object({
   paymentCompletionDate: z.date().optional().nullable(),
   plannedStart: z.date().optional().nullable(),
   plannedEnd: z.date().optional().nullable(),
+  nextMaintenance: z.date().optional().nullable(),
   status: z.string().min(1, "Por favor, selecione um status"),
   documents: z.any().optional(),
 });
@@ -75,6 +76,8 @@ export function ModalCreateMaintenance({
     register,
     handleSubmit,
     reset,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm<InterventionFormData>({
     resolver: zodResolver(interventionSchema),
@@ -134,8 +137,46 @@ export function ModalCreateMaintenance({
     reset();
   }
 
+  const assetType = watch("assetType");
+  const plannedStart = watch("plannedStart");
+  const typeMaintenance = watch("typeMaintenance");
+  const assetSelected = assets?.find((asset) => String(asset.id) === assetType);
+
+  useEffect(() => {
+    if (
+      assetSelected?.maintenanceFrequency &&
+      plannedStart &&
+      typeMaintenance === "1"
+    ) {
+      const nextDate = new Date(plannedStart);
+
+      const freq = assetSelected.maintenanceFrequency.toLowerCase();
+
+      if (freq.includes("mensal")) nextDate.setMonth(nextDate.getMonth() + 1);
+      if (freq.includes("bimestral"))
+        nextDate.setMonth(nextDate.getMonth() + 2);
+      if (freq.includes("trimestral"))
+        nextDate.setMonth(nextDate.getMonth() + 3);
+      if (freq.includes("semestral"))
+        nextDate.setMonth(nextDate.getMonth() + 6);
+      if (freq.includes("anual"))
+        nextDate.setFullYear(nextDate.getFullYear() + 1);
+
+      setValue("nextMaintenance", nextDate);
+    }
+  }, [
+    assetSelected?.maintenanceFrequency,
+    plannedStart,
+    setValue,
+    typeMaintenance,
+  ]);
+
   return (
-    <Dialog>
+    <Dialog
+      onOpenChange={(open) => {
+        if (!open) reset();
+      }}
+    >
       <DialogTrigger asChild>
         <Button variant="outline">Adicionar Manutenção</Button>
       </DialogTrigger>
@@ -311,6 +352,24 @@ export function ModalCreateMaintenance({
               className="col-span-3"
             />
           </div>
+
+          {/* ✅ Próxima manutenção preventiva (auto + editável) */}
+          {assetSelected?.maintenanceFrequency && typeMaintenance === "1" && (
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label className="text-right">
+                Próxima Manutenção Preventiva
+              </Label>
+              <div className="col-span-3">
+                <Controller
+                  name="nextMaintenance"
+                  control={control}
+                  render={({ field: { onChange, value } }) => (
+                    <DatePicker date={value!} setDate={onChange} />
+                  )}
+                />
+              </div>
+            </div>
+          )}
 
           <DialogFooter className="pt-4">
             <DialogClose asChild>
