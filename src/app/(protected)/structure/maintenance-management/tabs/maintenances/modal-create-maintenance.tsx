@@ -355,20 +355,30 @@ export function ModalCreateMaintenance({
 
           {/* ✅ Próxima manutenção preventiva (auto + editável) */}
           {assetSelected?.maintenanceFrequency && typeMaintenance === "1" && (
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label className="text-right">
+            <fieldset className="border border-muted-foreground/20 rounded-xl p-4 space-y-4">
+              <legend className="px-2 text-sm font-semibold text-muted-foreground">
                 Próxima Manutenção Preventiva
-              </Label>
-              <div className="col-span-3">
-                <Controller
-                  name="nextMaintenance"
-                  control={control}
-                  render={({ field: { onChange, value } }) => (
-                    <DatePicker date={value!} setDate={onChange} />
-                  )}
-                />
+              </legend>
+
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label className="text-right">Data prevista</Label>
+                <div className="col-span-3">
+                  <Controller
+                    name="nextMaintenance"
+                    control={control}
+                    render={({ field: { onChange, value } }) => (
+                      <DatePicker date={value!} setDate={onChange} />
+                    )}
+                  />
+                </div>
               </div>
-            </div>
+
+              {/* Dica opcional abaixo da data */}
+              <p className="text-xs text-muted-foreground text-center">
+                A data foi calculada automaticamente com base na frequência do
+                ativo, mas pode ser ajustada manualmente.
+              </p>
+            </fieldset>
           )}
 
           <DialogFooter className="pt-4">
