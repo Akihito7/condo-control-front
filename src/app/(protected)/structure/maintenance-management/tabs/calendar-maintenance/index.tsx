@@ -32,8 +32,9 @@ export function CalendarMaintenance() {
   const renderDaysOut = () => {
     const firstDayOfMonth = calendarMaintenances?.[0]?.dayName;
     const numberDaysOut = DAY_HEADERS.findIndex(
-      (dayName) => dayName === firstDayOfMonth
+      (dayName) => dayName.toLowerCase() === firstDayOfMonth?.toLowerCase()
     );
+
     const daysOut = Array.from({ length: numberDaysOut });
     return daysOut.map((_, index) => (
       <div
