@@ -24,11 +24,13 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, Paperclip } from "lucide-react";
 import { ModalCreateMaintenance } from "./modal-create-maintenance";
 import { useMaintenances } from "./use-maintenances";
 import { format } from "date-fns";
 import { MonthYearPicker } from "@/components/month-year-select";
+import { Maintenance } from "@/api/fetch-maintenances";
+import { ModalAttachments } from "./modal-attchaments";
 
 const ATIVOS_MOCKED = [
   {
@@ -48,6 +50,9 @@ export function Maintenances() {
   const [code, setCode] = useState<string>();
   const [usefulLifeLessThanTwoYears, setUsefulLifeLessThanTwoYears] =
     useState("2");
+  const [maintenanceSelected, setMaintenanceSelected] =
+    useState<Maintenance | null>(null);
+  const [modalAttchamentIsOpen, setModalAttchamentIsOpen] = useState(false);
 
   const {
     priorityOptions,
@@ -142,6 +147,7 @@ export function Maintenances() {
                 <TableHead className="text-center">Valor</TableHead>
                 <TableHead className="text-left">Status</TableHead>
                 <TableHead>Anexos</TableHead>
+                <TableHead className="text-left">Anexos</TableHead>
                 <TableHead className="text-center">Ações</TableHead>
               </TableRow>
             </TableHeader>
@@ -168,14 +174,22 @@ export function Maintenances() {
                     })}
                   </TableCell>
                   <TableCell>{getStatusName(maintenance.statusId)}</TableCell>
-                  <TableCell>{}</TableCell>
+                  <TableCell
+                    onClick={() => {
+                      setMaintenanceSelected(maintenance);
+                      setModalAttchamentIsOpen(true);
+                    }}
+                  >
+                    <div className="cursor-pointer flex items-center justify-center gap-1 px-2 py-1 bg-gray-100 rounded hover:bg-gray-200 transition w-12 h-12">
+                      <Paperclip className="w-4 h-4 text-gray-700" />
+                    </div>
+                  </TableCell>
                   <TableCell className="text-center">
                     <DropdownMenu>
                       <DropdownMenuTrigger className="outline-none">
                         <MoreHorizontal className="w-5 h-5 cursor-pointer text-gray-600" />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent>
-                        <DropdownMenuItem>Votar</DropdownMenuItem>
                         <DropdownMenuItem>Editar</DropdownMenuItem>
                         <DropdownMenuItem>Excluir</DropdownMenuItem>
                       </DropdownMenuContent>
@@ -187,6 +201,12 @@ export function Maintenances() {
           </Table>
         </div>
       </section>
+      <ModalAttachments
+        isOpen={modalAttchamentIsOpen}
+        setIsOpen={setModalAttchamentIsOpen}
+        maintenanceSelected={maintenanceSelected}
+        setMaintenanceSelected={setMaintenanceSelected}
+      />
     </div>
   );
 }

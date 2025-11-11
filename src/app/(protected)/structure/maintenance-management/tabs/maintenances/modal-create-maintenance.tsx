@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useRef } from "react";
 import {
   Dialog,
   DialogContent,
@@ -50,6 +50,7 @@ const interventionSchema = z.object({
   plannedStart: z.date().optional().nullable(),
   plannedEnd: z.date().optional().nullable(),
   status: z.string().min(1, "Por favor, selecione um status"),
+  documents: z.any().optional(),
 });
 
 export type InterventionFormData = z.infer<typeof interventionSchema>;
@@ -74,9 +75,6 @@ export function ModalCreateMaintenance({
     register,
     handleSubmit,
     reset,
-    setValue,
-    getValues,
-    watch,
     formState: { errors },
   } = useForm<InterventionFormData>({
     resolver: zodResolver(interventionSchema),
@@ -89,53 +87,57 @@ export function ModalCreateMaintenance({
       value: "",
       paymentDate: null,
       paymentCompletionDate: null,
-      plannedStart: null,
-      plannedEnd: null,
+      plannedStart: new Date(),
       status: "",
     },
   });
+
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
+  const { mutateAsync: handleCreateIntervention } = useMutation({
+    mutationFn: async (payload: { condominiumId: number; data: FormData }) =>
+      createIntervention<FormData>(payload),
+  });
+
   async function onSubmit(data: InterventionFormData) {
-    await handleCreateIntervention({ condominiumId, data });
-    cleanFormFields();
+    const formData = new FormData();
+
+    // adiciona todos os campos comuns
+    Object.entries(data).forEach(([key, value]) => {
+      if (
+        key !== "documents" &&
+        value !== undefined &&
+        value !== null &&
+        value !== ""
+      ) {
+        if (value instanceof Date) {
+          formData.append(key, value.toISOString());
+        } else {
+          formData.append(key, String(value));
+        }
+      }
+    });
+
+    // adiciona arquivos, se houver
+    if (data.documents && data.documents.length > 0) {
+      for (let i = 0; i < data.documents.length; i++) {
+        formData.append("attachment", data.documents[i]);
+      }
+    }
+
+    await handleCreateIntervention({ condominiumId, data: formData });
     queryClient.invalidateQueries({
       queryKey: ["maintenances"],
       exact: false,
     });
     closeButtonRef?.current?.click();
-  }
-
-  const { mutateAsync: handleCreateIntervention } = useMutation({
-    mutationFn: async (payload: {
-      condominiumId: number;
-      data: InterventionFormData;
-    }) => createIntervention<InterventionFormData>(payload),
-  });
-
-  function cleanFormFields() {
-    reset({
-      assetType: "",
-      contact: "",
-      typeMaintenance: "",
-      priority: "",
-      description: "",
-      provider: "",
-      value: "",
-      type: "2",
-      paymentCompletionDate: null,
-      plannedStart: null,
-      plannedEnd: null,
-      status: "",
-    });
+    reset();
   }
 
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button onClick={() => {}} variant="outline" disabled={false}>
-          Adicionar Manutenção
-        </Button>
+        <Button variant="outline">Adicionar Manutenção</Button>
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-auto">
@@ -146,7 +148,11 @@ export function ModalCreateMaintenance({
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-4">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="space-y-4 py-4"
+          encType="multipart/form-data"
+        >
           {/* Asset */}
           <div className="grid grid-cols-4 items-center gap-4">
             <Label className="text-right">Ativo</Label>
@@ -156,12 +162,14 @@ export function ModalCreateMaintenance({
                 control={control}
                 render={({ field }) => (
                   <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger className="min-w-[200px]">
-                      <SelectValue placeholder="Selecione a prioridade" />
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione o ativo" />
                     </SelectTrigger>
                     <SelectContent>
                       {assets?.map(({ id, name }) => (
-                        <SelectItem value={String(id)}>{name}</SelectItem>
+                        <SelectItem key={id} value={String(id)}>
+                          {name}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -170,7 +178,7 @@ export function ModalCreateMaintenance({
             </div>
           </div>
           {errors.assetType && (
-            <p className="text-red-500 text-sm -mt-2 ml-[145px]">
+            <p className="text-red-500 text-sm ml-[145px]">
               {errors.assetType.message}
             </p>
           )}
@@ -184,12 +192,14 @@ export function ModalCreateMaintenance({
                 control={control}
                 render={({ field }) => (
                   <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger className="min-w-[200px]">
+                    <SelectTrigger>
                       <SelectValue placeholder="Selecione a prioridade" />
                     </SelectTrigger>
                     <SelectContent>
                       {priorityOptions?.map(({ id, name }) => (
-                        <SelectItem value={String(id)}>{name}</SelectItem>
+                        <SelectItem key={id} value={String(id)}>
+                          {name}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -197,14 +207,9 @@ export function ModalCreateMaintenance({
               />
             </div>
           </div>
-          {errors.priority && (
-            <p className="text-red-500 text-sm -mt-2 ml-[145px]">
-              {errors.priority.message}
-            </p>
-          )}
 
           {/* Description */}
-          <div className="grid grid-cols-4 items-center gap-4">
+          <div className="grid grid-cols-4 items-start gap-4">
             <Label className="text-right">Descrição</Label>
             <textarea
               {...register("description")}
@@ -212,11 +217,6 @@ export function ModalCreateMaintenance({
               rows={3}
             />
           </div>
-          {errors.description && (
-            <p className="text-red-500 text-sm -mt-2 ml-[145px]">
-              {errors.description.message}
-            </p>
-          )}
 
           {/* Provider */}
           <div className="grid grid-cols-4 items-center gap-4">
@@ -230,7 +230,7 @@ export function ModalCreateMaintenance({
             <Input {...register("contact")} className="col-span-3" />
           </div>
 
-          {/* Maintenance Type */}
+          {/* Tipo de manutenção */}
           <div className="grid grid-cols-4 items-center gap-4">
             <Label className="text-right">Tipo de manutenção</Label>
             <div className="col-span-3">
@@ -239,8 +239,8 @@ export function ModalCreateMaintenance({
                 control={control}
                 render={({ field }) => (
                   <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger className="min-w-[200px]">
-                      <SelectValue placeholder="Selecione o status" />
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione o tipo" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="1">Preventiva</SelectItem>
@@ -251,13 +251,8 @@ export function ModalCreateMaintenance({
               />
             </div>
           </div>
-          {errors.status && (
-            <p className="text-red-500 text-sm -mt-2 ml-[145px]">
-              {errors.status.message}
-            </p>
-          )}
 
-          {/* Value */}
+          {/* Valor */}
           <div className="grid grid-cols-4 items-center gap-4">
             <Label className="text-right">Valor</Label>
             <Input
@@ -266,43 +261,16 @@ export function ModalCreateMaintenance({
               placeholder="Ex: 1000,00"
             />
           </div>
-          {errors.value && (
-            <p className="text-red-500 text-sm -mt-2 ml-[145px]">
-              {errors.value.message}
-            </p>
-          )}
 
-          {/* Actual Start */}
+          {/* Datas */}
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Início Real</Label>
+            <Label className="text-right">Data</Label>
             <div className="col-span-3">
               <Controller
                 name="plannedStart"
                 control={control}
                 render={({ field: { onChange, value } }) => (
-                  <DatePicker
-                    date={value as any}
-                    setDate={onChange}
-                    label="Início Real"
-                  />
-                )}
-              />
-            </div>
-          </div>
-
-          {/* Actual End */}
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Término Real</Label>
-            <div className="col-span-3">
-              <Controller
-                name="plannedEnd"
-                control={control}
-                render={({ field: { onChange, value } }) => (
-                  <DatePicker
-                    date={value as any}
-                    setDate={onChange}
-                    label="Término Real"
-                  />
+                  <DatePicker date={value!} setDate={onChange} />
                 )}
               />
             </div>
@@ -317,12 +285,14 @@ export function ModalCreateMaintenance({
                 control={control}
                 render={({ field }) => (
                   <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger className="min-w-[200px]">
+                    <SelectTrigger>
                       <SelectValue placeholder="Selecione o status" />
                     </SelectTrigger>
                     <SelectContent>
                       {maintenancesStatusOptions?.map(({ id, name }) => (
-                        <SelectItem value={String(id)}>{name}</SelectItem>
+                        <SelectItem key={id} value={String(id)}>
+                          {name}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -330,11 +300,17 @@ export function ModalCreateMaintenance({
               />
             </div>
           </div>
-          {errors.status && (
-            <p className="text-red-500 text-sm -mt-2 ml-[145px]">
-              {errors.status.message}
-            </p>
-          )}
+
+          {/* Documents */}
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label className="text-right">Documentos</Label>
+            <Input
+              type="file"
+              {...register("documents")}
+              multiple
+              className="col-span-3"
+            />
+          </div>
 
           <DialogFooter className="pt-4">
             <DialogClose asChild>

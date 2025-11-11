@@ -1,7 +1,7 @@
 import { api } from "@/services/api";
 
 
-type Maintenance = {
+export type Maintenance = {
   id: number;
   assetMaintenanceId: number | null;
   assetsMaintenanceCode: string;
