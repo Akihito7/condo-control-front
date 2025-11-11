@@ -31,6 +31,8 @@ import { format } from "date-fns";
 import { MonthYearPicker } from "@/components/month-year-select";
 import { Maintenance } from "@/api/fetch-maintenances";
 import { ModalAttachments } from "./modal-attchaments";
+import { deleteIntervention } from "@/api/delete-intervention";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const ATIVOS_MOCKED = [
   {
@@ -47,9 +49,10 @@ const ATIVOS_MOCKED = [
 ];
 
 export function Maintenances() {
-  const [code, setCode] = useState<string>();
-  const [usefulLifeLessThanTwoYears, setUsefulLifeLessThanTwoYears] =
-    useState("2");
+  const [code, setCode] = useState<string>("");
+  const [assetSelected, setAssetSelected] = useState<string>("-1");
+  const [typeSelected, setTypeSelected] = useState<string>("-1");
+  const [statusSelected, setStatusSelected] = useState<string>("-1");
   const [maintenanceSelected, setMaintenanceSelected] =
     useState<Maintenance | null>(null);
   const [modalAttchamentIsOpen, setModalAttchamentIsOpen] = useState(false);
@@ -75,9 +78,46 @@ export function Maintenances() {
     return status?.name ?? "";
   };
 
+  const queryClient = useQueryClient();
+  const { mutateAsync: handleDeleteIntervention } = useMutation({
+    mutationFn: async (maintenanceId: number) =>
+      deleteIntervention(maintenanceId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["maintenances"],
+        exact: false,
+      });
+    },
+  });
+
+  const filteredMaintenances = maintenances?.filter((maintenance) => {
+    const matchesCode = code
+      ? maintenance.assetsMaintenanceCode
+          ?.toLowerCase()
+          .includes(code.toLowerCase())
+      : true;
+
+    const matchesAsset =
+      assetSelected === "-1"
+        ? true
+        : String(maintenance.assetsMaintenanceId) === assetSelected;
+
+    const matchesType =
+      typeSelected === "-1"
+        ? true
+        : String(maintenance.typeMaintenance) === typeSelected;
+
+    const matchesStatus =
+      statusSelected === "-1"
+        ? true
+        : String(maintenance.statusId) === statusSelected;
+
+    return matchesCode && matchesAsset && matchesType && matchesStatus;
+  });
+
   return (
     <div className="space-y-6">
-      <div className="flex space-x-4">
+      <div className="flex flex-wrap gap-4">
         <div className="space-y-2">
           <Label>Selecione o mês e ano</Label>
           <MonthYearPicker
@@ -86,47 +126,78 @@ export function Maintenances() {
             justFutureMonths={false}
           />
         </div>
+
         <div className="w-[250px] space-y-2">
-          <Label>Busca por Código</Label>
+          <Label>Código do Ativo</Label>
           <Input
             placeholder="Ex: ELV-001"
-            onChange={(event) => {
-              const code = event.target.value;
-              setCode(code);
-            }}
+            value={code}
+            onChange={(event) => setCode(event.target.value)}
           />
         </div>
 
-        <div className="space-y-2 ">
-          <Label>Tipo de ativo</Label>
-          <Select>
+        <div className="space-y-2">
+          <Label>Ativo</Label>
+          <Select
+            value={assetSelected}
+            onValueChange={(value) => setAssetSelected(value)}
+          >
             <SelectTrigger className="w-[250px]">
-              <SelectValue placeholder="Selecione o tipo do ativo" />
+              <SelectValue placeholder="Selecione o ativo" />
             </SelectTrigger>
-            <SelectContent></SelectContent>
+            <SelectContent>
+              <SelectItem value="-1">Todos</SelectItem>
+              {assets?.map(({ id, name }) => (
+                <SelectItem key={id} value={String(id)}>
+                  {name}
+                </SelectItem>
+              ))}
+            </SelectContent>
           </Select>
         </div>
 
-        <div className="w-[250px] space-y-2">
-          <Label>Apenas vida útil menor que 2 anos</Label>
+        <div className="space-y-2">
+          <Label>Tipo</Label>
           <Select
-            value={usefulLifeLessThanTwoYears}
-            onValueChange={(choice) => setUsefulLifeLessThanTwoYears(choice)}
+            value={typeSelected}
+            onValueChange={(value) => setTypeSelected(value)}
           >
             <SelectTrigger className="w-[250px]">
-              <SelectValue placeholder="Sim/Não" />
+              <SelectValue placeholder="Selecione o tipo" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="1">Sim</SelectItem>
-              <SelectItem value="2">Não</SelectItem>
+              <SelectItem value="-1">Todos</SelectItem>
+              <SelectItem value="1">Preventiva</SelectItem>
+              <SelectItem value="2">Corretiva</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label>Status</Label>
+          <Select
+            value={statusSelected}
+            onValueChange={(value) => setStatusSelected(value)}
+          >
+            <SelectTrigger className="w-[250px]">
+              <SelectValue placeholder="Selecione o status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="-1">Todos</SelectItem>
+              {maintenancesStatusOptions?.map(({ id, name }) => (
+                <SelectItem key={id} value={String(id)}>
+                  {name}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
       </div>
 
+      {/* 📋 Tabela */}
       <section className="rounded-xl overflow-auto border">
         <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200">
-          <h2 className="font-medium text-gray-800 text-lg">Ativos</h2>
+          <h2 className="font-medium text-gray-800 text-lg">Manutenções</h2>
 
           <ModalCreateMaintenance
             priorityOptions={priorityOptions}
@@ -142,17 +213,17 @@ export function Maintenances() {
                 <TableHead>Ativo</TableHead>
                 <TableHead>Tipo</TableHead>
                 <TableHead>Data</TableHead>
-                <TableHead>Responsavel</TableHead>
-                <TableHead className="text-left">Contato</TableHead>
+                <TableHead>Responsável</TableHead>
+                <TableHead>Contato</TableHead>
                 <TableHead className="text-center">Valor</TableHead>
-                <TableHead className="text-left">Status</TableHead>
+                <TableHead>Status</TableHead>
                 <TableHead>Anexos</TableHead>
-                <TableHead className="text-left">Anexos</TableHead>
                 <TableHead className="text-center">Ações</TableHead>
               </TableRow>
             </TableHeader>
+
             <TableBody>
-              {maintenances?.map((maintenance) => (
+              {filteredMaintenances?.map((maintenance) => (
                 <TableRow key={maintenance.id}>
                   <TableCell>{maintenance.assetsMaintenanceCode}</TableCell>
                   <TableCell>
@@ -191,7 +262,13 @@ export function Maintenances() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent>
                         <DropdownMenuItem>Editar</DropdownMenuItem>
-                        <DropdownMenuItem>Excluir</DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() =>
+                            handleDeleteIntervention(maintenance.id)
+                          }
+                        >
+                          Excluir
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
@@ -201,6 +278,8 @@ export function Maintenances() {
           </Table>
         </div>
       </section>
+
+      {/* 📎 Modal de anexos */}
       <ModalAttachments
         isOpen={modalAttchamentIsOpen}
         setIsOpen={setModalAttchamentIsOpen}

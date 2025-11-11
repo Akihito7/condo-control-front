@@ -20,7 +20,6 @@ export function useMaintenances() {
     queryFn: fetchPriorityOptions
   })
 
-
   const { data: maintenancesStatusOptions, status: maintenancesStatusOptionsStatus } = useQuery({
     queryKey: ['status-options'],
     queryFn: fetchMaintenancesStatus,
@@ -36,6 +35,7 @@ export function useMaintenances() {
     queryKey: ['maintenances', user.id, dateFormatted],
     queryFn: () => fetchMaintenaces(dateFormatted)
   })
+
 
   return {
     priorityOptions,
