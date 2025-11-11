@@ -32,7 +32,7 @@ export function DatePicker({
       >
         {dateFormmated}
       </PopoverTrigger>
-      <PopoverContent>
+      <PopoverContent className="pointer-events-auto">
         <Calendar
           mode="single"
           selected={date}
