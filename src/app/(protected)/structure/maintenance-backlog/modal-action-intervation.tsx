@@ -137,7 +137,7 @@ export function ModalActionIntervention({
     resolver: zodResolver(interventionSchema),
     defaultValues: {
       priority: "",
-      type: "",
+      type: "2",
       area: "",
       description: "",
       provider: "",
@@ -258,7 +258,7 @@ export function ModalActionIntervention({
   function cleanFormFields() {
     reset({
       priority: "",
-      type: "",
+      type: "2",
       area: "",
       description: "",
       provider: "",

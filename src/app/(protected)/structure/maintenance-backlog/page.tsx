@@ -55,7 +55,7 @@ export default function MaintenanceBacklog() {
           <Breadcrumb paths={["Início", "Estrutura e operações"]} />
         </div>
         <h1 className="text-2xl font-semibold text-gray-800">
-          Backlog de Manutenções
+          Gestão de Obras
         </h1>
       </div>
       <Tabs defaultValue="interventions" className="p-4">
@@ -64,7 +64,7 @@ export default function MaintenanceBacklog() {
             value="interventions"
             className="data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-gray-900 px-4 py-2 rounded-md font-medium text-gray-600 transition-all"
           >
-            Intervenções
+            Obras
           </TabsTrigger>
           <TabsTrigger
             value="indicators"

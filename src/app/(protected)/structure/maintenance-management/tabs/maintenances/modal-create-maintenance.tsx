@@ -86,7 +86,7 @@ export function ModalCreateMaintenance({
       priority: "",
       description: "",
       provider: "",
-      type: "2",
+      type: "1",
       value: "",
       paymentDate: null,
       paymentCompletionDate: null,

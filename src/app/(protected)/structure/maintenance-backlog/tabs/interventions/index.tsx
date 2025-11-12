@@ -68,7 +68,6 @@ export function Interventions({
   setYear,
   handleDeleteIntervention,
 }: InterventionsProps) {
-  const [typeSelected, setTypeSelected] = useState("-1");
   const [statusSelected, setStatusSelected] = useState("-1");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [dropdownOpenToThisItem, setDropdownOpenToThisItem] = useState<
@@ -94,34 +93,6 @@ export function Interventions({
             </label>
 
             <YearSelect yearSelected={year} setYearSelected={setYear} />
-          </div>
-
-          <div>
-            <Label className="block text-sm font-medium text-gray-700 mb-2">
-              Tipo
-            </Label>
-            <Select
-              value={typeSelected}
-              onValueChange={(value) => setTypeSelected(value)}
-            >
-              <SelectTrigger
-                className="w-full"
-                style={{
-                  height: 40,
-                  width: 200,
-                }}
-              >
-                <SelectValue placeholder="Selecione o tipo" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="-1">Todos</SelectItem>
-                {maintenancesTypes?.map((type: any, index) => (
-                  <SelectItem key={index} value={String(type.id)}>
-                    {type.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
           </div>
 
           <div>
@@ -229,11 +200,8 @@ export function Interventions({
                       statusSelected === "-1"
                         ? true
                         : statusSelected === String(intervention.statusId);
-                    const typeMatch =
-                      typeSelected === "-1"
-                        ? true
-                        : typeSelected === String(intervention.typeId);
-                    return statusMatch && typeMatch;
+
+                    return statusMatch;
                   })
                   .map((item: any) => {
                     return (

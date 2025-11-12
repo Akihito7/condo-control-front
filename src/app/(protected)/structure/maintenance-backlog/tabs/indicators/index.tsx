@@ -49,7 +49,6 @@ export function Indicators({
   const COLORS = ["#3B82F6", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6"];
 
   const costByTypeFormatted = [
-    { name: "Manutenção", value: indicatorsResume?.maintenanceCost },
     { name: "Melhoria", value: indicatorsResume?.improvementsCost },
   ].sort((a, b) => (b.value ?? 0) - (a.value ?? 0));
 
@@ -84,77 +83,38 @@ export function Indicators({
       <Card>
         <CardHeader>
           <CardTitle className="text-lg font-semibold">
-            Resumo de Manutenções & Melhorias
+            Resumo de Obras
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-y-6">
             <div>
-              <p className="text-sm text-muted-foreground">
-                Manutenções Realizadas
-              </p>
-              <p className="text-lg font-bold">
-                {indicatorsResume?.maintenancePerfomed}
-              </p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">
-                Melhorias Realizadas
-              </p>
+              <p className="text-sm text-muted-foreground">Obras Realizadas</p>
               <p className="text-lg font-bold">
                 {indicatorsResume?.improvementsImplemented}
               </p>
             </div>
+
             <div>
-              <p className="text-sm text-muted-foreground">
-                Custo Total (Manutenção)
-              </p>
-              <p className="text-lg font-bold">
-                {formatterToCurrency(indicatorsResume?.maintenanceCost)}
-              </p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">
-                Custo Médio (Manutenção)
-              </p>
-              <p className="text-lg font-bold">
-                {formatterToCurrency(indicatorsResume?.accuracyMaintenanceCost)}
-              </p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">
-                Custo Total (Melhoria)
-              </p>
+              <p className="text-sm text-muted-foreground">Custo Total</p>
               <p className="text-lg font-bold">
                 {formatterToCurrency(indicatorsResume?.improvementsCost)}
               </p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">
-                Custo Médio (Melhoria)
-              </p>
+              <p className="text-sm text-muted-foreground">Custo Médio</p>
               <p className="text-lg font-bold">
                 {formatterToCurrency(indicatorsResume?.accuracyImprovementCost)}
               </p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">
-                Tempo Médio (Exec. Melhoria)
-              </p>
+              <p className="text-sm text-muted-foreground">Tempo Médio</p>
               <p className="text-lg font-bold">
                 {indicatorsResume?.accuracyExecutionDaysImprovements} dias
               </p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">
-                Impacto Manutenções
-              </p>
-              <p className="text-lg font-bold">
-                {indicatorsResume?.percentageImpactMaintenances}%
-              </p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Impacto Melhorias</p>
+              <p className="text-sm text-muted-foreground">Impacto Obras</p>
               <p className="text-lg font-bold">
                 {indicatorsResume?.percentageImpactImprovements}%
               </p>
@@ -162,68 +122,6 @@ export function Indicators({
           </div>
         </CardContent>
       </Card>
-
-      {/* Gráficos */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Custo por Tipo */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg font-medium">
-              Custo Total por Tipo
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={costByTypeFormatted} barSize={30}>
-                <XAxis dataKey="name" />
-                <YAxis
-                  tickFormatter={(value: number) =>
-                    value.toLocaleString("pt-BR", {
-                      style: "currency",
-                      currency: "BRL",
-                    })
-                  }
-                  tick={{ fontSize: 10, fill: "#6B7280", fontWeight: 500 }}
-                />
-                <Tooltip
-                  formatter={(value: number, name: string) => [
-                    value.toLocaleString("pt-BR", {
-                      currency: "BRL",
-                      style: "currency",
-                    }),
-                    "Valor",
-                  ]}
-                />
-
-                <Bar dataKey="value" fill="#3B82F6" />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        {/* Melhorias por Área */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg font-medium">
-              Melhorias por Área
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={chartImprovementsByArea} barSize={30}>
-                <XAxis dataKey="areaName" />
-                <YAxis allowDecimals={false} />
-                <Tooltip formatter={(value, name) => [value, "Quantidade"]} />
-                <Bar dataKey="count">
-                  {chartImprovementsByArea?.map((item, index) => (
-                    <Cell key={index} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      </div>
 
       <Card className="col-span-1 md:col-span-2 shadow-lg rounded-2xl border border-gray-100">
         <CardHeader>
