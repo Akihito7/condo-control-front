@@ -33,6 +33,7 @@ import { Maintenance } from "@/api/fetch-maintenances";
 import { ModalAttachments } from "./modal-attchaments";
 import { deleteIntervention } from "@/api/delete-intervention";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { ModalUpdateMaintenance } from "./modal-update-maintenance";
 
 const ATIVOS_MOCKED = [
   {
@@ -56,6 +57,11 @@ export function Maintenances() {
   const [maintenanceSelected, setMaintenanceSelected] =
     useState<Maintenance | null>(null);
   const [modalAttchamentIsOpen, setModalAttchamentIsOpen] = useState(false);
+  const [modalUpdateIsOpen, setModalUpdateIsOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [dropdownOpenToThisItem, setDropdownOpenToThisItem] = useState<
+    number | undefined
+  >();
 
   const {
     priorityOptions,
@@ -256,12 +262,33 @@ export function Maintenances() {
                     </div>
                   </TableCell>
                   <TableCell className="text-center">
-                    <DropdownMenu>
+                    <DropdownMenu
+                      open={
+                        dropdownOpen &&
+                        dropdownOpenToThisItem === maintenance.id
+                      }
+                      onOpenChange={(open) => {
+                        if (!open) {
+                          setDropdownOpenToThisItem(undefined);
+                        } else {
+                          setDropdownOpenToThisItem(maintenance.id);
+                        }
+                        setDropdownOpen(open);
+                      }}
+                    >
                       <DropdownMenuTrigger className="outline-none">
                         <MoreHorizontal className="w-5 h-5 cursor-pointer text-gray-600" />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent>
-                        <DropdownMenuItem>Editar</DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setDropdownOpen(false);
+                            setMaintenanceSelected(maintenance);
+                            setModalUpdateIsOpen(true);
+                          }}
+                        >
+                          Editar
+                        </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() =>
                             handleDeleteIntervention(maintenance.id)
@@ -285,6 +312,15 @@ export function Maintenances() {
         setIsOpen={setModalAttchamentIsOpen}
         maintenanceSelected={maintenanceSelected}
         setMaintenanceSelected={setMaintenanceSelected}
+      />
+      <ModalUpdateMaintenance
+        assets={assets}
+        maintenance={maintenanceSelected}
+        maintenancesStatusOptions={maintenancesStatusOptions}
+        priorityOptions={priorityOptions}
+        setMaintenance={setMaintenanceSelected}
+        isOpen={modalUpdateIsOpen}
+        setIsOpen={setModalUpdateIsOpen}
       />
     </div>
   );
