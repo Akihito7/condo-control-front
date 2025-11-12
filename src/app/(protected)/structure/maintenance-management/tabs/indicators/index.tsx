@@ -26,7 +26,7 @@ import { fetchSummaryMaintenance } from "@/api/fetch-summary-maintenance";
 export function Indicators() {
   const [year, setYear] = useState(new Date().getFullYear().toString());
 
-  const { data: summary, status: summaryStatus } = useQuery({
+  const { data: summary } = useQuery({
     queryKey: ["summary", year],
     queryFn: () => fetchSummaryMaintenance(year),
     enabled: !!year,
@@ -39,7 +39,7 @@ export function Indicators() {
     });
   };
 
-  // Fallback para evitar erro antes do carregamento
+  // fallback cards & charts
   const cards = summary?.cards ?? {
     total: 0,
     preventives: 0,
@@ -51,21 +51,30 @@ export function Indicators() {
   const charts = summary?.charts ?? {
     monthlyCosts: [],
     maintenanceTypes: [],
+    topAssets: [],
   };
 
   const totalMaintenances = cards.total;
   const percentPreventive =
-    cards.total > 0 ? ((cards.preventives / cards.total) * 100).toFixed(1) : 0;
+    cards.total > 0
+      ? ((cards.preventives / cards.total) * 100).toFixed(1)
+      : "0.0";
 
-  const COLORS = ["#3B82F6", "#EF4444"];
+  // Minimalist shadcn-like colors
+  const PIE_COLORS = ["#10B981", "#F43F5E"]; // emerald, rose
+  const LINE_COLOR = "#6366F1"; // indigo
+  const GRID_COLOR = "#E4E4E7";
+  const TOOLTIP_BG = "#F4F4F5";
+  const TOOLTIP_FG = "#F4F4F5";
+  const YAXIS_TICK = "#6B7280";
 
   return (
     <div className="space-y-6 pb-6">
-      {/* Filtros */}
+      {/* filtros */}
       <div className="flex flex-col sm:flex-row gap-4 items-end">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Mês de referência
+          <label className="block text-sm font-medium text-muted-foreground mb-2">
+            Ano de referência
           </label>
           <YearSelect yearSelected={year} setYearSelected={setYear} />
         </div>
@@ -92,23 +101,26 @@ export function Indicators() {
               <p className="text-sm text-muted-foreground">
                 Total de Manutenções
               </p>
-              <p className="text-lg font-bold">{totalMaintenances}</p>
+              <p className="text-lg font-semibold">{totalMaintenances}</p>
             </div>
+
             <div>
               <p className="text-sm text-muted-foreground">% de Preventivas</p>
-              <p className="text-lg font-bold text-green-600">
+              <p className="text-lg font-semibold text-emerald-600">
                 {percentPreventive}%
               </p>
             </div>
+
             <div>
               <p className="text-sm text-muted-foreground">Custo Total</p>
-              <p className="text-lg font-bold text-purple-600">
+              <p className="text-lg font-semibold text-primary">
                 {formatterToCurrency(cards.totalAmount)}
               </p>
             </div>
+
             <div>
               <p className="text-sm text-muted-foreground">Custo Médio</p>
-              <p className="text-lg font-bold text-blue-600">
+              <p className="text-lg font-semibold text-muted-foreground">
                 {formatterToCurrency(cards.averageAmount)}
               </p>
             </div>
@@ -116,7 +128,7 @@ export function Indicators() {
         </CardContent>
       </Card>
 
-      {/* Grid: Preventivas vs Corretivas (2 col) + Custo Mensal (4 col) */}
+      {/* Grid: Preventivas vs Corretivas (2) + Custo Mensal (4) */}
       <div className="grid grid-cols-1 lg:grid-cols-6 gap-6">
         {/* Preventivas vs Corretivas */}
         <Card className="col-span-1 lg:col-span-2">
@@ -137,22 +149,29 @@ export function Indicators() {
                     outerRadius={90}
                     label
                   >
-                    {charts.maintenanceTypes.map((_: any, index: number) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={COLORS[index % COLORS.length]}
-                      />
+                    {charts.maintenanceTypes.map((_: any, i: number) => (
+                      <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
                     ))}
                   </Pie>
                   <Tooltip
                     formatter={(value: number, name) => [`${value}`, name]}
                     contentStyle={{
-                      backgroundColor: "#111827",
+                      backgroundColor: TOOLTIP_BG,
                       borderRadius: 8,
-                      border: "none",
-                      color: "#FFFFFF",
+                      border: "1px solid black",
+                      color: TOOLTIP_FG,
                       padding: "10px",
                     }}
+                  />
+                  <Legend
+                    verticalAlign="bottom"
+                    iconType="square"
+                    align="center"
+                    formatter={(value) => (
+                      <span style={{ color: "#444", fontSize: 14 }}>
+                        {value}
+                      </span>
+                    )}
                   />
                 </PieChart>
               </ResponsiveContainer>
@@ -170,36 +189,36 @@ export function Indicators() {
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={charts.monthlyCosts}>
-                <CartesianGrid strokeDasharray="4 4" stroke="#E5E7EB" />
+                <CartesianGrid strokeDasharray="4 4" stroke={GRID_COLOR} />
                 <XAxis
                   dataKey="month"
-                  tick={{ fill: "#6B7280", fontSize: 12, fontWeight: 500 }}
+                  tick={{ fill: YAXIS_TICK, fontSize: 12, fontWeight: 500 }}
                 />
                 <YAxis
                   tickFormatter={(value) =>
                     `R$ ${value.toLocaleString("pt-BR")}`
                   }
-                  tick={{ fill: "#6B7280", fontSize: 12 }}
+                  tick={{ fill: YAXIS_TICK, fontSize: 12 }}
                 />
                 <Tooltip
                   formatter={(value: number) => formatterToCurrency(value)}
                   contentStyle={{
-                    backgroundColor: "#111827",
+                    backgroundColor: TOOLTIP_BG,
                     borderRadius: 8,
                     border: "none",
-                    color: "#FFFFFF",
+                    color: TOOLTIP_FG,
                     padding: "10px",
                   }}
                 />
                 <Line
                   type="monotone"
                   dataKey="amount"
-                  stroke="#6366F1"
+                  stroke={LINE_COLOR}
                   strokeWidth={3}
                   dot={{
-                    r: 5,
+                    r: 4,
                     fill: "#FFF",
-                    stroke: "#6366F1",
+                    stroke: LINE_COLOR,
                     strokeWidth: 2,
                   }}
                 />
@@ -208,6 +227,54 @@ export function Indicators() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Ativos com mais manutenções */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg font-semibold">
+            Ativos com mais manutenções
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ResponsiveContainer width="100%" height={320}>
+            <BarChart
+              data={charts.topAssets}
+              layout="vertical"
+              margin={{ left: 60, right: 20, top: 10, bottom: 10 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" stroke={GRID_COLOR} />
+              <XAxis
+                type="number"
+                tick={{ fill: YAXIS_TICK, fontSize: 12 }}
+                allowDecimals={false}
+              />
+              <YAxis
+                type="category"
+                dataKey="name"
+                tick={{ fontSize: 12, fill: "#374151" }}
+                width={260}
+              />
+              <Tooltip
+                formatter={(value: number) => [`${value}`, "Quantidade"]}
+                contentStyle={{
+                  backgroundColor: TOOLTIP_BG,
+                  borderRadius: 8,
+                  border: "none",
+                  color: TOOLTIP_FG,
+                  padding: "10px",
+                }}
+              />
+              <Legend />
+              <Bar
+                dataKey="count"
+                fill="#3B82F6" // blue-500
+                barSize={18}
+                radius={[4, 4, 0, 0]}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
     </div>
   );
 }
