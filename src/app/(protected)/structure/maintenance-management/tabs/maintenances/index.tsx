@@ -19,6 +19,16 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
+  DialogClose,
+} from "@/components/ui/dialog";
+import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
@@ -34,6 +44,7 @@ import { ModalAttachments } from "./modal-attchaments";
 import { deleteIntervention } from "@/api/delete-intervention";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ModalUpdateMaintenance } from "./modal-update-maintenance";
+import { Button } from "@/components/ui/button";
 
 const ATIVOS_MOCKED = [
   {
@@ -62,6 +73,7 @@ export function Maintenances() {
   const [dropdownOpenToThisItem, setDropdownOpenToThisItem] = useState<
     number | undefined
   >();
+  const [maintenanceSelectedToDelete, setMaintenanceSelectedToDelete] = useState<Maintenance | null>(null)
 
   const {
     priorityOptions,
@@ -290,9 +302,10 @@ export function Maintenances() {
                           Editar
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                          onClick={() =>
-                            handleDeleteIntervention(maintenance.id)
-                          }
+                          onClick={() => {
+                            setDropdownOpen(false);
+                            setMaintenanceSelectedToDelete(maintenance)
+                          }}
                         >
                           Excluir
                         </DropdownMenuItem>
@@ -322,6 +335,42 @@ export function Maintenances() {
         isOpen={modalUpdateIsOpen}
         setIsOpen={setModalUpdateIsOpen}
       />
+
+      
+      <Dialog open={!!maintenanceSelectedToDelete} onOpenChange={(open) => {if(!open) setMaintenanceSelectedToDelete(null)}}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirmar exclusão</DialogTitle>
+            <DialogDescription>
+              Tem certeza que deseja excluir a manutenção no ativo{" "}
+              <strong>{maintenanceSelectedToDelete?.assetsMaintenanceName}</strong> <br />
+          {maintenanceSelectedToDelete?.plannedStart ? "para a data " + format(maintenanceSelectedToDelete.plannedStart, "yyyy/MM/dd HH:mm") + "?" : ''}
+           <br />
+              Esta ação não poderá ser desfeita.
+            </DialogDescription>
+          </DialogHeader>
+
+          <DialogFooter>
+            <Button
+            variant="outline"
+              onClick={() => setMaintenanceSelectedToDelete(null)}
+            >
+              Cancelar
+            </Button> 
+
+            <Button
+            variant="destructive"
+              onClick={async () => {
+                if (!maintenanceSelected) return;
+                await handleDeleteIntervention(maintenanceSelected.id);
+                setMaintenanceSelectedToDelete(null);
+              }}
+            >
+              Confirmar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -160,7 +160,7 @@ export function ModalUpdateMaintenance({
         nextDate.setFullYear(nextDate.getFullYear() + 1);
 
     setValue("nextMaintenance", nextDate)
-  
+
     }
   }, [
     assetSelected?.maintenanceFrequency,
@@ -333,33 +333,6 @@ export function ModalUpdateMaintenance({
               />
             </div>
           </div>
-
-          {/* Próxima manutenção preventiva */}
-          {assetSelected?.maintenanceFrequency && typeMaintenance === "1" && (
-            <fieldset className="border border-muted-foreground/20 rounded-xl p-4 space-y-4">
-              <legend className="px-2 text-sm font-semibold text-muted-foreground">
-                Próxima Manutenção Preventiva
-              </legend>
-
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label className="text-right">Data prevista</Label>
-                <div className="col-span-3">
-                  <Controller
-                    name="nextMaintenance"
-                    control={control}
-                    render={({ field: { onChange, value } }) => (
-                      <DatePickerWithHours date={value!} setDate={onChange} />
-                    )}
-                  />
-                </div>
-              </div>
-
-              <p className="text-xs text-muted-foreground text-center">
-                A data é calculada automaticamente com base na frequência do
-                ativo, mas pode ser ajustada manualmente.
-              </p>
-            </fieldset>
-          )}
 
 
           <DialogFooter className="pt-4">
