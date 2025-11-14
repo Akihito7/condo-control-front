@@ -232,7 +232,7 @@ export function Indicators() {
       <Card>
         <CardHeader>
           <CardTitle className="text-lg font-semibold">
-            Ativos com mais manutenções
+            Ativos com mais manutenções corretivas.
           </CardTitle>
         </CardHeader>
         <CardContent>
