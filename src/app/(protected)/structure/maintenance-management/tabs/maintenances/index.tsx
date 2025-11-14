@@ -239,7 +239,7 @@ export function Maintenances() {
                   </TableCell>
                   <TableCell>
                     {maintenance.plannedStart
-                      ? format(maintenance.plannedStart, "yyyy/MM/dd")
+                      ? format(maintenance.plannedStart, "yyyy/MM/dd HH:mm")
                       : ""}
                   </TableCell>
                   <TableCell>{maintenance.supplier}</TableCell>
