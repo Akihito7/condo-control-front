@@ -96,14 +96,14 @@ export function CalendarMaintenance() {
                 className="day-event-wrapper border border-gray-200 p-2 flex flex-col gap-2 min-h-56 overflow-auto max-h-56"
               >
                 <span className="text-sm font-medium text-gray-700">
-                  {day.date}
+                  {String(index+1).padStart(2, "0")}
                 </span>
 
                 <div className="space-y-4">
                   {day.dayEvents?.map((event) => (
                     <div
                       key={event.id}
-                      className="rounded-md text-white bg-green-600 px-2 py-1 cursor-pointer hover:bg-green-700 transition"
+                      className="border border-bg-gray-700 shadow-md text-gray-800 text-xs rounded-lg px-3 py-1 cursor-pointer"
                       onClick={() => {
                         setEventSelected(event);
                         setModalIsOpen(true);

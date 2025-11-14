@@ -34,8 +34,6 @@ import { Asset } from "@/api/fetch-maintenance-management-assets";
 
 const interventionSchema = z.object({
   assetType: z.string().min(1, "Por favor, selecione um ativo"),
-  priority: z.string().min(1, "Por favor, selecione uma prioridade"),
-  description: z.string().min(3, "Por favor, insira uma descrição"),
   provider: z.string().optional(),
   typeMaintenance: z.string().min(1, "Por favor, selecione um tipo"),
   contact: z.string(),
@@ -48,7 +46,6 @@ const interventionSchema = z.object({
   paymentDate: z.date().optional().nullable(),
   paymentCompletionDate: z.date().optional().nullable(),
   plannedStart: z.date().optional().nullable(),
-  plannedEnd: z.date().optional().nullable(),
   nextMaintenance: z.date().optional().nullable(),
   status: z.string().min(1, "Por favor, selecione um status"),
   documents: z.any().optional(),
@@ -83,8 +80,6 @@ export function ModalCreateMaintenance({
     resolver: zodResolver(interventionSchema),
     defaultValues: {
       assetType: "",
-      priority: "",
-      description: "",
       provider: "",
       type: "1",
       value: "",
@@ -200,7 +195,7 @@ export function ModalCreateMaintenance({
             <div className="col-span-3">
               <Controller
                 name="assetType"
-                control={control}
+                control={control}   
                 render={({ field }) => (
                   <Select value={field.value} onValueChange={field.onChange}>
                     <SelectTrigger>
@@ -223,41 +218,6 @@ export function ModalCreateMaintenance({
               {errors.assetType.message}
             </p>
           )}
-
-          {/* Priority */}
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Prioridade</Label>
-            <div className="col-span-3">
-              <Controller
-                name="priority"
-                control={control}
-                render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione a prioridade" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {priorityOptions?.map(({ id, name }) => (
-                        <SelectItem key={id} value={String(id)}>
-                          {name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-            </div>
-          </div>
-
-          {/* Description */}
-          <div className="grid grid-cols-4 items-start gap-4">
-            <Label className="text-right">Descrição</Label>
-            <textarea
-              {...register("description")}
-              className="col-span-3 border rounded-md p-2"
-              rows={3}
-            />
-          </div>
 
           {/* Provider */}
           <div className="grid grid-cols-4 items-center gap-4">
