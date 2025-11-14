@@ -272,7 +272,7 @@ export function ModalCreateMaintenance({
                 name="plannedStart"
                 control={control}
                 render={({ field: { onChange, value } }) => (
-                  <DatePicker date={value!} setDate={onChange} />
+                  <DatePickerWithHours date={value!} setDate={onChange} />
                 )}
               />
             </div>
