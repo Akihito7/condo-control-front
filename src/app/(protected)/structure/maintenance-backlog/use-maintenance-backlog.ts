@@ -43,12 +43,12 @@ export function useMaintenanceBacklog({
     queryFn: async () => fetchCondominiumAreas(condominiumId)
   })
 
+  const STATUS_NOT_ALLOWED = [7,6]
   const { data: paymentMethodsOptions, status: paymentMethodsOptionsStatus } = useQuery({
     queryKey: ['payment-methods-options'],
     queryFn: async () => fetchPaymentMethodOptions(),
     enabled: !!condominiumId
   })
-
 
   const { data: maintenancesStatusOptions, status: maintenancesStatusOptionsStatus } = useQuery({
     queryKey: ['status-options'],
@@ -109,7 +109,7 @@ export function useMaintenanceBacklog({
     areasOptionsStatus,
     paymentMethodsOptions,
     paymentMethodsOptionsStatus,
-    maintenancesStatusOptions,
+    maintenancesStatusOptions : maintenancesStatusOptions?.filter(status => !STATUS_NOT_ALLOWED.includes(status.id)),
     maintenancesStatusOptionsStatus,
     maintenancesTypes,
     maintenancesTypesStatus,
