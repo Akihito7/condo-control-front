@@ -73,10 +73,13 @@ export function DatePickerWithHours({
           </PopoverTrigger>
           <PopoverContent className="w-auto overflow-hidden p-0 pointer-events-auto" align="start">
             <Calendar
+             
               mode="single"
               selected={date}
               captionLayout="dropdown"
               onSelect={handleDateSelect}
+              startMonth={new Date(1900, 0)}
+             endMonth={new Date(2100, 11)}
             />
           </PopoverContent>
         </Popover>
