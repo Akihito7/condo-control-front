@@ -2,7 +2,7 @@
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -34,7 +34,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Paperclip } from "lucide-react";
+import { MoreHorizontal, Paperclip, Router } from "lucide-react";
 import { ModalCreateMaintenance } from "./modal-create-maintenance";
 import { useMaintenances } from "./use-maintenances";
 import { format } from "date-fns";
@@ -45,20 +45,7 @@ import { deleteIntervention } from "@/api/delete-intervention";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ModalUpdateMaintenance } from "./modal-update-maintenance";
 import { Button } from "@/components/ui/button";
-
-const ATIVOS_MOCKED = [
-  {
-    code: "ELV-001",
-    name: " Elevador Social Bloco A",
-    type: "Elevador",
-    supplier: "Atlas Schindler",
-    contact: "(11) 98765-4321",
-    frequency: "Mensal",
-    installationDate: "15/08/2015",
-    estimatedUsefulLife: "15 Anos",
-    remainingUsefulLife: "5 Anos",
-  },
-];
+import { useRouter, useSearchParams } from "next/navigation";
 
 export function Maintenances() {
   const [code, setCode] = useState<string>("");
@@ -73,7 +60,8 @@ export function Maintenances() {
   const [dropdownOpenToThisItem, setDropdownOpenToThisItem] = useState<
     number | undefined
   >();
-  const [maintenanceSelectedToDelete, setMaintenanceSelectedToDelete] = useState<Maintenance | null>(null)
+  const [maintenanceSelectedToDelete, setMaintenanceSelectedToDelete] =
+    useState<Maintenance | null>(null);
 
   const {
     priorityOptions,
@@ -132,6 +120,33 @@ export function Maintenances() {
 
     return matchesCode && matchesAsset && matchesType && matchesStatus;
   });
+
+  const getMaintenanceById = (id: number) => {
+    const maintenance = maintenances?.find(
+      (maintenance) => maintenance.id === id
+    );
+
+    return maintenance;
+  };
+
+  const searchParams = useSearchParams();
+  useEffect(() => {
+    const maintenanceId = searchParams.get("maintenanceId");
+    const dateFormatted = searchParams.get("date");
+
+    if (!maintenanceId || !dateFormatted) return;
+
+    const date = new Date(dateFormatted);
+    setDate(date);
+
+    if (!maintenances || maintenances.length === 0) return;
+
+    const maintenanceSelected = getMaintenanceById(Number(maintenanceId));
+
+    if (!maintenanceSelected) return;
+    setMaintenanceSelected(maintenanceSelected);
+    setModalUpdateIsOpen(true);
+  }, [maintenances, searchParams]);
 
   return (
     <div className="space-y-6">
@@ -304,7 +319,7 @@ export function Maintenances() {
                         <DropdownMenuItem
                           onClick={() => {
                             setDropdownOpen(false);
-                            setMaintenanceSelectedToDelete(maintenance)
+                            setMaintenanceSelectedToDelete(maintenance);
                           }}
                         >
                           Excluir
@@ -336,30 +351,44 @@ export function Maintenances() {
         setIsOpen={setModalUpdateIsOpen}
       />
 
-      
-      <Dialog open={!!maintenanceSelectedToDelete} onOpenChange={(open) => {if(!open) setMaintenanceSelectedToDelete(null)}}>
+      <Dialog
+        open={!!maintenanceSelectedToDelete}
+        onOpenChange={(open) => {
+          if (!open) setMaintenanceSelectedToDelete(null);
+        }}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Confirmar exclusão</DialogTitle>
             <DialogDescription>
               Tem certeza que deseja excluir a manutenção no ativo{" "}
-              <strong>{maintenanceSelectedToDelete?.assetsMaintenanceName}</strong> <br />
-          {maintenanceSelectedToDelete?.plannedStart ? "para a data " + format(maintenanceSelectedToDelete.plannedStart, "yyyy/MM/dd HH:mm") + "?" : ''}
-           <br />
+              <strong>
+                {maintenanceSelectedToDelete?.assetsMaintenanceName}
+              </strong>{" "}
+              <br />
+              {maintenanceSelectedToDelete?.plannedStart
+                ? "para a data " +
+                  format(
+                    maintenanceSelectedToDelete.plannedStart,
+                    "yyyy/MM/dd HH:mm"
+                  ) +
+                  "?"
+                : ""}
+              <br />
               Esta ação não poderá ser desfeita.
             </DialogDescription>
           </DialogHeader>
 
           <DialogFooter>
             <Button
-            variant="outline"
+              variant="outline"
               onClick={() => setMaintenanceSelectedToDelete(null)}
             >
               Cancelar
-            </Button> 
+            </Button>
 
             <Button
-            variant="destructive"
+              variant="destructive"
               onClick={async () => {
                 if (!maintenanceSelected) return;
                 await handleDeleteIntervention(maintenanceSelected.id);

@@ -4,7 +4,7 @@ import { Breadcrumb } from "@/components/breadcrumb";
 import { ButtonOpenSidebar } from "@/components/button-open-sidebar";
 import { AssetsMaintenance } from "./tabs/assets-maintenance";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Maintenances } from "./tabs/maintenances";
 import { Indicators } from "./tabs/indicators";
 import { CalendarMaintenance } from "./tabs/calendar-maintenance";
@@ -83,7 +83,7 @@ export default function MaintenanceManagement() {
         </TabsContent>
 
         <TabsContent className="mt-6" value="calendar-maintenance">
-          <CalendarMaintenance />
+          <CalendarMaintenance setTabSelected={setTabSelected} />
         </TabsContent>
 
         <TabsContent className="mt-6" value="indicators">
