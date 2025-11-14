@@ -30,6 +30,7 @@ import { ModalCreateType } from "./modal-create-type";
 import { Type } from "@/api/fetch-maintenance-management-assets-types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createMaintenanceManagementAssets } from "@/api/create-maintenance-management-assets";
+import { CalendarCustom } from "@/components/calendar";
 
 const assetSchema = z.object({
   code: z.string().min(1, "Informe o código"),
@@ -245,7 +246,7 @@ export function ModalCreateAsset({ assetsTypes }: ModalCreateAssetProps) {
             <Label className="text-right">Fornecedor</Label>
             <Input
               {...register("supplier")}
-              placeholder="Ex: ABC Equipamentos Ltda"
+              placeholder="Nome"
               className="col-span-3"
             />
           </div>
@@ -260,7 +261,7 @@ export function ModalCreateAsset({ assetsTypes }: ModalCreateAssetProps) {
             <Label className="text-right">Contato</Label>
             <Input
               {...register("contact")}
-              placeholder="Ex: ABC Equipamentos Ltda"
+              placeholder="Ex : Email, nome ou número."
               className="col-span-3"
             />
           </div>
@@ -296,8 +297,11 @@ export function ModalCreateAsset({ assetsTypes }: ModalCreateAssetProps) {
               control={control}
               render={({ field }) => {
                 return (
-                  <DatePicker date={field.value} setDate={field.onChange} />
-                );
+                 <CalendarCustom 
+                 date={field.value}
+                 setDate={field.onChange}
+                 label="Data de instalação"
+                 />)
               }}
             />
           </div>

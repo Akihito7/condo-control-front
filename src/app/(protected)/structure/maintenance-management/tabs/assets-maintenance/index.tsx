@@ -130,7 +130,6 @@ export function AssetsMaintenance() {
                 <TableHead className="text-left">Frequência</TableHead>
                 <TableHead>Vida Útil Estimada</TableHead>
                 <TableHead>Vida Útil Restante</TableHead>
-                <TableHead>Vida Útil Restante</TableHead>
                 <TableHead className="text-left">Anexos</TableHead>
                 <TableHead className="text-center">Ações</TableHead>
               </TableRow>
@@ -174,7 +173,6 @@ export function AssetsMaintenance() {
                     <TableCell>{asset.maintenanceFrequency}</TableCell>
                     <TableCell>{asset.estimatedUsefulLife}</TableCell>
                     <TableCell>{asset.remainingUsefulLife}</TableCell>
-                    <TableCell></TableCell>
                     <TableCell
                       onClick={() => {
                         setAssetSelected(asset);
