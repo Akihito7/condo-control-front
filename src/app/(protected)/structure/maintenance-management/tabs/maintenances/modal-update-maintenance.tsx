@@ -31,12 +31,10 @@ import { MaintenanceStatusOption } from "@/api/fetch-maintenances-status";
 import { Asset } from "@/api/fetch-maintenance-management-assets";
 import { Maintenance } from "@/api/fetch-maintenances";
 import { updateIntervention } from "@/api/update-intervention";
-import { parse } from "date-fns";
+import { DatePickerWithHours } from "@/components/date-picker-with-hours";
 
 const interventionSchema = z.object({
   assetType: z.string().min(1, "Por favor, selecione um ativo"),
-  priority: z.string().min(1, "Por favor, selecione uma prioridade"),
-  description: z.string().min(3, "Por favor, insira uma descrição"),
   provider: z.string().optional(),
   typeMaintenance: z.string().min(1, "Por favor, selecione um tipo"),
   contact: z.string(),
@@ -47,9 +45,7 @@ const interventionSchema = z.object({
     .optional()
     .or(z.literal("")),
   plannedStart: z.date().optional().nullable(),
-  nextMaintenance: z.date().optional().nullable(),
   status: z.string().min(1, "Por favor, selecione um status"),
-  documents: z.any().optional(),
 });
 
 export type InterventionFormData = z.infer<typeof interventionSchema>;
@@ -74,7 +70,6 @@ export function ModalUpdateMaintenance({
   setIsOpen,
 }: ModalUpdateMaintenanceProps) {
   const { user } = useUserContext();
-  const { condominiumId } = user;
   const queryClient = useQueryClient();
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -92,8 +87,6 @@ export function ModalUpdateMaintenance({
       assetType: maintenance?.assetMaintenanceId
         ? String(maintenance.assetMaintenanceId)
         : "",
-      priority: maintenance?.priorityId ? String(maintenance.priorityId) : "",
-      description: maintenance?.description || "",
       provider: maintenance?.assetsMaintenanceSupplier || "",
       typeMaintenance: maintenance?.assetsMaintenanceType
         ? String(maintenance.assetsMaintenanceType)
@@ -134,12 +127,6 @@ export function ModalUpdateMaintenance({
       }
     });
 
-    if (data.documents && data.documents.length > 0) {
-      for (let i = 0; i < data.documents.length; i++) {
-        formData.append("attachment", data.documents[i]);
-      }
-    }
-
     await handleUpdateIntervention(data);
 
     queryClient.invalidateQueries({ queryKey: ["maintenances"], exact: false });
@@ -171,7 +158,6 @@ export function ModalUpdateMaintenance({
       if (freq.includes("anual"))
         nextDate.setFullYear(nextDate.getFullYear() + 1);
 
-      setValue("nextMaintenance", nextDate);
     }
   }, [
     assetSelected?.maintenanceFrequency,
@@ -185,14 +171,6 @@ export function ModalUpdateMaintenance({
     (asset) => String(asset.id) === assetMaintenanceId
   );
 
-  useEffect(() => {
-    if (
-      maintenanceTypeId === "2" ||
-      !currentAssetSelected?.maintenanceFrequency
-    ) {
-      setValue("nextMaintenance", null);
-    }
-  }, []);
 
   useEffect(() => {
     if (maintenance) {
@@ -200,8 +178,6 @@ export function ModalUpdateMaintenance({
         assetType: maintenance.assetMaintenanceId
           ? String(maintenance.assetMaintenanceId)
           : "",
-        priority: maintenance.priorityId ? String(maintenance.priorityId) : "",
-        description: maintenance.description || "",
         provider: maintenance.supplier || "",
         typeMaintenance: maintenance.typeMaintenance
           ? String(maintenance.typeMaintenance)
@@ -263,41 +239,6 @@ export function ModalUpdateMaintenance({
             </div>
           </div>
 
-          {/* Prioridade */}
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Prioridade</Label>
-            <div className="col-span-3">
-              <Controller
-                name="priority"
-                control={control}
-                render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione a prioridade" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {priorityOptions?.map(({ id, name }) => (
-                        <SelectItem key={id} value={String(id)}>
-                          {name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-            </div>
-          </div>
-
-          {/* Descrição */}
-          <div className="grid grid-cols-4 items-start gap-4">
-            <Label className="text-right">Descrição</Label>
-            <textarea
-              {...register("description")}
-              className="col-span-3 border rounded-md p-2"
-              rows={3}
-            />
-          </div>
-
           {/* Fornecedor */}
           <div className="grid grid-cols-4 items-center gap-4">
             <Label className="text-right">Fornecedor</Label>
@@ -350,7 +291,7 @@ export function ModalUpdateMaintenance({
                 name="plannedStart"
                 control={control}
                 render={({ field: { onChange, value } }) => (
-                  <DatePicker date={value!} setDate={onChange} />
+                 <DatePickerWithHours date={value!} setDate={onChange} />
                 )}
               />
             </div>
@@ -380,44 +321,6 @@ export function ModalUpdateMaintenance({
               />
             </div>
           </div>
-
-          {/* Documentos */}
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Documentos</Label>
-            <Input
-              type="file"
-              {...register("documents")}
-              multiple
-              className="col-span-3"
-            />
-          </div>
-
-          {/* Próxima manutenção preventiva */}
-          {assetSelected?.maintenanceFrequency && typeMaintenance === "1" && (
-            <fieldset className="border border-muted-foreground/20 rounded-xl p-4 space-y-4">
-              <legend className="px-2 text-sm font-semibold text-muted-foreground">
-                Próxima Manutenção Preventiva
-              </legend>
-
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label className="text-right">Data prevista</Label>
-                <div className="col-span-3">
-                  <Controller
-                    name="nextMaintenance"
-                    control={control}
-                    render={({ field: { onChange, value } }) => (
-                      <DatePicker date={value!} setDate={onChange} />
-                    )}
-                  />
-                </div>
-              </div>
-
-              <p className="text-xs text-muted-foreground text-center">
-                A data é calculada automaticamente com base na frequência do
-                ativo, mas pode ser ajustada manualmente.
-              </p>
-            </fieldset>
-          )}
 
           <DialogFooter className="pt-4">
             <DialogClose asChild>

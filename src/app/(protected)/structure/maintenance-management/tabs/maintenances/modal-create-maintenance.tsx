@@ -31,6 +31,7 @@ import { createIntervention } from "@/api/create-intervention";
 import { PriorityOption } from "@/api/fetch-priority-options";
 import { MaintenanceStatusOption } from "@/api/fetch-maintenances-status";
 import { Asset } from "@/api/fetch-maintenance-management-assets";
+import { DatePickerWithHours } from "@/components/date-picker-with-hours";
 
 const interventionSchema = z.object({
   assetType: z.string().min(1, "Por favor, selecione um ativo"),
@@ -327,7 +328,7 @@ export function ModalCreateMaintenance({
                     name="nextMaintenance"
                     control={control}
                     render={({ field: { onChange, value } }) => (
-                      <DatePicker date={value!} setDate={onChange} />
+                      <DatePickerWithHours date={value!} setDate={onChange} />
                     )}
                   />
                 </div>
