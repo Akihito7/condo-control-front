@@ -31,6 +31,17 @@ import { Asset } from "@/api/fetch-maintenance-management-assets";
 import { ModalAttachments } from "./modal-attachments";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteMaintenanceAsset } from "@/api/delete-maintenance-asset";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
+  DialogClose,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 export function AssetsMaintenance() {
   const query = useQueryClient();
@@ -40,6 +51,11 @@ export function AssetsMaintenance() {
   const [modalAttchamentIsOpen, setModalAttchamentIsOpen] = useState(false);
   const [usefulLifeLessThanTwoYears, setUsefulLifeLessThanTwoYears] =
     useState("2");
+  const [assetToDelete, setAssetToDelete] = useState<Asset | null>(null);
+    const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [dropdownOpenToThisItem, setDropdownOpenToThisItem] = useState<
+    number | undefined
+  >();
 
   const { assetsTypes, assetsTypesStatus, assets, assetsStatus } =
     useAssetsMaintenance();
@@ -185,16 +201,30 @@ export function AssetsMaintenance() {
                     </TableCell>
 
                     <TableCell className="text-center">
-                      <DropdownMenu>
+                      <DropdownMenu
+                          open={
+                            dropdownOpen &&
+                            dropdownOpenToThisItem === asset.id
+                          }
+                          onOpenChange={(open) => {
+                            if (!open) {
+                              setDropdownOpenToThisItem(undefined);
+                            } else {
+                              setDropdownOpenToThisItem(asset.id);
+                            }
+                            setDropdownOpen(open);
+                          }}
+                      > 
                         <DropdownMenuTrigger className="outline-none">
                           <MoreHorizontal className="w-5 h-5 cursor-pointer text-gray-600" />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
                           <DropdownMenuItem>Editar</DropdownMenuItem>
                           <DropdownMenuItem
-                            onClick={() =>
-                              handleDeleteMaintenanceAsset(asset.id)
-                            }
+                            onClick={() => {
+                              setDropdownOpen(false)
+                              setAssetToDelete(asset)
+                            }}
                           >
                             Excluir
                           </DropdownMenuItem>
@@ -214,6 +244,41 @@ export function AssetsMaintenance() {
         isOpen={modalAttchamentIsOpen}
         setIsOpen={setModalAttchamentIsOpen}
       />
+
+      <Dialog open={!!assetToDelete} onOpenChange={(open) => {if(!open) setAssetToDelete(null)}}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirmar exclusão</DialogTitle>
+            <DialogDescription>
+              Tem certeza que deseja excluir o ativo{" "}
+              <strong>{assetToDelete?.name}</strong>? <br />
+              Esta ação não poderá ser desfeita.
+            </DialogDescription>
+          </DialogHeader>
+
+          <DialogFooter>
+            <Button
+            variant="outline"
+              onClick={() => setAssetToDelete(null)}
+            >
+              Cancelar
+            </Button> 
+
+            <Button
+            variant="destructive"
+              onClick={async () => {
+                if (!assetToDelete) return;
+                await handleDeleteMaintenanceAsset(assetToDelete.id);
+                setAssetToDelete(null);
+              }}
+            >
+              Confirmar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+
     </div>
   );
 }
