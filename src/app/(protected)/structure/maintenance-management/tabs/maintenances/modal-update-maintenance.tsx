@@ -46,6 +46,7 @@ const interventionSchema = z.object({
     .or(z.literal("")),
   plannedStart: z.date().optional().nullable(),
   status: z.string().min(1, "Por favor, selecione um status"),
+  nextMaintenance : z.date().nullable()
 });
 
 export type InterventionFormData = z.infer<typeof interventionSchema>;
@@ -158,6 +159,8 @@ export function ModalUpdateMaintenance({
       if (freq.includes("anual"))
         nextDate.setFullYear(nextDate.getFullYear() + 1);
 
+    setValue("nextMaintenance", nextDate)
+  
     }
   }, [
     assetSelected?.maintenanceFrequency,
@@ -170,6 +173,15 @@ export function ModalUpdateMaintenance({
   const currentAssetSelected = assets?.find(
     (asset) => String(asset.id) === assetMaintenanceId
   );
+
+    useEffect(() => {
+    if (
+      maintenanceTypeId === "2" ||
+      !currentAssetSelected?.maintenanceFrequency
+    ) {
+      setValue("nextMaintenance", null);
+    }
+  }, []);
 
 
   useEffect(() => {
@@ -321,6 +333,34 @@ export function ModalUpdateMaintenance({
               />
             </div>
           </div>
+
+          {/* Próxima manutenção preventiva */}
+          {assetSelected?.maintenanceFrequency && typeMaintenance === "1" && (
+            <fieldset className="border border-muted-foreground/20 rounded-xl p-4 space-y-4">
+              <legend className="px-2 text-sm font-semibold text-muted-foreground">
+                Próxima Manutenção Preventiva
+              </legend>
+
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label className="text-right">Data prevista</Label>
+                <div className="col-span-3">
+                  <Controller
+                    name="nextMaintenance"
+                    control={control}
+                    render={({ field: { onChange, value } }) => (
+                      <DatePickerWithHours date={value!} setDate={onChange} />
+                    )}
+                  />
+                </div>
+              </div>
+
+              <p className="text-xs text-muted-foreground text-center">
+                A data é calculada automaticamente com base na frequência do
+                ativo, mas pode ser ajustada manualmente.
+              </p>
+            </fieldset>
+          )}
+
 
           <DialogFooter className="pt-4">
             <DialogClose asChild>
