@@ -23,6 +23,8 @@ export function CalendarMaintenance() {
     setEventSelected,
     modalIsOpen,
     setModalIsOpen,
+    maintenancesStatusOptions,
+    maintenancesStatusOptionsStatus,
   } = useCalendarMaintenance();
 
   const getTypeName = (typeMaintenanceId: string) => {
@@ -127,6 +129,7 @@ export function CalendarMaintenance() {
         isOpen={modalIsOpen}
         setIsOpen={setModalIsOpen}
         setEventSelected={setEventSelected}
+        statusMaintenances={maintenancesStatusOptions}
       />
     </div>
   );

@@ -20,6 +20,13 @@ export function useCalendarMaintenance() {
     enabled: !!dateFormatted
   })
 
+    const { data: maintenancesStatusOptions, status: maintenancesStatusOptionsStatus } = useQuery({
+    queryKey: ['status-options'],
+    queryFn: fetchMaintenancesStatus,
+    enabled: !!condominiumId
+  })
+
+
   return {
     date,
     setDate,
@@ -28,6 +35,8 @@ export function useCalendarMaintenance() {
     eventSelected,
     setEventSelected,
     modalIsOpen,
-    setModalIsOpen
+    setModalIsOpen,
+    maintenancesStatusOptions,
+    maintenancesStatusOptionsStatus
   }
 }

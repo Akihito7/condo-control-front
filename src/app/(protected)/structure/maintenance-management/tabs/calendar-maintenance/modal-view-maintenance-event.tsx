@@ -14,12 +14,14 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { CalendarDays, User, Wrench, Clock, Tag } from "lucide-react";
 import React from "react";
+import { MaintenanceStatusOption } from "@/api/fetch-maintenances-status";
 
 interface ModalViewMaintenanceProps {
   event: DayEvent | null;
   setEventSelected: React.Dispatch<React.SetStateAction<DayEvent | null>>;
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  statusMaintenances : MaintenanceStatusOption[] | undefined
 }
 
 export function ModalViewMaintenance({
@@ -27,7 +29,15 @@ export function ModalViewMaintenance({
   setEventSelected,
   isOpen,
   setIsOpen,
+  statusMaintenances
 }: ModalViewMaintenanceProps) {
+
+  const getStatusName = (statusId? : number) => {
+    if(!statusId) return ""
+    const status = statusMaintenances?.find(status => status.id === statusId);
+    return status?.name ?? ""
+  }
+  
   return (
     <Dialog
       open={isOpen}
@@ -97,13 +107,9 @@ export function ModalViewMaintenance({
               <span className="font-medium text-gray-700">Status:</span>
               <Badge
                 variant="outline"
-                className={`${
-                  event?.statusId === 1
-                    ? "border-green-500 text-green-600"
-                    : "border-yellow-500 text-yellow-600"
-                }`}
+              
               >
-                {event?.statusId === 1 ? "Concluída" : "Pendente"}
+                {getStatusName(event?.statusId)}
               </Badge>
             </p>
           </div>
