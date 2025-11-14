@@ -21,7 +21,6 @@ import { Button } from "@/components/ui/button";
 import { FileDown } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchSummaryMaintenance } from "@/api/fetch-summary-maintenance";
-import { Skeleton } from "@/components/ui/skeleton";
 
 export function Indicators() {
   const [year, setYear] = useState(new Date().getFullYear().toString());
@@ -52,8 +51,12 @@ export function Indicators() {
       currency: "BRL",
     });
 
-  const PIE_COLORS = ["#4ade80", "#f87171"];
-  const LINE_COLOR = "#3b82f6";
+  // 🎨 Paleta de tons de azul
+  const COLORS = ["#4273fc", "#60a5fa", "#93c5fd", "#2563eb", "#1e40af"];
+  const PIE_COLORS = [COLORS[0], COLORS[4]]; // Preventivas / Corretivas
+  const LINE_COLOR = COLORS[0];
+  const LINE_DOT_COLOR = COLORS[1];
+  const BAR_COLOR = COLORS[4];
 
   return (
     <div className="space-y-6 pb-6">
@@ -94,7 +97,7 @@ export function Indicators() {
 
           <div>
             <p className="text-sm text-gray-500">% de Preventivas</p>
-            <p className="text-lg font-semibold text-emerald-600">
+            <p className="text-lg font-semibold text-primary">
               {cards.total
                 ? ((cards.preventives / cards.total) * 100).toFixed(1)
                 : 0}
@@ -131,43 +134,40 @@ export function Indicators() {
             </p>
           </div>
 
+          <div className="h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={charts.maintenanceTypes}
+                  dataKey="count"
+                  nameKey="type"
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  outerRadius={90}
+                  label={({ name, percent }) =>
+                    `${name}: ${(percent! * 100).toFixed(1)}%`
+                  }
+                >
+                  {charts.maintenanceTypes.map((_ : any, i: number) => (
+                    <Cell key={i} fill={PIE_COLORS[i]} />
+                  ))}
+                </Pie>
 
-        <div className="h-[300px]">
-           <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={charts.maintenanceTypes}
-                dataKey="count"
-                nameKey="type"
-                cx="50%"
-                cy="50%"  
-                labelLine={false}
-                outerRadius={90}
-                label={({ name, percent }) =>
-                  `${name}: ${(percent! * 100).toFixed(1)}%`
-                }
-              >
-                {charts.maintenanceTypes.map((_ : any, i : number) => (
-                  <Cell key={i} fill={PIE_COLORS[i]} />
-                ))}
-              </Pie>
-
-              <Tooltip
-                formatter={(value, name) => [`${value} manutenções`, name]}
-              />
-              <Legend
-                verticalAlign="bottom"
-                align="center"
-                iconType="circle"
-                formatter={(value) => (
-                  <span className="text-sm text-gray-700">{value}</span>
-                )}
-              />
-            </PieChart>
-          </ResponsiveContainer>
-
+                <Tooltip
+                  formatter={(value, name) => [`${value} manutenções`, name]}
+                />
+                <Legend
+                  verticalAlign="bottom"
+                  align="center"
+                  iconType="circle"
+                  formatter={(value) => (
+                    <span className="text-sm text-gray-700">{value}</span>
+                  )}
+                />
+              </PieChart>
+            </ResponsiveContainer>
           </div>
-        
         </div>
 
         {/* Custo Mensal */}
@@ -181,37 +181,40 @@ export function Indicators() {
             </p>
           </div>
 
-
-       <div className="h-[300px]">
+          <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={charts.monthlyCosts}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+              <LineChart data={charts.monthlyCosts}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
 
-              <XAxis dataKey="month" tick={{ fill: "#4B5563", fontSize: 12 }} />
-              <YAxis
-                tick={{ fill: "#4B5563", fontSize: 12 }}
-                tickFormatter={(v) =>
-                  `R$ ${v.toLocaleString("pt-BR", { minimumFractionDigits: 0 })}`
-                }
-              />
+                <XAxis dataKey="month" tick={{ fill: "#4B5563", fontSize: 12 }} />
+                <YAxis
+                  tick={{ fill: "#4B5563", fontSize: 12 }}
+                  tickFormatter={(v) =>
+                    `R$ ${v.toLocaleString("pt-BR", { minimumFractionDigits: 0 })}`
+                  }
+                />
 
-              <Tooltip
-                formatter={(value: number) => formatterToCurrency(value)}
-                labelFormatter={(label) => `Mês: ${label}`}
-              />
+                <Tooltip
+                  formatter={(value: number) => formatterToCurrency(value)}
+                  labelFormatter={(label) => `Mês: ${label}`}
+                />
 
-              <Line
-                type="monotone"
-                dataKey="amount"
-                name="Custo"
-                stroke={LINE_COLOR}
-                strokeWidth={3}
-                dot={{ r: 4, fill: "#FFF", stroke: LINE_COLOR, strokeWidth: 2 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+                <Line
+                  type="monotone"
+                  dataKey="amount"
+                  name="Custo"
+                  stroke={LINE_COLOR}
+                  strokeWidth={3}
+                  dot={{
+                    r: 4,
+                    fill: "#FFF",
+                    stroke: LINE_DOT_COLOR,
+                    strokeWidth: 2,
+                  }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
- 
         </div>
       </div>
 
@@ -250,7 +253,7 @@ export function Indicators() {
             <Bar
               dataKey="count"
               name="Quantidade"
-              fill="#3b82f6"
+              fill={BAR_COLOR}
               barSize={18}
               radius={[4, 4, 0, 0]}
             />
