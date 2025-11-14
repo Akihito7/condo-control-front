@@ -35,12 +35,13 @@ export function useMaintenances() {
     queryKey: ['maintenances', user.id, dateFormatted],
     queryFn: () => fetchMaintenaces(dateFormatted)
   })
-
+  
+  const STATUS_ALLOWS = [5,4, 7, 6,]
 
   return {
     priorityOptions,
     priorityOptionsStatus,
-    maintenancesStatusOptions,
+    maintenancesStatusOptions : maintenancesStatusOptions?.filter((status) => STATUS_ALLOWS.includes(status.id)),
     maintenancesStatusOptionsStatus,
     assets,
     assetsStatus,
