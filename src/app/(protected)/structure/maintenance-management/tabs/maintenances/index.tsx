@@ -390,8 +390,8 @@ export function Maintenances({ date, setDate }: MaintenancesProps) {
             <Button
               variant="destructive"
               onClick={async () => {
-                if (!maintenanceSelected) return;
-                await handleDeleteIntervention(maintenanceSelected.id);
+                if (!maintenanceSelectedToDelete) return;
+                await handleDeleteIntervention(maintenanceSelectedToDelete.id);
                 setMaintenanceSelectedToDelete(null);
               }}
             >
