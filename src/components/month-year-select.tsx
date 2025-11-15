@@ -38,7 +38,9 @@ export function MonthYearPicker({
   const [selectedMonth, setSelectedMonth] = useState<number>(
     selectedDate.getMonth()
   );
-  const [selectedYear, setSelectedYear] = useState<number>(currentYear);
+  const [selectedYear, setSelectedYear] = useState<number>(
+    selectedDate.getFullYear()
+  );
 
   useEffect(() => {
     console.log("mudei", selectedYear, selectedMonth);
