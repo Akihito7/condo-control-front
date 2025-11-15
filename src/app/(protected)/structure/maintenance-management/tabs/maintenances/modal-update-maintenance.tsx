@@ -80,6 +80,7 @@ export function ModalUpdateMaintenance({
     register,
     handleSubmit,
     reset,
+    getValues,
     watch,
     setValue,
     formState: { errors },
@@ -181,28 +182,42 @@ export function ModalUpdateMaintenance({
     ) {
       setValue("nextMaintenance", null);
     }
-  }, []);
+  }, [maintenance]);
+
 
   useEffect(() => {
     if (maintenance) {
-      reset({
-        assetType: maintenance.assetMaintenanceId
+      setValue(
+        "assetType",
+        maintenance.assetMaintenanceId
           ? String(maintenance.assetMaintenanceId)
-          : "",
-        provider: maintenance.supplier || "",
-        typeMaintenance: maintenance.typeMaintenance
-          ? String(maintenance.typeMaintenance)
-          : "",
-        contact: maintenance.contact || "",
-        type: maintenance.typeId ? String(maintenance.typeId) : "1",
-        value: maintenance.amount ? String(maintenance.amount) : "",
-        plannedStart: maintenance.plannedStart
-          ? new Date(maintenance.plannedStart)
-          : null,
-        status: maintenance.statusId ? String(maintenance.statusId) : "",
-      });
+          : ""
+      );
+
+      setValue("provider", maintenance.supplier || "");
+
+      setValue(
+        "typeMaintenance",
+        maintenance.typeMaintenance ? String(maintenance.typeMaintenance) : ""
+      );
+
+      setValue("contact", maintenance.contact || "");
+
+      setValue("type", maintenance.typeId ? String(maintenance.typeId) : "1");
+
+      setValue("value", maintenance.amount ? String(maintenance.amount) : "");
+
+      setValue(
+        "plannedStart",
+        maintenance.plannedStart ? new Date(maintenance.plannedStart) : null
+      );
+
+      setValue(
+        "status",
+        maintenance.statusId ? String(maintenance.statusId) : ""
+      );
     }
-  }, [maintenance, reset]);
+  }, [maintenance, setValue]);
 
   const router = useRouter();
   return (

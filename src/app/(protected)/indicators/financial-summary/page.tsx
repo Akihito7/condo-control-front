@@ -100,6 +100,9 @@ export default function FinancialSummary() {
           </div>
 
           <div className="w-full h-[80%]">
+            
+            
+            
             {chartRevenueStatus === "pending" ? (
               <Skeleton className="w-full h-full rounded-lg" />
             ) : chartRevenue && chartRevenue.length > 0 ? (
