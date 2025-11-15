@@ -12,6 +12,7 @@ import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
 export default function MaintenanceManagement() {
   const [tabSelected, setTabSelected] = useState("asset-maintenance");
+  const [date, setDate] = useState(new Date());
 
   const router = useRouter();
   const pathname = usePathname();
@@ -79,11 +80,15 @@ export default function MaintenanceManagement() {
         </TabsContent>
 
         <TabsContent className="mt-6" value="maintenances">
-          <Maintenances />
+          <Maintenances date={date} setDate={setDate} />
         </TabsContent>
 
         <TabsContent className="mt-6" value="calendar-maintenance">
-          <CalendarMaintenance setTabSelected={setTabSelected} />
+          <CalendarMaintenance
+            date={date}
+            setDate={setDate}
+            setTabSelected={setTabSelected}
+          />
         </TabsContent>
 
         <TabsContent className="mt-6" value="indicators">

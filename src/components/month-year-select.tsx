@@ -41,6 +41,7 @@ export function MonthYearPicker({
   const [selectedYear, setSelectedYear] = useState<number>(currentYear);
 
   useEffect(() => {
+    console.log("mudei", selectedYear, selectedMonth);
     onChange(new Date(selectedYear, selectedMonth));
   }, [selectedMonth, selectedYear]);
 
@@ -61,7 +62,7 @@ export function MonthYearPicker({
   }
 
   return (
-    <Popover >
+    <Popover>
       <PopoverTrigger asChild>
         <Button variant="outline" className="w-[200px] justify-between h-10">
           {format(selectedDate, "MMMM yyyy", { locale: ptBR })}
@@ -71,7 +72,6 @@ export function MonthYearPicker({
         <Select
           value={selectedMonth.toString()}
           onValueChange={(val) => setSelectedMonth(parseInt(val))}
-        
         >
           <SelectTrigger className="w-[120px]">
             <SelectValue placeholder="Mês" />

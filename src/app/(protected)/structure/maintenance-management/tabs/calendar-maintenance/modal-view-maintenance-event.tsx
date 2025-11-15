@@ -46,14 +46,11 @@ export function ModalViewMaintenance({
   const searchParams = useSearchParams();
 
   function handleNavigate() {
-    const dateFormatted = event?.plannedStart
-      ? format(new Date(event!.plannedStart), "yyyy-MM-dd")
-      : "";
     const maintenanceId = event?.id;
 
-    if (!dateFormatted || !maintenanceId) return;
+    if (!maintenanceId) return;
     router.replace(
-      `maintenance-management?tab=maintenances&date=${dateFormatted}&maintenanceId=${maintenanceId}`
+      `maintenance-management?tab=maintenances&maintenanceId=${maintenanceId}`
     );
     setNavigate(true);
   }

@@ -2,7 +2,7 @@
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -47,7 +47,11 @@ import { ModalUpdateMaintenance } from "./modal-update-maintenance";
 import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export function Maintenances() {
+interface MaintenancesProps {
+  date: Date;
+  setDate: React.Dispatch<React.SetStateAction<Date>>;
+}
+export function Maintenances({ date, setDate }: MaintenancesProps) {
   const [code, setCode] = useState<string>("");
   const [assetSelected, setAssetSelected] = useState<string>("-1");
   const [typeSelected, setTypeSelected] = useState<string>("-1");
@@ -63,6 +67,8 @@ export function Maintenances() {
   const [maintenanceSelectedToDelete, setMaintenanceSelectedToDelete] =
     useState<Maintenance | null>(null);
 
+  const dateFormatted = format(date, "yyyy-MM-dd");
+
   const {
     priorityOptions,
     priorityOptionsStatus,
@@ -72,9 +78,7 @@ export function Maintenances() {
     assetsStatus,
     maintenances,
     maintenancesStatus,
-    date,
-    setDate,
-  } = useMaintenances();
+  } = useMaintenances({ dateFormatted });
 
   const getStatusName = (statusId: number) => {
     const status = maintenancesStatusOptions?.find(
@@ -132,12 +136,8 @@ export function Maintenances() {
   const searchParams = useSearchParams();
   useEffect(() => {
     const maintenanceId = searchParams.get("maintenanceId");
-    const dateFormatted = searchParams.get("date");
 
     if (!maintenanceId || !dateFormatted) return;
-
-    const date = new Date(dateFormatted);
-    setDate(date);
 
     if (!maintenances || maintenances.length === 0) return;
 

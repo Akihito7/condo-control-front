@@ -3,6 +3,7 @@ import { useCalendarMaintenance } from "./use-calendar-maintenance";
 import { ModalViewMaintenance } from "./modal-view-maintenance-event";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Dispatch, SetStateAction } from "react";
+import { format } from "date-fns";
 
 const DAY_HEADERS = [
   "Segunda-feira",
@@ -16,11 +17,16 @@ const DAY_HEADERS = [
 
 interface CalendarMaintenance {
   setTabSelected: Dispatch<SetStateAction<string>>;
+  date: Date;
+  setDate: React.Dispatch<React.SetStateAction<Date>>;
 }
-export function CalendarMaintenance({ setTabSelected }: CalendarMaintenance) {
+export function CalendarMaintenance({
+  date,
+  setDate,
+  setTabSelected,
+}: CalendarMaintenance) {
+  const dateFormatted = format(date, "yyyy-MM-dd");
   const {
-    date,
-    setDate,
     calendarMaintenances,
     calendarStatus,
     eventSelected,
@@ -29,7 +35,7 @@ export function CalendarMaintenance({ setTabSelected }: CalendarMaintenance) {
     setModalIsOpen,
     maintenancesStatusOptions,
     maintenancesStatusOptionsStatus,
-  } = useCalendarMaintenance();
+  } = useCalendarMaintenance({ dateFormatted });
 
   const getTypeName = (typeMaintenanceId: string) => {
     return typeMaintenanceId === "1" ? "Preventiva" : "Corretiva";
