@@ -34,6 +34,7 @@ export function DatePicker({
       </PopoverTrigger>
       <PopoverContent className="pointer-events-auto">
         <Calendar
+          className="min-h-[324px] max-h-[324px] bg-red-400"
           mode="single"
           selected={date}
           onSelect={(value) => {

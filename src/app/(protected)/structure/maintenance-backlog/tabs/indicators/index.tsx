@@ -110,7 +110,8 @@ export function Indicators({
             <div>
               <p className="text-sm text-muted-foreground">Tempo Médio</p>
               <p className="text-lg font-bold">
-                {indicatorsResume?.accuracyExecutionDaysImprovements} dias
+                {indicatorsResume?.accuracyExecutionDaysImprovements ?
+                 `${Math.round(indicatorsResume?.accuracyExecutionDaysImprovements)} dias` : ""}
               </p>
             </div>
             <div>
@@ -128,9 +129,6 @@ export function Indicators({
           <CardTitle className="text-lg font-semibold text-gray-800">
             Gastos Mensais com Acumulado
           </CardTitle>
-          <p className="text-sm text-gray-500">
-            Gasto mensal em colunas e valor acumulado em linha.
-          </p>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={320}>
