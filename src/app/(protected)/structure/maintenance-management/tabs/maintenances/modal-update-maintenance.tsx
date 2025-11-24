@@ -32,6 +32,7 @@ import { Asset } from "@/api/fetch-maintenance-management-assets";
 import { Maintenance } from "@/api/fetch-maintenances";
 import { updateIntervention } from "@/api/update-intervention";
 import { DatePickerWithHours } from "@/components/date-picker-with-hours";
+import { useRouter } from "next/navigation";
 
 const interventionSchema = z.object({
   assetType: z.string().min(1, "Por favor, selecione um ativo"),
@@ -46,7 +47,7 @@ const interventionSchema = z.object({
     .or(z.literal("")),
   plannedStart: z.date().optional().nullable(),
   status: z.string().min(1, "Por favor, selecione um status"),
-  nextMaintenance : z.date().nullable()
+  nextMaintenance: z.date().nullable(),
 });
 
 export type InterventionFormData = z.infer<typeof interventionSchema>;
@@ -79,6 +80,7 @@ export function ModalUpdateMaintenance({
     register,
     handleSubmit,
     reset,
+    getValues,
     watch,
     setValue,
     formState: { errors },
@@ -159,8 +161,7 @@ export function ModalUpdateMaintenance({
       if (freq.includes("anual"))
         nextDate.setFullYear(nextDate.getFullYear() + 1);
 
-    setValue("nextMaintenance", nextDate)
-
+      setValue("nextMaintenance", nextDate);
     }
   }, [
     assetSelected?.maintenanceFrequency,
@@ -174,42 +175,59 @@ export function ModalUpdateMaintenance({
     (asset) => String(asset.id) === assetMaintenanceId
   );
 
-    useEffect(() => {
+  useEffect(() => {
     if (
       maintenanceTypeId === "2" ||
       !currentAssetSelected?.maintenanceFrequency
     ) {
       setValue("nextMaintenance", null);
     }
-  }, []);
+  }, [maintenance]);
 
 
   useEffect(() => {
     if (maintenance) {
-      reset({
-        assetType: maintenance.assetMaintenanceId
+      setValue(
+        "assetType",
+        maintenance.assetMaintenanceId
           ? String(maintenance.assetMaintenanceId)
-          : "",
-        provider: maintenance.supplier || "",
-        typeMaintenance: maintenance.typeMaintenance
-          ? String(maintenance.typeMaintenance)
-          : "",
-        contact: maintenance.contact || "",
-        type: maintenance.typeId ? String(maintenance.typeId) : "1",
-        value: maintenance.amount ? String(maintenance.amount) : "",
-        plannedStart: maintenance.plannedStart
-          ? new Date(maintenance.plannedStart)
-          : null,
-        status: maintenance.statusId ? String(maintenance.statusId) : "",
-      });
-    }
-  }, [maintenance, reset]);
+          : ""
+      );
 
+      setValue("provider", maintenance.supplier || "");
+
+      setValue(
+        "typeMaintenance",
+        maintenance.typeMaintenance ? String(maintenance.typeMaintenance) : ""
+      );
+
+      setValue("contact", maintenance.contact || "");
+
+      setValue("type", maintenance.typeId ? String(maintenance.typeId) : "1");
+
+      setValue("value", maintenance.amount ? String(maintenance.amount) : "");
+
+      setValue(
+        "plannedStart",
+        maintenance.plannedStart ? new Date(maintenance.plannedStart) : null
+      );
+
+      setValue(
+        "status",
+        maintenance.statusId ? String(maintenance.statusId) : ""
+      );
+    }
+  }, [maintenance, setValue]);
+
+  const router = useRouter();
   return (
     <Dialog
       open={isOpen}
       onOpenChange={(open) => {
-        if (!open) reset();
+        if (!open) {
+          reset();
+          router.replace(`maintenance-management?tab=maintenances`);
+        }
         setIsOpen(open);
       }}
     >
@@ -303,7 +321,7 @@ export function ModalUpdateMaintenance({
                 name="plannedStart"
                 control={control}
                 render={({ field: { onChange, value } }) => (
-                 <DatePickerWithHours date={value!} setDate={onChange} />
+                  <DatePickerWithHours date={value!} setDate={onChange} />
                 )}
               />
             </div>
@@ -333,7 +351,6 @@ export function ModalUpdateMaintenance({
               />
             </div>
           </div>
-
 
           <DialogFooter className="pt-4">
             <DialogClose asChild>

@@ -1,7 +1,9 @@
 import { MonthYearPicker } from "@/components/month-year-select";
 import { useCalendarMaintenance } from "./use-calendar-maintenance";
 import { ModalViewMaintenance } from "./modal-view-maintenance-event";
-import { Skeleton } from "@/components/ui/skeleton"; // 👈 novo componente
+import { Skeleton } from "@/components/ui/skeleton";
+import { Dispatch, SetStateAction } from "react";
+import { format } from "date-fns";
 
 const DAY_HEADERS = [
   "Segunda-feira",
@@ -13,10 +15,18 @@ const DAY_HEADERS = [
   "Domingo",
 ];
 
-export function CalendarMaintenance() {
+interface CalendarMaintenance {
+  setTabSelected: Dispatch<SetStateAction<string>>;
+  date: Date;
+  setDate: React.Dispatch<React.SetStateAction<Date>>;
+}
+export function CalendarMaintenance({
+  date,
+  setDate,
+  setTabSelected,
+}: CalendarMaintenance) {
+  const dateFormatted = format(date, "yyyy-MM-dd");
   const {
-    date,
-    setDate,
     calendarMaintenances,
     calendarStatus,
     eventSelected,
@@ -25,7 +35,7 @@ export function CalendarMaintenance() {
     setModalIsOpen,
     maintenancesStatusOptions,
     maintenancesStatusOptionsStatus,
-  } = useCalendarMaintenance();
+  } = useCalendarMaintenance({ dateFormatted });
 
   const getTypeName = (typeMaintenanceId: string) => {
     return typeMaintenanceId === "1" ? "Preventiva" : "Corretiva";
@@ -98,7 +108,7 @@ export function CalendarMaintenance() {
                 className="day-event-wrapper border border-gray-200 p-2 flex flex-col gap-2 min-h-56 overflow-auto max-h-56"
               >
                 <span className="text-sm font-medium text-gray-700">
-                  {String(index+1).padStart(2, "0")}
+                  {String(index + 1).padStart(2, "0")}
                 </span>
 
                 <div className="space-y-4">
@@ -130,6 +140,7 @@ export function CalendarMaintenance() {
         setIsOpen={setModalIsOpen}
         setEventSelected={setEventSelected}
         statusMaintenances={maintenancesStatusOptions}
+        setTabSelected={setTabSelected}
       />
     </div>
   );

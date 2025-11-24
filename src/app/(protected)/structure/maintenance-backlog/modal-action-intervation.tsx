@@ -357,40 +357,6 @@ export function ModalActionIntervention({
             </p>
           )}
 
-          {/* Type */}
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Tipo</Label>
-            <div className="col-span-3">
-              <Controller
-                name="type"
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    value={field.value}
-                    onValueChange={field.onChange}
-                    disabled={isDisabled}
-                  >
-                    <SelectTrigger className="min-w-[200px]">
-                      <SelectValue placeholder="Selecione o tipo" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {typesOptions.map(({ id, name }) => (
-                        <SelectItem key={id} value={id.toString()}>
-                          {name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-            </div>
-          </div>
-          {errors.type && !isDisabled && (
-            <p className="text-red-500 text-sm -mt-2 ml-[145px]">
-              {errors.type.message}
-            </p>
-          )}
-
           {/* Area */}
           <div className="grid grid-cols-4 items-center gap-4">
             <Label className="text-right">Área</Label>

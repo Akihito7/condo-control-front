@@ -13,15 +13,18 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { CalendarDays, User, Wrench, Clock, Tag } from "lucide-react";
-import React from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { MaintenanceStatusOption } from "@/api/fetch-maintenances-status";
+import { useRouter, useSearchParams } from "next/navigation";
+import { format } from "date-fns";
 
 interface ModalViewMaintenanceProps {
   event: DayEvent | null;
   setEventSelected: React.Dispatch<React.SetStateAction<DayEvent | null>>;
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  statusMaintenances : MaintenanceStatusOption[] | undefined
+  statusMaintenances: MaintenanceStatusOption[] | undefined;
+  setTabSelected: Dispatch<SetStateAction<string>>;
 }
 
 export function ModalViewMaintenance({
@@ -29,15 +32,36 @@ export function ModalViewMaintenance({
   setEventSelected,
   isOpen,
   setIsOpen,
-  statusMaintenances
+  statusMaintenances,
+  setTabSelected,
 }: ModalViewMaintenanceProps) {
+  const [navigate, setNavigate] = useState(false);
+  const getStatusName = (statusId?: number) => {
+    if (!statusId) return "";
+    const status = statusMaintenances?.find((status) => status.id === statusId);
+    return status?.name ?? "";
+  };
 
-  const getStatusName = (statusId? : number) => {
-    if(!statusId) return ""
-    const status = statusMaintenances?.find(status => status.id === statusId);
-    return status?.name ?? ""
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  function handleNavigate() {
+    const maintenanceId = event?.id;
+
+    if (!maintenanceId) return;
+    router.replace(
+      `maintenance-management?tab=maintenances&maintenanceId=${maintenanceId}`
+    );
+    setNavigate(true);
   }
-  
+
+  useEffect(() => {
+    const currentTab = searchParams.get("tab");
+    if (currentTab === "maintenances" && navigate) {
+      setTabSelected("maintenances");
+    }
+  }, [navigate, searchParams]);
+
   return (
     <Dialog
       open={isOpen}
@@ -105,12 +129,7 @@ export function ModalViewMaintenance({
             <CalendarDays className="w-4 h-4 text-gray-500" />
             <p className="flex items-center gap-1">
               <span className="font-medium text-gray-700">Status:</span>
-              <Badge
-                variant="outline"
-              
-              >
-                {getStatusName(event?.statusId)}
-              </Badge>
+              <Badge variant="outline">{getStatusName(event?.statusId)}</Badge>
             </p>
           </div>
         </div>
@@ -121,7 +140,9 @@ export function ModalViewMaintenance({
           <DialogClose asChild>
             <Button variant="outline">Fechar</Button>
           </DialogClose>
-          <Button variant="default">Ir para Edição</Button>
+          <Button variant="default" onClick={handleNavigate}>
+            Ir para Edição
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
