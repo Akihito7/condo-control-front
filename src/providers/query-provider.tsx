@@ -12,6 +12,7 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
             refetchOnWindowFocus: false,
             refetchOnReconnect: false,
             refetchOnMount: false,
+            staleTime: 1000 * 60 * 20,
           },
         },
       })
