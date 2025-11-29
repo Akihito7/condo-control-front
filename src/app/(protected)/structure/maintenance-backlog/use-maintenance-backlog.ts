@@ -86,19 +86,19 @@ export function useMaintenanceBacklog({
   })
 
   const { data: resumeIndicators, status: resumeIndicatorsStatus } = useQuery({
-    queryKey: ['resume-indicators', year],
+    queryKey: ['chart', 'resume-indicators', year],
     queryFn: () => fetchResumeIndicatorsMaintenances(dateFormatted)
 
   })
 
   const { data: chartImprovementsByArea } = useQuery({
-    queryKey: ['improvements-by-area', dateFormatted],
+    queryKey: ['chart','improvements-by-area', dateFormatted],
     queryFn: () => fetchChartImprovementsByArea(dateFormatted)
   })
 
 
   const { data: chartMonthlyExpensesSummary } = useQuery({
-    queryKey: ['monthly-expenses-summary', dateFormatted],
+    queryKey: ['chart', 'monthly-expenses-summary', dateFormatted],
     queryFn: () => fetchChartMonthlyExpensesSummary(dateFormatted)
   })
 

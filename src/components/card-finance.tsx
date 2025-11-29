@@ -74,6 +74,10 @@ export function CardFinance({
         queryKey: ["revenueTotal"],
         exact: false,
       });
+      queryClient.invalidateQueries({
+        queryKey: ["chart"],
+        exact: false,
+      });
       setModalIsOpen(false);
     },
   });
@@ -89,6 +93,10 @@ export function CardFinance({
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["revenueTotal"],
+        exact: false,
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["chart"],
         exact: false,
       });
       setModalIsOpen(false);
@@ -167,7 +175,7 @@ export function CardFinance({
       styleTitle = value < target ? "text-green-500" : "text-red-500";
     }
   }
-  
+
   return (
     <Dialog
       open={isSameMonth && modalIsOpen}

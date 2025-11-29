@@ -179,7 +179,6 @@ export function ModalActionEntry({
     form.append("recurring", String(data.recurring));
     form.append("type", String(data.type));
 
-
     if (data.amountPaid !== undefined)
       form.append("amountPaid", data.amountPaid);
     if (data.notes) form.append("notes", data.notes);
@@ -213,6 +212,10 @@ export function ModalActionEntry({
       });
       queryClient.invalidateQueries({
         queryKey: ["revenueTotal"],
+        exact: false,
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["chart"],
         exact: false,
       });
     },

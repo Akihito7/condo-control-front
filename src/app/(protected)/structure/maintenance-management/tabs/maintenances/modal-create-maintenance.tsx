@@ -96,6 +96,12 @@ export function ModalCreateMaintenance({
   const { mutateAsync: handleCreateIntervention } = useMutation({
     mutationFn: async (payload: { condominiumId: number; data: FormData }) =>
       createIntervention<FormData>(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["summary"],
+        exact: false,
+      });
+    },
   });
 
   async function onSubmit(data: InterventionFormData) {
@@ -196,7 +202,7 @@ export function ModalCreateMaintenance({
             <div className="col-span-3">
               <Controller
                 name="assetType"
-                control={control}   
+                control={control}
                 render={({ field }) => (
                   <Select value={field.value} onValueChange={field.onChange}>
                     <SelectTrigger>

@@ -110,6 +110,12 @@ export function ModalUpdateMaintenance({
         interventionId: maintenance!.id,
         data: data as any,
       }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["summary"],
+        exact: false,
+      });
+    },
   });
 
   async function onSubmit(data: InterventionFormData) {
@@ -183,7 +189,6 @@ export function ModalUpdateMaintenance({
       setValue("nextMaintenance", null);
     }
   }, [maintenance]);
-
 
   useEffect(() => {
     if (maintenance) {

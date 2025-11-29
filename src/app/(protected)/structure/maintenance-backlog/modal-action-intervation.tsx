@@ -179,6 +179,10 @@ export function ModalActionIntervention({
       queryKey: ["interventionsCards"],
       exact: false,
     });
+    queryClient.invalidateQueries({
+      queryKey: ["chart"],
+      exact: false,
+    });
   }
 
   const { mutateAsync: handleCreateIntervention } = useMutation({
