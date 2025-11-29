@@ -115,7 +115,7 @@ export function ModalAddEvent({
     setIsOpen(false);
     reset({
       apartmentId: "",
-      condominiumAreaId: "",
+      condominiumAreaId : condominiumAreaId,
       eventDate: undefined,
       guests: [],
       periodSelecteds: [],
@@ -171,6 +171,7 @@ export function ModalAddEvent({
     totalPeriodsSelected && totalPriceByPeriod
       ? totalPriceByPeriod * totalPeriodsSelected
       : 0;
+
 
   return (
     <Dialog
