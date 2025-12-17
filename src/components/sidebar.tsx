@@ -42,20 +42,19 @@ import { deleteCookies } from "@/actions/cookies";
 import { Module } from "@/api/fetch-me";
 
 export function Sidebar() {
-  const { isOpen, setIsOpen } = useSidebarContext();
+  const { isOpen, setIsOpen, sidebarRef } = useSidebarContext();
   const { user, userIsLoading } = useUserContext();
   const [isSubMenuOpen, setIsSubMenuOpen] = useState<Record<string, boolean>>(
     {}
   );
 
   const isMobile = useIsMobile();
-  const sidebarRef = useRef<HTMLDivElement>(null);
 
   async function handleLogout() {
     deleteCookies("@smartCondo:token");
     redirect("/signin");
   }
-
+ 
   useEffect(() => {
     if (!isOpen) setIsSubMenuOpen({});
   }, [isOpen]);
