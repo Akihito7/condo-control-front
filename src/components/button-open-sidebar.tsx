@@ -13,7 +13,7 @@ export function ButtonOpenSidebar() {
   }
 
   useEffect(() => {
-    document.addEventListener("click", (event) => {
+    const handleClick = (event: MouseEvent) => {
       if (
         !sidebarRef?.current?.contains(event.target as Node) &&
         !iconSidebar?.current?.contains(event.target as Node) &&
@@ -21,8 +21,14 @@ export function ButtonOpenSidebar() {
       ) {
         setIsOpen(false);
       }
-    });
-  }, [isOpen]);
+    };
+
+    document.addEventListener("click", handleClick);
+
+    return () => {
+      document.removeEventListener("click", handleClick);
+    };
+  }, [isOpen, sidebarRef, iconSidebar]);
 
   return (
     <LayoutPanelLeft
