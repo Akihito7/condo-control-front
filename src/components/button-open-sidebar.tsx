@@ -1,5 +1,6 @@
 "use client";
 
+import { useIsMobile } from "@/lib/use-is-mobile";
 import { useSidebarContext } from "@/providers/use-sidebar-context";
 import { LayoutPanelLeft } from "lucide-react";
 import { useEffect, useRef } from "react";
@@ -7,7 +8,7 @@ import { useEffect, useRef } from "react";
 export function ButtonOpenSidebar() {
   const { setIsOpen, sidebarRef, isOpen } = useSidebarContext();
   const iconSidebar = useRef<SVGSVGElement>(null);
-
+  const isMobile = useIsMobile();
   function handleIsOpen() {
     setIsOpen((prev) => !prev);
   }
@@ -17,7 +18,8 @@ export function ButtonOpenSidebar() {
       if (
         !sidebarRef?.current?.contains(event.target as Node) &&
         !iconSidebar?.current?.contains(event.target as Node) &&
-        isOpen
+        isOpen &&
+        isMobile
       ) {
         setIsOpen(false);
       }
@@ -28,7 +30,7 @@ export function ButtonOpenSidebar() {
     return () => {
       document.removeEventListener("click", handleClick);
     };
-  }, [isOpen, sidebarRef, iconSidebar]);
+  }, [isOpen, sidebarRef, iconSidebar, isMobile]);
 
   return (
     <LayoutPanelLeft
