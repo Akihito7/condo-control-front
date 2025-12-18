@@ -73,7 +73,7 @@ export default function DailyRequests() {
 
         <section className="rounded-xl overflow-auto border">
           <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200">
-            <h2 className="font-medium text-gray-800 text-lg">Obras</h2>
+            <h2 className="font-medium text-gray-800 text-lg">Tarefas</h2>
           </div>
 
           <div className="max-h-[70vh] overflow-y-auto border border-gray-300 rounded">
