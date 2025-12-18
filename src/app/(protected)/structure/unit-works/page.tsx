@@ -22,6 +22,8 @@ import {
 import { DatePickRange } from "@/components/date-pick-ranger";
 import { Input } from "@/components/ui/input";
 import { useUnitWorks } from "./use-unit-works";
+import { Button } from "@/components/ui/button";
+import { FileDown } from "lucide-react";
 
 export default function UnitWorks() {
   const { range, setRange } = useUnitWorks();
@@ -39,7 +41,7 @@ export default function UnitWorks() {
       </div>
 
       <div className="space-y-6">
-        <div className="flex flex-wrap gap-4">
+        <div className="flex flex-col gap-4 md:items-end md:flex-row">
           <div className="w-[250px] space-y-2">
             <Label>Previsão</Label>
             <DatePickRange setRange={setRange} range={range} className="h-9" />
@@ -59,6 +61,14 @@ export default function UnitWorks() {
               <SelectContent></SelectContent>
             </Select>
           </div>
+
+          <Button
+            variant="outline"
+            className="ml-auto flex items-center gap-2 h-10 cursor-pointer"
+          >
+            <FileDown className="w-6 h-6" />
+            Exportar PDF
+          </Button>
         </div>
 
         <section className="rounded-xl overflow-auto border">
