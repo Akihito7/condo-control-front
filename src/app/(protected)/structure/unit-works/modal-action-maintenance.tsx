@@ -29,6 +29,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { DatePicker } from "@/components/date-picker";
 import { TrashIcon } from "lucide-react";
 import { Apartment } from "@/api/fetch-apartaments";
+import { useMutation } from "@tanstack/react-query";
+import { createUnitWorks } from "@/api/create-unit-works";
 
 const workOrderSchema = z.object({
   apartment_id: z.string().min(1, "Selecione o apartamento"),
@@ -83,6 +85,10 @@ export function ModalActionMaintenance({
 
   const employees = watch("employees");
 
+  const { mutateAsync: handleCreateUnitWorks } = useMutation({
+    mutationFn: (form: FormData) => createUnitWorks({ form }),
+  });
+
   async function onSubmit(data: WorkOrderFormData) {
     const formData = new FormData();
 
@@ -105,7 +111,7 @@ export function ModalActionMaintenance({
         formData.append(key, String(value));
       }
     });
-
+    await handleCreateUnitWorks(formData);
     closeRef.current?.click();
     reset();
     setSelectedFiles([]);
