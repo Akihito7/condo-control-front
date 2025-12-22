@@ -3,7 +3,7 @@
 import { Breadcrumb } from "@/components/breadcrumb";
 import { ButtonOpenSidebar } from "@/components/button-open-sidebar";
 import { Label } from "@radix-ui/react-label";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -23,18 +23,48 @@ import { DatePickRange } from "@/components/date-pick-ranger";
 import { Input } from "@/components/ui/input";
 import { useUnitWorks } from "./use-unit-works";
 import { Button } from "@/components/ui/button";
-import { FileDown } from "lucide-react";
+import { FileDown, Paperclip } from "lucide-react";
 import { ModalActionMaintenance } from "./modal-action-maintenance";
 
 export default function UnitWorks() {
-  const {
-    range,
-    setRange,
-    unitWorksStatuses,
-    unitWorksStatusesStatus,
-    apartaments,
-    apartamentsStatus,
-  } = useUnitWorks();
+  const { range, setRange, unitWorksStatuses, apartaments, unitWorks } =
+    useUnitWorks();
+
+  const [apartmentFilter, setApartmentFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string | undefined>();
+
+  const filteredUnitWorks = useMemo(() => {
+    return (
+      unitWorks?.filter((work) => {
+        if (statusFilter && work.statusId !== Number(statusFilter)) {
+          return false;
+        }
+
+        if (apartmentFilter) {
+          const apt = apartaments?.find((a) => a.id === work.apartamentId);
+          if (
+            !apt ||
+            !apt.apartmentNumber?.toString().includes(apartmentFilter)
+          ) {
+            return false;
+          }
+        }
+
+        if (range?.from && range?.to) {
+          const forecast = new Date(work.forecastDate);
+          const from = new Date(range.from);
+          const to = new Date(range.to);
+          to.setHours(23, 59, 59, 999);
+
+          if (forecast < from || forecast > to) {
+            return false;
+          }
+        }
+
+        return true;
+      }) ?? []
+    );
+  }, [unitWorks, statusFilter, apartmentFilter, range, apartaments]);
 
   return (
     <main className="bg-gray-50 min-h-screen w-full p-0 py-8 px-2 sm:p-8 flex flex-col gap-6 overflow-x-auto">
@@ -57,16 +87,27 @@ export default function UnitWorks() {
 
           <div className="w-[250px] space-y-2">
             <Label>Apartamentos</Label>
-            <Input placeholder="21" style={{ height: 39 }} />
+            <Input
+              placeholder="21"
+              style={{ height: 39 }}
+              value={apartmentFilter}
+              onChange={(e) => setApartmentFilter(e.target.value)}
+            />
           </div>
 
           <div className="space-y-2">
             <Label>Status</Label>
-            <Select>
+            <Select onValueChange={setStatusFilter}>
               <SelectTrigger className="col-span-3 w-full">
-                <SelectValue placeholder="Selecione o tipo de problema" />
+                <SelectValue placeholder="Selecione o status" />
               </SelectTrigger>
-              <SelectContent></SelectContent>
+              <SelectContent>
+                {unitWorksStatuses?.map((status: any) => (
+                  <SelectItem key={status.id} value={status.id.toString()}>
+                    {status.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
             </Select>
           </div>
 
@@ -97,21 +138,70 @@ export default function UnitWorks() {
                   <TableHead>Status</TableHead>
                   <TableHead>Unidade</TableHead>
                   <TableHead>Descrição</TableHead>
-                  <TableHead className="text-left">ART</TableHead>
+                  <TableHead>ART</TableHead>
+                  <TableHead>Observações</TableHead>
                   <TableHead className="text-center">Anexos</TableHead>
-                  <TableHead className="text-left">Observações</TableHead>
                   <TableHead className="text-center">Ações</TableHead>
                 </TableRow>
               </TableHeader>
+
               <TableBody>
-                <TableRow>
-                  <TableCell
-                    colSpan={10}
-                    className="text-center py-4 text-gray-500"
-                  >
-                    No interventions found.
-                  </TableCell>
-                </TableRow>
+                {filteredUnitWorks.length > 0 ? (
+                  filteredUnitWorks.map((work) => (
+                    <TableRow key={work.id}>
+                      <TableCell>
+                        {new Date(work.forecastDate).toLocaleDateString(
+                          "pt-BR"
+                        )}
+                      </TableCell>
+
+                      <TableCell>
+                        {unitWorksStatuses?.find(
+                          (status: any) => status.id === work.statusId
+                        )?.name ?? "-"}
+                      </TableCell>
+
+                      <TableCell>
+                        {apartaments?.find(
+                          (apt) => apt.id === work.apartamentId
+                        )?.apartmentNumber ?? "-"}
+                      </TableCell>
+
+                      <TableCell>{work.description}</TableCell>
+
+                      <TableCell>{work.hasArtRrt ? "Sim" : "Não"}</TableCell>
+
+                      <TableCell>{work.observations}</TableCell>
+
+                      <TableCell className="text-center">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() =>
+                            console.log("open attachments", work.id)
+                          }
+                        >
+                          <Paperclip className="w-5 h-5" />
+                        </Button>
+                      </TableCell>
+
+                      <TableCell className="text-center">
+                        <Button size="sm" variant="outline">
+                          Ver
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={8}
+                      className="text-center py-4 text-gray-500"
+                    >
+                      Nenhuma obra encontrada.
+                    </TableCell>
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
           </div>

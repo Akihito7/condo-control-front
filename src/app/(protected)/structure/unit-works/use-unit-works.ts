@@ -1,7 +1,9 @@
 import { fetchApartaments } from "@/api/fetch-apartaments";
+import { fetchUnitWorks } from "@/api/fetch-unit-works";
 import { fetchUnitWorksStatus } from "@/api/fetch-unit-works-status";
 import { useUserContext } from "@/providers/use-user-context";
 import { useQuery } from "@tanstack/react-query";
+import { format } from "date-fns";
 import { useState } from "react";
 
 export function useUnitWorks() {
@@ -10,6 +12,9 @@ export function useUnitWorks() {
     from: date,
     to: date,
   });
+
+  const startDateFormatted = format(range.from, "yyyy-MM-dd");
+  const endDateFormatted = format(range.to, "yyyy-MM-dd");
 
   const { user } = useUserContext();
   const condominiumId = user.condominiumId;
@@ -22,8 +27,17 @@ export function useUnitWorks() {
   );
 
   const { data: apartaments, status: apartamentsStatus } = useQuery({
-    queryKey: ["apartaments"],
+    queryKey: ["apartaments", condominiumId],
     queryFn: () => fetchApartaments({ condominiumId }),
+  });
+
+  const { data: unitWorks, status: unitWorksStatus } = useQuery({
+    queryKey: ["works", startDateFormatted, endDateFormatted],
+    queryFn: () =>
+      fetchUnitWorks({
+        startDate: startDateFormatted,
+        endDate: endDateFormatted,
+      }),
   });
 
   return {
@@ -33,5 +47,7 @@ export function useUnitWorks() {
     unitWorksStatusesStatus,
     apartaments,
     apartamentsStatus,
+    unitWorks,
+    unitWorksStatus,
   };
 }
