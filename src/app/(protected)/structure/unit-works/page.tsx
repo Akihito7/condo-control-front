@@ -24,9 +24,17 @@ import { Input } from "@/components/ui/input";
 import { useUnitWorks } from "./use-unit-works";
 import { Button } from "@/components/ui/button";
 import { FileDown } from "lucide-react";
+import { ModalActionMaintenance } from "./modal-action-maintenance";
 
 export default function UnitWorks() {
-  const { range, setRange } = useUnitWorks();
+  const {
+    range,
+    setRange,
+    unitWorksStatuses,
+    unitWorksStatusesStatus,
+    apartaments,
+    apartamentsStatus,
+  } = useUnitWorks();
 
   return (
     <main className="bg-gray-50 min-h-screen w-full p-0 py-8 px-2 sm:p-8 flex flex-col gap-6 overflow-x-auto">
@@ -74,6 +82,11 @@ export default function UnitWorks() {
         <section className="rounded-xl overflow-auto border">
           <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200">
             <h2 className="font-medium text-gray-800 text-lg">Obras</h2>
+
+            <ModalActionMaintenance
+              statusOptions={unitWorksStatuses}
+              apartments={apartaments}
+            />
           </div>
 
           <div className="max-h-[70vh] overflow-y-auto border border-gray-300 rounded">
