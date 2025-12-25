@@ -18,14 +18,67 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { DatePickRange } from "@/components/date-pick-ranger";
-import { Input } from "@/components/ui/input";
 import { useDailyRequests } from "./use-daily-requests";
 import { Button } from "@/components/ui/button";
-import { FileDown } from "lucide-react";
+import { FileDown, Pencil } from "lucide-react";
+import { DatePicker } from "@/components/date-picker";
+import { ModalAction } from "./modal-action";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function DailyRequests() {
-  const { range, setRange } = useDailyRequests();
+  const {
+    date,
+    setDate,
+    gravitiesOptions,
+    responsibleOptions,
+    statusOptions,
+    dailyRequestRegisters,
+    dailyRequestRegistersStatus,
+    gravityId,
+    responsibleId,
+    setGravityId,
+    setResponsibleId,
+  } = useDailyRequests();
+
+  const filteredDailyRequests = React.useMemo(() => {
+    return dailyRequestRegisters?.filter((item: any) => {
+      if (gravityId && String(item.gravityId) !== gravityId) {
+        return false;
+      }
+
+      if (responsibleId && String(item.responsibleId) !== responsibleId) {
+        return false;
+      }
+
+      return true;
+    });
+  }, [dailyRequestRegisters, gravityId, responsibleId]);
+
+  const getGravityName = (gravityId: number | string) => {
+    return (
+      gravitiesOptions?.find((g) => String(g.id) === String(gravityId))?.name ||
+      "-"
+    );
+  };
+
+  const getResponsibleName = (responsibleId: number | string) => {
+    return (
+      responsibleOptions?.find((r) => String(r.id) === String(responsibleId))
+        ?.name || "-"
+    );
+  };
+
+  const getStatusName = (statusId: number | string) => {
+    return (
+      statusOptions?.find((s) => String(s.id) === String(statusId))?.name || "-"
+    );
+  };
+
   return (
     <main className="bg-gray-50 min-h-screen w-full p-0 py-8 px-2 sm:p-8 flex flex-col gap-6">
       <div className="space-y-2">
@@ -39,26 +92,38 @@ export default function DailyRequests() {
         <div className="flex flex-col gap-4 md:items-end md:flex-row">
           <div className="w-[250px] space-y-2">
             <Label>Data da Tarefa</Label>
-            <DatePickRange setRange={setRange} range={range} className="h-9" />
+            <DatePicker setDate={setDate} date={date} />
           </div>
 
           <div className="w-[250px] space-y-2">
             <Label>Urgência / Gravidade</Label>
-            <Select>
+            <Select value={gravityId} onValueChange={setGravityId}>
               <SelectTrigger className="col-span-3 w-full">
-                <SelectValue placeholder="Selecione o tipo de problema" />
+                <SelectValue placeholder="Selecione a gravidade" />
               </SelectTrigger>
-              <SelectContent></SelectContent>
+              <SelectContent>
+                {gravitiesOptions?.map(({ id, name }) => (
+                  <SelectItem key={id} value={id.toString()}>
+                    {name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
             </Select>
           </div>
 
           <div className="space-y-2">
             <Label>Responsável</Label>
-            <Select>
+            <Select value={responsibleId} onValueChange={setResponsibleId}>
               <SelectTrigger className="col-span-3 w-full">
-                <SelectValue placeholder="Selecione o tipo de problema" />
+                <SelectValue placeholder="Selecione o responsável" />
               </SelectTrigger>
-              <SelectContent></SelectContent>
+              <SelectContent>
+                {responsibleOptions?.map(({ id, name }) => (
+                  <SelectItem key={id} value={id.toString()}>
+                    {name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
             </Select>
           </div>
 
@@ -74,6 +139,12 @@ export default function DailyRequests() {
         <section className="rounded-xl overflow-auto border">
           <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200">
             <h2 className="font-medium text-gray-800 text-lg">Tarefas</h2>
+
+            <ModalAction
+              gravities={gravitiesOptions}
+              responsibles={responsibleOptions}
+              statuses={statusOptions}
+            />
           </div>
 
           <div className="max-h-[70vh] overflow-y-auto border border-gray-300 rounded">
@@ -90,14 +161,57 @@ export default function DailyRequests() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                <TableRow>
-                  <TableCell
-                    colSpan={10}
-                    className="text-center py-4 text-gray-500"
-                  >
-                    Nenhuma tarefa encontrada.
-                  </TableCell>
-                </TableRow>
+                {dailyRequestRegistersStatus === "pending" && (
+                  <TableRow>
+                    <TableCell colSpan={7} className="text-center py-4">
+                      Carregando...
+                    </TableCell>
+                  </TableRow>
+                )}
+
+                {dailyRequestRegistersStatus !== "pending" &&
+                  filteredDailyRequests?.length === 0 && (
+                    <TableRow>
+                      <TableCell
+                        colSpan={7}
+                        className="text-center py-4 text-gray-500"
+                      >
+                        Nenhuma tarefa encontrada.
+                      </TableCell>
+                    </TableRow>
+                  )}
+
+                {filteredDailyRequests?.map((item: any) => (
+                  <TableRow key={item.id}>
+                    <TableCell>{item.name}</TableCell>
+
+                    <TableCell>
+                      {new Date(item.date).toLocaleDateString("pt-BR")}
+                    </TableCell>
+
+                    <TableCell>{getGravityName(item.gravityId)}</TableCell>
+
+                    <TableCell>
+                      {getResponsibleName(item.responsibleId)}
+                    </TableCell>
+
+                    <TableCell className="max-w-[300px] truncate">
+                      {item.observation || "-"}
+                    </TableCell>
+
+                    <TableCell className="text-center">
+                      {getStatusName(item.statusId)}
+                    </TableCell>
+
+                    <TableCell className="text-center">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger className="outline-none ring-0 focus:outline-none focus:ring-0 cursor-pointer">
+                          <Pencil className="w-4 h-4 text-gray-700" />
+                        </DropdownMenuTrigger>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
           </div>
