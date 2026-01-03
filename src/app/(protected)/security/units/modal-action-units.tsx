@@ -24,6 +24,8 @@ import {
 } from "@/components/ui/select";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Option } from "@/api/fetch-work-areas";
+import { Apartament } from "@/api/backoffice/fetch-apartaments";
 
 /* =========================
    Schema
@@ -42,6 +44,8 @@ interface ModalActionUnitsProps {
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   type?: "create" | "edit" | "view";
+  status?: Option[];
+  apartaments?: Option[];
 }
 
 /* =========================
@@ -51,6 +55,8 @@ export function ModalActionUnits({
   isOpen,
   setIsOpen,
   type = "create",
+  apartaments,
+  status,
 }: ModalActionUnitsProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -134,9 +140,11 @@ export function ModalActionUnits({
               </SelectTrigger>
 
               <SelectContent>
-                <SelectItem value="occupied">Ocupado</SelectItem>
-                <SelectItem value="vacant">Vago</SelectItem>
-                <SelectItem value="reserved">Reservado</SelectItem>
+                {status?.map((status) => (
+                  <SelectItem key={status.id} value={status.id.toString()}>
+                    {status.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -152,11 +160,24 @@ export function ModalActionUnits({
           ========================= */}
           <div className="flex flex-col gap-2">
             <Label>Apartamento</Label>
-            <Input
-              {...register("apartment_id")}
-              placeholder="Ex: 101"
+            <Select
               disabled={isDisabled}
-            />
+              onValueChange={(value) =>
+                setValue("apartment_id", value, { shouldValidate: true })
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione o status" />
+              </SelectTrigger>
+
+              <SelectContent>
+                {apartaments?.map((ap) => (
+                  <SelectItem key={ap.id} value={ap.id.toString()}>
+                    {ap.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {errors.apartment_id && !isDisabled && (
@@ -178,9 +199,7 @@ export function ModalActionUnits({
           </div>
 
           {errors.guest && !isDisabled && (
-            <p className="text-red-500 text-sm -mt-2">
-              {errors.guest.message}
-            </p>
+            <p className="text-red-500 text-sm -mt-2">{errors.guest.message}</p>
           )}
 
           {/* =========================
