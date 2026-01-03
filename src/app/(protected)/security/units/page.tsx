@@ -36,6 +36,10 @@ export default function Units() {
     statuses,
     units,
     blocks,
+    search,
+    setSearch,
+    setStatusIdSelected,
+    statusIdSelected,
   } = useUnits();
 
   function getOption(optionId: number | string, options: Option[]) {
@@ -45,6 +49,40 @@ export default function Units() {
 
     return foundOption?.name ?? "-";
   }
+
+  const filteredUnits = units?.filter((unit: any) => {
+    if (!search && !statusIdSelected) return true;
+
+    const apartamentOptions =
+      apartaments?.map(({ apartmentNumber, id }) => ({
+        name: apartmentNumber,
+        id,
+      })) ?? [];
+
+    const apartamentNumber = getOption(unit.apartamentId, apartamentOptions);
+
+    apartaments?.map(({ apartmentNumber, id }) => ({
+      name: apartmentNumber,
+      id,
+    }));
+    const searchApartmentMatch = apartamentNumber
+      .toString()
+      .toLowerCase()
+      .includes(search.toString().toLowerCase());
+
+    const searchGuest = unit.guest
+      .toString()
+      .toLowerCase()
+      .includes(search.toString().toLowerCase());
+
+    const statusMatch = statusIdSelected
+      ? statusIdSelected === unit.statusId.toString()
+      : true;
+
+      console.log('status selected', statusMatch)
+    return statusMatch && (searchApartmentMatch || searchGuest);
+  });
+
   return (
     <main className="bg-gray-50 min-h-screen w-full p-0 py-8 px-2 sm:p-8 flex flex-col gap-6">
       <div className="space-y-2">
@@ -62,15 +100,25 @@ export default function Units() {
             <Input
               placeholder="Busque por apartamento ou morador"
               style={{ height: 39 }}
+              onChange={(event) => setSearch(event.target.value)}
             />
           </div>
           <div className="space-y-2">
             <Label>Status</Label>
-            <Select>
+            <Select
+              value={statusIdSelected}
+              onValueChange={setStatusIdSelected}
+            >
               <SelectTrigger className="col-span-3 w-full">
                 <SelectValue placeholder="Selecione o tipo de problema" />
               </SelectTrigger>
-              <SelectContent></SelectContent>
+              <SelectContent>
+                {statuses?.map((status: any) => (
+                  <SelectItem key={status.id} value={status.id.toString()}>
+                    {status.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
             </Select>
           </div>
           <Button
@@ -114,7 +162,7 @@ export default function Units() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {units?.map((unit: any) => (
+                {filteredUnits?.map((unit: any) => (
                   <TableRow>
                     <TableCell>{getOption(unit.statusId, statuses)}</TableCell>
                     <TableCell>{getOption(unit.blockId, blocks)}</TableCell>

@@ -13,6 +13,9 @@ export function useUnits() {
     to: date,
   });
 
+  const [search, setSearch] = useState("");
+  const [statusIdSelected, setStatusIdSelected] = useState("1");
+
   const { user } = useUserContext();
 
   const condominiumId = user.condominiumId;
@@ -50,5 +53,9 @@ export function useUnits() {
     units,
     unitsStatus,
     blocks: blocks?.map(({ id, name }: any) => ({ id, name })),
+    search,
+    setSearch,
+    statusIdSelected,
+    setStatusIdSelected,
   };
 }
