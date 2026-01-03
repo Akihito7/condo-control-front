@@ -33,8 +33,9 @@ export default function Units() {
     setModalIsOpen,
     apartaments,
     statuses,
+    units,
+    unitsStatus,
   } = useUnits();
-  console.log(statuses);
   return (
     <main className="bg-gray-50 min-h-screen w-full p-0 py-8 px-2 sm:p-8 flex flex-col gap-6">
       <div className="space-y-2">

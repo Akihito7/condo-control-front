@@ -1,4 +1,5 @@
 import { fetchApartaments } from "@/api/fetch-apartaments";
+import { fetchSecurityUnits } from "@/api/fetch-security-units";
 import { fetchUnitStatuses } from "@/api/fetch-unit-statuses";
 import { useUserContext } from "@/providers/use-user-context";
 import { useQuery } from "@tanstack/react-query";
@@ -19,12 +20,17 @@ export function useUnits() {
     queryKey: ["apartaments", condominiumId],
     queryFn: ({ queryKey: [_, condominiumId] }) =>
       fetchApartaments({ condominiumId: condominiumId as number }),
-     enabled : !!condominiumId
+    enabled: !!condominiumId,
   });
 
   const { data: statuses } = useQuery({
     queryKey: ["statuses"],
     queryFn: fetchUnitStatuses,
+  });
+
+  const { data: units, status: unitsStatus } = useQuery({
+    queryKey: ["units"],
+    queryFn: fetchSecurityUnits,
   });
 
   const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -35,5 +41,7 @@ export function useUnits() {
     setModalIsOpen,
     apartaments,
     statuses,
+    units,
+    unitsStatus,
   };
 }

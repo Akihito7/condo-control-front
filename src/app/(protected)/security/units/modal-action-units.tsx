@@ -26,6 +26,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Option } from "@/api/fetch-work-areas";
 import { Apartament } from "@/api/backoffice/fetch-apartaments";
+import { useMutation } from "@tanstack/react-query";
+import { addUnit } from "@/api/add-unit";
 
 /* =========================
    Schema
@@ -38,7 +40,7 @@ export const unitSchema = z.object({
   responsible: z.string().min(1, "Informe o responsável"),
 });
 
-type UnitFormData = z.infer<typeof unitSchema>;
+export type UnitFormData = z.infer<typeof unitSchema>;
 
 interface ModalActionUnitsProps {
   isOpen: boolean;
@@ -79,8 +81,15 @@ export function ModalActionUnits({
 
   const isDisabled = type === "view";
 
-  function onSubmit(data: UnitFormData) {
-    console.log(data);
+  const { mutateAsync: handleCreateUnit } = useMutation({
+    mutationFn: (data: UnitFormData) => addUnit(data),
+  });
+
+  async function onSubmit(data: UnitFormData) {
+
+    if (type === "create") {
+      await handleCreateUnit(data)
+    }
 
     reset();
     closeButtonRef.current?.click();
