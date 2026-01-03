@@ -23,9 +23,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { FileDown } from "lucide-react";
 import { useUnits } from "./use-units";
+import { ModalActionUnits } from "./modal-action-units";
 
 export default function Units() {
-  const { range, setRange } = useUnits();
+  const { range, setRange, modalIsOpen, setModalIsOpen } = useUnits();
   return (
     <main className="bg-gray-50 min-h-screen w-full p-0 py-8 px-2 sm:p-8 flex flex-col gap-6">
       <div className="space-y-2">
@@ -66,6 +67,13 @@ export default function Units() {
         <section className="rounded-xl overflow-auto border">
           <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200">
             <h2 className="font-medium text-gray-800 text-lg">Unidades</h2>
+
+            <ModalActionUnits
+              isOpen={modalIsOpen}
+              setIsOpen={setModalIsOpen}
+              type="create"
+            />
+            
           </div>
 
           <div className="max-h-[70vh] overflow-y-auto border border-gray-300 rounded">

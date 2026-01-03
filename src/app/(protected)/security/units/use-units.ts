@@ -7,8 +7,11 @@ export function useUnits() {
     to: date,
   });
 
+  const [modalIsOpen, setModalIsOpen] = useState(false);
   return {
     range,
     setRange,
+    modalIsOpen,
+    setModalIsOpen,
   };
 }
