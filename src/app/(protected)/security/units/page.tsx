@@ -24,6 +24,7 @@ import { Button } from "@/components/ui/button";
 import { FileDown } from "lucide-react";
 import { useUnits } from "./use-units";
 import { ModalActionUnits } from "./modal-action-units";
+import { Option } from "@/api/fetch-work-areas";
 
 export default function Units() {
   const {
@@ -34,8 +35,16 @@ export default function Units() {
     apartaments,
     statuses,
     units,
-    unitsStatus,
+    blocks,
   } = useUnits();
+
+  function getOption(optionId: number | string, options: Option[]) {
+    const foundOption = options?.find(
+      (option) => option.id.toString() === optionId.toString()
+    );
+
+    return foundOption?.name ?? "-";
+  }
   return (
     <main className="bg-gray-50 min-h-screen w-full p-0 py-8 px-2 sm:p-8 flex flex-col gap-6">
       <div className="space-y-2">
@@ -97,7 +106,7 @@ export default function Units() {
                   <TableHead>Bloco</TableHead>
                   <TableHead>Apartamento</TableHead>
                   <TableHead>Morador / Hóspede</TableHead>
-                  <TableHead className="text-left">Contato</TableHead>
+                  <TableHead>Contato</TableHead>
                   <TableHead className="text-center">
                     Corretor / Imobiliária
                   </TableHead>
@@ -105,14 +114,26 @@ export default function Units() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                <TableRow>
-                  <TableCell
-                    colSpan={10}
-                    className="text-center py-4 text-gray-500"
-                  >
-                    No interventions found.
-                  </TableCell>
-                </TableRow>
+                {units?.map((unit: any) => (
+                  <TableRow>
+                    <TableCell>{getOption(unit.statusId, statuses)}</TableCell>
+                    <TableCell>{getOption(unit.blockId, blocks)}</TableCell>
+                    <TableCell>
+                      {getOption(
+                        unit.apartamentId,
+                        apartaments?.map(({ id, apartmentNumber }) => ({
+                          id,
+                          name: apartmentNumber,
+                        })) ?? []
+                      )}
+                    </TableCell>
+                    <TableCell>{unit.guest}</TableCell>
+                    <TableCell>{unit.contact}</TableCell>
+                    <TableCell className="text-center">
+                      {unit.responsible}
+                    </TableCell>
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
           </div>

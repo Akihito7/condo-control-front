@@ -1,4 +1,5 @@
 import { fetchApartaments } from "@/api/fetch-apartaments";
+import { fetchBlocks } from "@/api/fetch-blocks";
 import { fetchSecurityUnits } from "@/api/fetch-security-units";
 import { fetchUnitStatuses } from "@/api/fetch-unit-statuses";
 import { useUserContext } from "@/providers/use-user-context";
@@ -33,6 +34,11 @@ export function useUnits() {
     queryFn: fetchSecurityUnits,
   });
 
+  const { data: blocks } = useQuery({
+    queryKey: ["blocks"],
+    queryFn: fetchBlocks,
+  });
+
   const [modalIsOpen, setModalIsOpen] = useState(false);
   return {
     range,
@@ -43,5 +49,6 @@ export function useUnits() {
     statuses,
     units,
     unitsStatus,
+    blocks: blocks?.map(({ id, name }: any) => ({ id, name })),
   };
 }
