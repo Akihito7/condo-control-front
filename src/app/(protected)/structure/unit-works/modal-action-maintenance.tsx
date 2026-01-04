@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { use, useEffect, useRef } from "react";
 import {
   Dialog,
   DialogContent,
@@ -35,6 +35,7 @@ import { WorkUnit } from "@/api/fetch-unit-works";
 import { fetchEmployesUnitWorks } from "@/api/fetch-employees-unit-works";
 import { addEmployeeUnitWork } from "@/api/add-employee-unit-work";
 import { deleteEmployeeUnitWorks } from "@/api/delete-employee.unit-work";
+import { updateGenericRegister } from "@/api/update-generic.register";
 
 const workOrderSchema = z.object({
   apartment_id: z.string().min(1, "Selecione o apartamento"),
@@ -54,7 +55,14 @@ const workOrderSchema = z.object({
   ),
 });
 
-type WorkOrderFormData = z.infer<typeof workOrderSchema>;
+export type WorkOrderFormData = z.infer<typeof workOrderSchema>;
+
+export type WorkDataFormDataUpdate = Omit<
+  WorkOrderFormData,
+  "employees" | "apartment_id"
+> & {
+  apartament_id: string;
+};
 
 export function ModalActionMaintenance({
   apartments,
@@ -90,7 +98,6 @@ export function ModalActionMaintenance({
     resolver: zodResolver(workOrderSchema),
     defaultValues: {
       has_art_rrt: false,
-      employees: [{ employeeId: null, full_name: "", cpf: "" }],
     },
   });
 
@@ -98,6 +105,10 @@ export function ModalActionMaintenance({
     control,
     name: "employees",
   });
+
+  useEffect(() => {
+    console.log(errors);
+  }, [errors]);
 
   const employees = watch("employees");
 
@@ -129,9 +140,12 @@ export function ModalActionMaintenance({
     },
   });
 
+  const { mutateAsync: handleUpdateRegister } = useMutation({
+    mutationFn: updateGenericRegister<WorkDataFormDataUpdate>,
+  });
+
   async function onSubmit(data: WorkOrderFormData) {
     const formData = new FormData();
-
     Object.entries(data).forEach(([key, value]) => {
       if (key === "employees") {
         formData.append("employees", JSON.stringify(value));
@@ -151,7 +165,26 @@ export function ModalActionMaintenance({
         formData.append(key, String(value));
       }
     });
-    await handleCreateUnitWorks(formData);
+
+    const actionType = work ? "edit" : "create";
+    if (actionType === "edit") {
+      console.log("entrei aqui");
+
+      const apartament_id = data.apartment_id;
+      delete data.employees;
+      delete data.apartment_id;
+      delete data.attachments;
+      await handleUpdateRegister({
+        registerId: work!.id,
+        tableName: "works_units",
+        data: {
+          ...data,
+          apartament_id,
+        },
+      });
+    } else {
+      await handleCreateUnitWorks(formData);
+    }
     closeRef.current?.click();
     reset();
     setSelectedFiles([]);
@@ -181,21 +214,25 @@ export function ModalActionMaintenance({
   function setInitialValues(workUnit: WorkUnit) {
     setValue("apartment_id", workUnit.apartamentId.toString());
     setValue("description", workUnit.description.toString());
-    setValue("forecast_date", workUnit.forecastDate as any);
+    setValue("forecast_date", new Date(workUnit.forecastDate));
     setValue("has_art_rrt", workUnit.hasArtRrt);
     setValue("observations", workUnit.observations);
     setValue("status_id", workUnit.statusId.toString());
+    setValue("employees", []);
   }
 
   useEffect(() => {
     if (work) {
       setInitialValues(work);
+    } else {
+      setValue("employees", [{ employeeId: null, full_name: "", cpf: "" }]);
     }
   }, [work?.id]);
 
+  useEffect(() => {}, []);
+
   useEffect(() => {
     if (work) {
-      console.log(emplooyesQuery);
       const emplooyesAlreadyInMemory = getValues("employees").filter(
         ({ employeeId }) => !employeeId
       );
@@ -336,7 +373,6 @@ export function ModalActionMaintenance({
             <legend className="px-2 text-sm font-semibold">Funcionários</legend>
 
             {fields.map((field, index) => {
-              console.log(field);
               return (
                 <div
                   key={field.id}
@@ -425,58 +461,60 @@ export function ModalActionMaintenance({
           </fieldset>
 
           {/* Anexos */}
-          <div className="grid grid-cols-4 items-start gap-4">
-            <Label className="text-right pt-2">Documentos</Label>
+          {!work?.id && (
+            <div className="grid grid-cols-4 items-start gap-4">
+              <Label className="text-right pt-2">Documentos</Label>
 
-            <div className="col-span-3 space-y-2">
-              {/* Área clicável */}
-              <div
-                onClick={() => fileInputRef.current?.click()}
-                className="border-2 border-dashed rounded-md h-[90px] flex flex-col items-center justify-center gap-1 cursor-pointer hover:border-primary transition"
-              >
-                <span className="text-xl">📎</span>
-                <span className="text-sm text-muted-foreground">
-                  Clique para selecionar documentos (máx. 5)
-                </span>
-              </div>
+              <div className="col-span-3 space-y-2">
+                {/* Área clicável */}
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  className="border-2 border-dashed rounded-md h-[90px] flex flex-col items-center justify-center gap-1 cursor-pointer hover:border-primary transition"
+                >
+                  <span className="text-xl">📎</span>
+                  <span className="text-sm text-muted-foreground">
+                    Clique para selecionar documentos (máx. 5)
+                  </span>
+                </div>
 
-              {/* Input escondido */}
-              <input
-                ref={fileInputRef}
-                type="file"
-                multiple
-                className="hidden"
-                onChange={handleFilesChange}
-              />
+                {/* Input escondido */}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  multiple
+                  className="hidden"
+                  onChange={handleFilesChange}
+                />
 
-              {/* Lista de arquivos */}
-              {selectedFiles.length > 0 && (
-                <ul className="text-sm space-y-1">
-                  {selectedFiles.map((file, index) => (
-                    <li
-                      key={index}
-                      className="flex items-center justify-between bg-muted px-3 py-1 rounded"
-                    >
-                      <span className="truncate">{file.name}</span>
-                      <button
-                        type="button"
-                        className="text-red-500 text-xs"
-                        onClick={() => {
-                          const updated = selectedFiles.filter(
-                            (_, i) => i !== index
-                          );
-                          setSelectedFiles(updated);
-                          setValue("attachments", updated as any);
-                        }}
+                {/* Lista de arquivos */}
+                {selectedFiles.length > 0 && (
+                  <ul className="text-sm space-y-1">
+                    {selectedFiles.map((file, index) => (
+                      <li
+                        key={index}
+                        className="flex items-center justify-between bg-muted px-3 py-1 rounded"
                       >
-                        Remover
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
+                        <span className="truncate">{file.name}</span>
+                        <button
+                          type="button"
+                          className="text-red-500 text-xs"
+                          onClick={() => {
+                            const updated = selectedFiles.filter(
+                              (_, i) => i !== index
+                            );
+                            setSelectedFiles(updated);
+                            setValue("attachments", updated as any);
+                          }}
+                        >
+                          Remover
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             </div>
-          </div>
+          )}
 
           <DialogFooter>
             <DialogClose asChild>
