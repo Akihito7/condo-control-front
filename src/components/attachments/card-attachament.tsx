@@ -48,7 +48,7 @@ export function CardAttachement({ file }: CardAttachentProps) {
     link.download = attachment.originalName || "arquivo.svg";
     link.click();
 
-    window.URL.revokeObjectURL(url);
+    window.URL.revokeObjectURL(url)
   }
 
   return (
