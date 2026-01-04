@@ -23,13 +23,33 @@ import { DatePickRange } from "@/components/date-pick-ranger";
 import { Input } from "@/components/ui/input";
 import { useUnitWorks } from "./use-unit-works";
 import { Button } from "@/components/ui/button";
-import { FileDown, Paperclip } from "lucide-react";
+import { FileDown, MoreHorizontal, Paperclip } from "lucide-react";
 import { ModalActionMaintenance } from "./modal-action-maintenance";
 import { ModalAttchament } from "@/components/attachments/modal-attachament";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useCommandDelete } from "@/commands/use-command.delete";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function UnitWorks() {
   const { range, setRange, unitWorksStatuses, apartaments, unitWorks } =
     useUnitWorks();
+
+  const queryClient = useQueryClient();
+
+  function onDeleteSuccess() {
+    queryClient.invalidateQueries({
+      exact: false,
+      queryKey: ["works"],
+    });
+  }
+  const { execute: handleDeleteRegister } = useCommandDelete({
+    onSuccess: onDeleteSuccess,
+  });
 
   const [apartmentFilter, setApartmentFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState<string | undefined>();
@@ -186,9 +206,24 @@ export default function UnitWorks() {
                       </TableCell>
 
                       <TableCell className="text-center">
-                        <Button size="sm" variant="outline">
-                          Ver
-                        </Button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger className="outline-none">
+                            <MoreHorizontal className="w-5 h-5 cursor-pointer text-gray-600" />
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            <DropdownMenuItem>Editar</DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={async () => {
+                                handleDeleteRegister({
+                                  registerId: work.id,
+                                  tableName: "works_units",
+                                });
+                              }}
+                            >
+                              Excluir
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </TableCell>
                     </TableRow>
                   ))

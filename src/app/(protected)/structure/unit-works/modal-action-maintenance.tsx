@@ -29,7 +29,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { DatePicker } from "@/components/date-picker";
 import { TrashIcon } from "lucide-react";
 import { Apartment } from "@/api/fetch-apartaments";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createUnitWorks } from "@/api/create-unit-works";
 
 const workOrderSchema = z.object({
@@ -89,6 +89,8 @@ export function ModalActionMaintenance({
     mutationFn: (form: FormData) => createUnitWorks({ form }),
   });
 
+  const queryClient = useQueryClient();
+
   async function onSubmit(data: WorkOrderFormData) {
     const formData = new FormData();
 
@@ -115,6 +117,10 @@ export function ModalActionMaintenance({
     closeRef.current?.click();
     reset();
     setSelectedFiles([]);
+    queryClient.invalidateQueries({
+      exact: false,
+      queryKey: ["works"],
+    });
   }
 
   function handleFilesChange(event: React.ChangeEvent<HTMLInputElement>) {
