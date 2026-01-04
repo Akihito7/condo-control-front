@@ -1,5 +1,5 @@
 interface BreadcrumbProps {
-  paths: string[];
+  paths: string[]
 }
 
 export function Breadcrumb({ paths }: BreadcrumbProps) {
