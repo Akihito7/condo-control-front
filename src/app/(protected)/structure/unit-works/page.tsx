@@ -25,6 +25,7 @@ import { useUnitWorks } from "./use-unit-works";
 import { Button } from "@/components/ui/button";
 import { FileDown, Paperclip } from "lucide-react";
 import { ModalActionMaintenance } from "./modal-action-maintenance";
+import { ModalAttchament } from "@/components/attachments/modal-attachament";
 
 export default function UnitWorks() {
   const { range, setRange, unitWorksStatuses, apartaments, unitWorks } =
@@ -174,15 +175,14 @@ export default function UnitWorks() {
                       <TableCell>{work.observations}</TableCell>
 
                       <TableCell className="text-center">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() =>
-                            console.log("open attachments", work.id)
-                          }
+                        <ModalAttchament
+                          relatedId={work.id}
+                          relatedType="unit-works"
                         >
-                          <Paperclip className="w-5 h-5" />
-                        </Button>
+                          <Button variant="ghost">
+                            <Paperclip className="w-5 h-5" />
+                          </Button>
+                        </ModalAttchament>
                       </TableCell>
 
                       <TableCell className="text-center">
