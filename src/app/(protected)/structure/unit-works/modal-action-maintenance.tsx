@@ -27,11 +27,14 @@ import { useForm, Controller, useFieldArray } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DatePicker } from "@/components/date-picker";
-import { TrashIcon } from "lucide-react";
+import { Check, TrashIcon } from "lucide-react";
 import { Apartment } from "@/api/fetch-apartaments";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createUnitWorks } from "@/api/create-unit-works";
 import { WorkUnit } from "@/api/fetch-unit-works";
+import { fetchEmployesUnitWorks } from "@/api/fetch-employees-unit-works";
+import { addEmployeeUnitWork } from "@/api/add-employee-unit-work";
+import { deleteEmployeeUnitWorks } from "@/api/delete-employee.unit-work";
 
 const workOrderSchema = z.object({
   apartment_id: z.string().min(1, "Selecione o apartamento"),
@@ -44,7 +47,7 @@ const workOrderSchema = z.object({
 
   employees: z.array(
     z.object({
-      id: z.number().optional().nullable(),
+      employeeId: z.number().optional().nullable(),
       full_name: z.string().min(1, "Nome obrigatório"),
       cpf: z.string().min(11, "CPF inválido").max(14, "CPF inválido"),
     })
@@ -81,12 +84,13 @@ export function ModalActionMaintenance({
     reset,
     watch,
     setValue,
+    getValues,
     formState: { errors },
   } = useForm<WorkOrderFormData>({
     resolver: zodResolver(workOrderSchema),
     defaultValues: {
       has_art_rrt: false,
-      employees: [{ full_name: "", cpf: "" }],
+      employees: [{ employeeId: null, full_name: "", cpf: "" }],
     },
   });
 
@@ -97,11 +101,33 @@ export function ModalActionMaintenance({
 
   const employees = watch("employees");
 
+  const queryClient = useQueryClient();
+
+  const title = work ? "Editar Solicitação" : "Criar Solicitação";
+
+  const { data: emplooyesQuery } = useQuery({
+    queryKey: ["emplooyes", work?.id, "form"],
+    queryFn: () => fetchEmployesUnitWorks(work!.id),
+    enabled: !!work?.id,
+  });
+
   const { mutateAsync: handleCreateUnitWorks } = useMutation({
     mutationFn: (form: FormData) => createUnitWorks({ form }),
   });
 
-  const queryClient = useQueryClient();
+  const { mutateAsync: handleCreateEmployee } = useMutation({
+    mutationFn: addEmployeeUnitWork,
+  });
+
+  const { mutateAsync: handleDeleteEmployee } = useMutation({
+    mutationFn: deleteEmployeeUnitWorks,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        exact: false,
+        queryKey: ["emplooyes", work?.id, "form"],
+      });
+    },
+  });
 
   async function onSubmit(data: WorkOrderFormData) {
     const formData = new FormData();
@@ -167,7 +193,21 @@ export function ModalActionMaintenance({
     }
   }, [work?.id]);
 
-  const title = work ? "Editar Solicitação" : "Criar Solicitação";
+  useEffect(() => {
+    if (work) {
+      console.log(emplooyesQuery);
+      const emplooyesAlreadyInMemory = getValues("employees").filter(
+        ({ employeeId }) => !employeeId
+      );
+      setValue("employees", [
+        ...emplooyesQuery?.map((employee: any) => ({
+          ...employee,
+          employeeId: employee.id,
+        })),
+        ...emplooyesAlreadyInMemory,
+      ]);
+    }
+  }, [emplooyesQuery]);
 
   return (
     <Dialog
@@ -182,7 +222,7 @@ export function ModalActionMaintenance({
           observations: "",
           forecast_date: new Date(),
           attachments: [],
-          employees: [{ id: null, full_name: "", cpf: "" }],
+          employees: [{ employeeId: null, full_name: "", cpf: "" }],
         });
         setWork?.(undefined);
       }}
@@ -295,31 +335,85 @@ export function ModalActionMaintenance({
           <fieldset className="border rounded-xl p-4 space-y-4">
             <legend className="px-2 text-sm font-semibold">Funcionários</legend>
 
-            {fields.map((field, index) => (
-              <div key={field.id} className="grid grid-cols-10 gap-2 items-end">
-                <Input
-                  placeholder="Nome completo"
-                  {...register(`employees.${index}.full_name`)}
-                  className="col-span-5"
-                />
-                <Input
-                  placeholder="CPF"
-                  {...register(`employees.${index}.cpf`)}
-                  className="col-span-4"
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() => {
-                    const canRemove = employees.length > 1;
-                    if (!canRemove) return;
-                    remove(index);
-                  }}
+            {fields.map((field, index) => {
+              console.log(field);
+              return (
+                <div
+                  key={field.id}
+                  className="grid grid-cols-11 gap-2 items-end"
                 >
-                  <TrashIcon className="text-red-500" />
-                </Button>
-              </div>
-            ))}
+                  <Input
+                    placeholder="Nome completo"
+                    {...register(`employees.${index}.full_name`)}
+                    className="col-span-5"
+                  />
+                  <Input
+                    placeholder="CPF"
+                    {...register(`employees.${index}.cpf`)}
+                    className="col-span-4"
+                  />
+
+                  {work?.id && !field.employeeId && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      onClick={async () => {
+                        const fullName = getValues(
+                          `employees.${index}.full_name`
+                        );
+                        const cpf = getValues(`employees.${index}.cpf`);
+                        await handleCreateEmployee({
+                          fullName,
+                          cpf,
+                          workId: work.id,
+                        });
+                        remove(index);
+                        queryClient.invalidateQueries({
+                          queryKey: ["emplooyes", work?.id, "form"],
+                        });
+                      }}
+                    >
+                      <Check className="text-green-500" />
+                    </Button>
+                  )}
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={async () => {
+                      const modalType = work ? "edit" : "create";
+
+                      if (modalType === "create") {
+                        const canRemove = employees.length > 1;
+                        if (!canRemove) return;
+                        remove(index);
+                      }
+
+                      if (modalType === "edit") {
+                        const canRemove =
+                          employees.filter((employee) => employee.employeeId)
+                            .length > 1;
+
+                        const isInMemoryEmployee = employees[index].employeeId
+                          ? false
+                          : true;
+
+                        if (isInMemoryEmployee) {
+                          remove(index);
+                          return;
+                        }
+
+                        if (canRemove) {
+                          await handleDeleteEmployee(field.employeeId!);
+                          remove(index);
+                        }
+                      }
+                    }}
+                  >
+                    <TrashIcon className="text-red-500" />
+                  </Button>
+                </div>
+              );
+            })}
 
             <Button
               type="button"
