@@ -26,7 +26,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Option } from "@/api/fetch-work-areas";
 import { Apartament } from "@/api/backoffice/fetch-apartaments";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addUnit } from "@/api/add-unit";
 
 /* =========================
@@ -81,16 +81,18 @@ export function ModalActionUnits({
 
   const isDisabled = type === "view";
 
+  const queryClient = useQueryClient();
+
   const { mutateAsync: handleCreateUnit } = useMutation({
     mutationFn: (data: UnitFormData) => addUnit(data),
   });
 
   async function onSubmit(data: UnitFormData) {
-
     if (type === "create") {
-      await handleCreateUnit(data)
+      await handleCreateUnit(data);
     }
 
+    queryClient.invalidateQueries({ exact: false, queryKey: ["units"] });
     reset();
     closeButtonRef.current?.click();
     setIsOpen(false);

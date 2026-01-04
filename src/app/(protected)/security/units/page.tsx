@@ -79,7 +79,6 @@ export default function Units() {
       ? statusIdSelected === unit.statusId.toString()
       : true;
 
-      console.log('status selected', statusMatch)
     return statusMatch && (searchApartmentMatch || searchGuest);
   });
 
