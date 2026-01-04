@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import {
   Dialog,
   DialogContent,
@@ -31,6 +31,7 @@ import { TrashIcon } from "lucide-react";
 import { Apartment } from "@/api/fetch-apartaments";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createUnitWorks } from "@/api/create-unit-works";
+import { WorkUnit } from "@/api/fetch-unit-works";
 
 const workOrderSchema = z.object({
   apartment_id: z.string().min(1, "Selecione o apartamento"),
@@ -43,6 +44,7 @@ const workOrderSchema = z.object({
 
   employees: z.array(
     z.object({
+      id: z.number().optional().nullable(),
       full_name: z.string().min(1, "Nome obrigatório"),
       cpf: z.string().min(11, "CPF inválido").max(14, "CPF inválido"),
     })
@@ -54,9 +56,19 @@ type WorkOrderFormData = z.infer<typeof workOrderSchema>;
 export function ModalActionMaintenance({
   apartments,
   statusOptions,
+  work,
+  children,
+  isOpen,
+  setModalIsOpen,
+  setWork,
 }: {
   apartments?: Apartment[];
   statusOptions?: { id: number; name: string }[];
+  work?: WorkUnit;
+  children?: React.ReactNode;
+  isOpen: boolean;
+  setWork?: React.Dispatch<React.SetStateAction<WorkUnit | undefined>>;
+  setModalIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const closeRef = useRef<HTMLButtonElement>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -140,15 +152,46 @@ export function ModalActionMaintenance({
     setValue("attachments", updatedFiles as any);
   }
 
+  function setInitialValues(workUnit: WorkUnit) {
+    setValue("apartment_id", workUnit.apartamentId.toString());
+    setValue("description", workUnit.description.toString());
+    setValue("forecast_date", workUnit.forecastDate as any);
+    setValue("has_art_rrt", workUnit.hasArtRrt);
+    setValue("observations", workUnit.observations);
+    setValue("status_id", workUnit.statusId.toString());
+  }
+
+  useEffect(() => {
+    if (work) {
+      setInitialValues(work);
+    }
+  }, [work?.id]);
+
+  const title = work ? "Editar Solicitação" : "Criar Solicitação";
+
   return (
-    <Dialog onOpenChange={(open) => !open && reset()}>
-      <DialogTrigger asChild>
-        <Button variant="outline">Nova Solicitação</Button>
-      </DialogTrigger>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        setModalIsOpen(open);
+        reset({
+          apartment_id: "",
+          description: "",
+          status_id: "",
+          has_art_rrt: false,
+          observations: "",
+          forecast_date: new Date(),
+          attachments: [],
+          employees: [{ id: null, full_name: "", cpf: "" }],
+        });
+        setWork?.(undefined);
+      }}
+    >
+      <DialogTrigger asChild>{children}</DialogTrigger>
 
       <DialogContent className="sm:max-w-[750px] max-h-[80vh] overflow-auto">
         <DialogHeader>
-          <DialogTitle className="text-2xl">Criar Solicitação</DialogTitle>
+          <DialogTitle className="text-2xl">{title}</DialogTitle>
           <DialogDescription>Preencha os dados abaixo</DialogDescription>
         </DialogHeader>
 

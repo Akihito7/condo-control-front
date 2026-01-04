@@ -3,7 +3,7 @@
 import { Breadcrumb } from "@/components/breadcrumb";
 import { ButtonOpenSidebar } from "@/components/button-open-sidebar";
 import { Label } from "@radix-ui/react-label";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -34,10 +34,20 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useCommandDelete } from "@/commands/use-command.delete";
 import { useQueryClient } from "@tanstack/react-query";
+import { WorkUnit } from "@/api/fetch-unit-works";
 
 export default function UnitWorks() {
   const { range, setRange, unitWorksStatuses, apartaments, unitWorks } =
     useUnitWorks();
+
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [dropDownIsOpen, setDropDownIsOpen] = useState(false);
+  const [dropDownItemSelected, setDropDownItemSelected] = useState<
+    number | null
+  >(null);
+  const [workSelected, setWorkSelected] = useState<WorkUnit | undefined>(
+    undefined
+  );
 
   const queryClient = useQueryClient();
 
@@ -50,7 +60,6 @@ export default function UnitWorks() {
   const { execute: handleDeleteRegister } = useCommandDelete({
     onSuccess: onDeleteSuccess,
   });
-
   const [apartmentFilter, setApartmentFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState<string | undefined>();
 
@@ -148,7 +157,13 @@ export default function UnitWorks() {
             <ModalActionMaintenance
               statusOptions={unitWorksStatuses}
               apartments={apartaments}
-            />
+              isOpen={modalIsOpen}
+              setModalIsOpen={setModalIsOpen}
+              work={workSelected}
+              setWork={setWorkSelected}
+            >
+              <Button variant="outline">Nova Solicitação</Button>
+            </ModalActionMaintenance>
           </div>
 
           <div className="max-h-[70vh] overflow-y-auto border border-gray-300 rounded">
@@ -206,12 +221,29 @@ export default function UnitWorks() {
                       </TableCell>
 
                       <TableCell className="text-center">
-                        <DropdownMenu>
+                        <DropdownMenu
+                          open={
+                            dropDownIsOpen && dropDownItemSelected === work.id
+                          }
+                          onOpenChange={(open) => {
+                            setDropDownItemSelected(work.id);
+                            setDropDownIsOpen(open);
+                          }}
+                        >
                           <DropdownMenuTrigger className="outline-none">
                             <MoreHorizontal className="w-5 h-5 cursor-pointer text-gray-600" />
                           </DropdownMenuTrigger>
                           <DropdownMenuContent>
-                            <DropdownMenuItem>Editar</DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setDropDownIsOpen(false);
+                                setDropDownItemSelected(null);
+                                setModalIsOpen(true);
+                                setWorkSelected(work);
+                              }}
+                            >
+                              <span>Editar</span>
+                            </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={async () => {
                                 handleDeleteRegister({
