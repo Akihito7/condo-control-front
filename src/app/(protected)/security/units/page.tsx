@@ -18,13 +18,20 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { DatePickRange } from "@/components/date-pick-ranger";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { FileDown } from "lucide-react";
+import { FileDown, MoreHorizontal } from "lucide-react";
 import { useUnits } from "./use-units";
 import { ModalActionUnits } from "./modal-action-units";
 import { Option } from "@/api/fetch-work-areas";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useQueryClient } from "@tanstack/react-query";
+import { useCommandDelete } from "@/commands/use-command.delete";
 
 export default function Units() {
   const {
@@ -40,6 +47,8 @@ export default function Units() {
     setSearch,
     setStatusIdSelected,
     statusIdSelected,
+    unitSelected,
+    setUnitSelected,
   } = useUnits();
 
   function getOption(optionId: number | string, options: Option[]) {
@@ -75,12 +84,31 @@ export default function Units() {
       .toLowerCase()
       .includes(search.toString().toLowerCase());
 
-    const statusMatch = statusIdSelected
-      ? statusIdSelected === unit.statusId.toString()
-      : true;
+    const statusMatch =
+      Number(statusIdSelected) > 0
+        ? statusIdSelected.toString() === unit.statusId.toString()
+        : true;
+
 
     return statusMatch && (searchApartmentMatch || searchGuest);
   });
+
+  const queryClient = useQueryClient();
+
+  function onDeleteSuccess() {
+    queryClient.invalidateQueries({
+      exact: false,
+      queryKey: ["units"],
+    });
+  }
+  const { execute: handleDeleteRegister } = useCommandDelete({
+    onSuccess: onDeleteSuccess,
+  });
+
+  const [dropDownIsOpen, setDropDownIsOpen] = useState(false);
+  const [dropDownItemSelected, setDropDownItemSelected] = useState<
+    number | null
+  >(null);
 
   return (
     <main className="bg-gray-50 min-h-screen w-full p-0 py-8 px-2 sm:p-8 flex flex-col gap-6">
@@ -112,6 +140,7 @@ export default function Units() {
                 <SelectValue placeholder="Selecione o tipo de problema" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="-1">Todos</SelectItem>
                 {statuses?.map((status: any) => (
                   <SelectItem key={status.id} value={status.id.toString()}>
                     {status.name}
@@ -136,12 +165,14 @@ export default function Units() {
             <ModalActionUnits
               isOpen={modalIsOpen}
               setIsOpen={setModalIsOpen}
-              type="create"
+              type={unitSelected ? "edit" : "create"}
               status={statuses}
               apartaments={apartaments?.map(({ apartmentNumber, id }) => ({
                 name: apartmentNumber,
                 id,
               }))}
+              unit={unitSelected}
+              setUnitSelected={setUnitSelected}
             />
           </div>
 
@@ -178,6 +209,44 @@ export default function Units() {
                     <TableCell>{unit.contact}</TableCell>
                     <TableCell className="text-center">
                       {unit.responsible}
+                    </TableCell>
+
+                    <TableCell className="text-center">
+                      <DropdownMenu
+                        open={
+                          dropDownIsOpen && dropDownItemSelected === unit.id
+                        }
+                        onOpenChange={(open) => {
+                          setDropDownItemSelected(unit.id);
+                          setDropDownIsOpen(open);
+                        }}
+                      >
+                        <DropdownMenuTrigger className="outline-none">
+                          <MoreHorizontal className="w-5 h-5 cursor-pointer text-gray-600" />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              setDropDownIsOpen(false);
+                              setDropDownItemSelected(null);
+                              setUnitSelected(unit);
+                              setModalIsOpen(true);
+                            }}
+                          >
+                            <span>Editar</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={async () => {
+                              handleDeleteRegister({
+                                registerId: unit.id,
+                                tableName: "units",
+                              });
+                            }}
+                          >
+                            Excluir
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </TableCell>
                   </TableRow>
                 ))}

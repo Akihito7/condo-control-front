@@ -14,7 +14,8 @@ export function useUnits() {
   });
 
   const [search, setSearch] = useState("");
-  const [statusIdSelected, setStatusIdSelected] = useState("1");
+  const [statusIdSelected, setStatusIdSelected] = useState("-1");
+  const [unitSelected, setUnitSelected] = useState(undefined);
 
   const { user } = useUserContext();
 
@@ -57,5 +58,7 @@ export function useUnits() {
     setSearch,
     statusIdSelected,
     setStatusIdSelected,
+    unitSelected,
+    setUnitSelected,
   };
 }

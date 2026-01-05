@@ -1,7 +1,7 @@
 "use client";
 
 import { z } from "zod";
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import {
   Dialog,
   DialogContent,
@@ -28,6 +28,7 @@ import { Option } from "@/api/fetch-work-areas";
 import { Apartament } from "@/api/backoffice/fetch-apartaments";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addUnit } from "@/api/add-unit";
+import { updateGenericRegister } from "@/api/update-generic.register";
 
 /* =========================
    Schema
@@ -48,6 +49,8 @@ interface ModalActionUnitsProps {
   type?: "create" | "edit" | "view";
   status?: Option[];
   apartaments?: Option[];
+  unit?: any;
+  setUnitSelected: React.Dispatch<React.SetStateAction<undefined>>;
 }
 
 /* =========================
@@ -59,6 +62,8 @@ export function ModalActionUnits({
   type = "create",
   apartaments,
   status,
+  unit,
+  setUnitSelected,
 }: ModalActionUnitsProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -67,6 +72,7 @@ export function ModalActionUnits({
     handleSubmit,
     reset,
     setValue,
+    getValues,
     formState: { errors },
   } = useForm<UnitFormData>({
     resolver: zodResolver(unitSchema),
@@ -87,11 +93,25 @@ export function ModalActionUnits({
     mutationFn: (data: UnitFormData) => addUnit(data),
   });
 
+  const { mutateAsync: handleUpdateRegister } = useMutation({
+    mutationFn: updateGenericRegister<any>,
+  });
+
   async function onSubmit(data: UnitFormData) {
     if (type === "create") {
       await handleCreateUnit(data);
+    } else {
+      const apartament_id = data.apartment_id;
+      delete data.apartment_id;
+      await handleUpdateRegister({
+        registerId: unit.id,
+        tableName: "units",
+        data: {
+          ...data,
+          apartament_id,
+        },
+      });
     }
-
     queryClient.invalidateQueries({ exact: false, queryKey: ["units"] });
     reset();
     closeButtonRef.current?.click();
@@ -112,20 +132,39 @@ export function ModalActionUnits({
       ? "Atualize os dados da unidade."
       : "Visualize as informações da unidade.";
 
+  useEffect(() => {
+    if (type === "edit") {
+      reset({
+        apartment_id: unit.apartamentId.toString(),
+        contact: unit.contact,
+        guest: unit.guest,
+        responsible: unit.responsible,
+        status_id: unit.statusId.toString(),
+      });
+    }
+  }, [unit]);
+
   return (
     <Dialog
       open={isOpen}
       onOpenChange={(open) => {
         if (!open) {
-          reset();
+          reset({
+            apartment_id: "",
+            contact: "",
+            guest: "",
+            responsible: "",
+            status_id: "",
+          });
           setIsOpen(false);
+          setUnitSelected(undefined);
         } else {
           setIsOpen(true);
         }
       }}
     >
       <DialogTrigger asChild>
-        <Button variant="outline">{modalTitle}</Button>
+        <Button variant="outline">Adicionar Unidade</Button>
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-[600px]">
@@ -141,6 +180,7 @@ export function ModalActionUnits({
           <div className="flex flex-col gap-2">
             <Label>Status</Label>
             <Select
+              value={getValues("status_id")}
               disabled={isDisabled}
               onValueChange={(value) =>
                 setValue("status_id", value, { shouldValidate: true })
@@ -172,6 +212,7 @@ export function ModalActionUnits({
           <div className="flex flex-col gap-2">
             <Label>Apartamento</Label>
             <Select
+              value={getValues("apartment_id")}
               disabled={isDisabled}
               onValueChange={(value) =>
                 setValue("apartment_id", value, { shouldValidate: true })
