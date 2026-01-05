@@ -168,9 +168,8 @@ export function ModalActionMaintenance({
 
     const actionType = work ? "edit" : "create";
     if (actionType === "edit") {
-      console.log("entrei aqui");
-
       const apartament_id = data.apartment_id;
+
       delete data.employees;
       delete data.apartment_id;
       delete data.attachments;
@@ -182,8 +181,39 @@ export function ModalActionMaintenance({
           apartament_id,
         },
       });
+      const employeesInMemory = employees.filter(
+        ({ employeeId }) => !employeeId
+      );
+
+      const saveEmployeesPromisses = employeesInMemory.map(
+        async ({ full_name, cpf }) => {
+          await handleCreateEmployee({
+            fullName: full_name,
+            cpf,
+            workId: work!.id,
+          });
+        }
+      );
+
+      await Promise.all(saveEmployeesPromisses);
+
+      queryClient.invalidateQueries({
+        queryKey: ["emplooyes", work?.id, "form"],
+      });
     } else {
-      await handleCreateUnitWorks(formData);
+      const { unitWorkId } = await handleCreateUnitWorks(formData);
+
+      const saveEmployeesPromisses = employees.map(
+        async ({ full_name, cpf }) => {
+          await handleCreateEmployee({
+            fullName: full_name,
+            cpf,
+            workId: unitWorkId,
+          });
+        }
+      );
+
+      await Promise.all(saveEmployeesPromisses);
     }
     closeRef.current?.click();
     reset();
@@ -389,29 +419,6 @@ export function ModalActionMaintenance({
                     className="col-span-4"
                   />
 
-                  {work?.id && !field.employeeId && (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      onClick={async () => {
-                        const fullName = getValues(
-                          `employees.${index}.full_name`
-                        );
-                        const cpf = getValues(`employees.${index}.cpf`);
-                        await handleCreateEmployee({
-                          fullName,
-                          cpf,
-                          workId: work.id,
-                        });
-                        remove(index);
-                        queryClient.invalidateQueries({
-                          queryKey: ["emplooyes", work?.id, "form"],
-                        });
-                      }}
-                    >
-                      <Check className="text-green-500" />
-                    </Button>
-                  )}
                   <Button
                     type="button"
                     variant="ghost"

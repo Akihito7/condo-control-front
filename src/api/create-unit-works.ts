@@ -5,9 +5,10 @@ interface CreateUnitWorksProps {
 }
 
 export async function createUnitWorks({ form }: CreateUnitWorksProps) {
-  await api.post("structure/unit-works", form, {
+  const response = await api.post("structure/unit-works", form, {
     headers: {
       "Content-Type": "multipart/form-data",
     },
   });
+  return response.data;
 }
