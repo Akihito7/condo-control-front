@@ -27,6 +27,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { DatePicker } from "@/components/date-picker";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addResidentRequest } from "@/api/add-resident-request";
+import { updateGenericRegister } from "@/api/update-generic.register";
+import snakecaseKeys from "snakecase-keys";
 
 const residentSchema = z.object({
   apartament_id: z.string().min(1, "Selecione o apartamento"),
@@ -50,6 +52,9 @@ export function ModalActionResident({
   isOpen,
   setModalIsOpen,
   children,
+  requestSelected,
+  setRequestSelected,
+  type,
 }: {
   apartments?: { id: number; apartmentNumber: string }[];
   statusOptions?: Option[];
@@ -57,6 +62,9 @@ export function ModalActionResident({
   isOpen: boolean;
   setModalIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   children?: React.ReactNode;
+  setRequestSelected: React.Dispatch<React.SetStateAction<any>>;
+  requestSelected: any;
+  type: "create" | "edit";
 }) {
   const closeRef = useRef<HTMLButtonElement>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -99,6 +107,10 @@ export function ModalActionResident({
     mutationFn: addResidentRequest,
   });
 
+  const { mutateAsync: handleUpdateRegister } = useMutation({
+    mutationFn: updateGenericRegister<any>,
+  });
+
   async function onSubmit(data: ResidentFormData) {
     const formData = new FormData();
 
@@ -117,12 +129,19 @@ export function ModalActionResident({
       }
     });
 
-    console.log("FORM DATA:", Array.from(formData.entries()));
+    if (type === "create") {
+      await handleAddResidentRequest(formData);
+    } else {
+      await handleUpdateRegister({
+        registerId: requestSelected.id,
+        tableName: "resident_calls",
+        data: snakecaseKeys(data, { deep: true }),
+      });
+    }
 
-    await handleAddResidentRequest(formData);
     queryClient.invalidateQueries({
       exact: false,
-      queryKey: ["resident-requests"],
+      queryKey: ["resident-calls"],
     });
 
     closeRef.current?.click();
@@ -130,12 +149,42 @@ export function ModalActionResident({
     setSelectedFiles([]);
   }
 
+  useEffect(() => {
+    if (requestSelected) {
+      const startDateFormatted = requestSelected.startDate
+        ? new Date(requestSelected.startDate)
+        : new Date();
+      const endDateFormatted = requestSelected.endDate
+        ? new Date(requestSelected.startDate)
+        : new Date();
+      reset({
+        apartament_id: requestSelected.apartamentId.toString(),
+        observation: requestSelected.observation,
+        description: requestSelected.description,
+        status_id: requestSelected.statusId.toString(),
+        gravity_id: requestSelected.gravityId.toString(),
+        start_date: startDateFormatted,
+        end_date: endDateFormatted,
+      });
+    }
+  }, [requestSelected]);
+
   return (
     <Dialog
       open={isOpen}
       onOpenChange={(open) => {
+        if (!open) {
+          reset({
+            apartament_id: "",
+            attachments: [],
+            description: "",
+            gravity_id: "",
+            observation: "",
+            status_id: "",
+          });
+          setRequestSelected(undefined);
+        }
         setModalIsOpen(open);
-        reset();
         setSelectedFiles([]);
       }}
     >
@@ -269,55 +318,57 @@ export function ModalActionResident({
           </div>
 
           {/* Anexos */}
-          <div className="grid grid-cols-4 items-start gap-4">
-            <Label className="text-right pt-2">Documentos</Label>
+          {type === "create" && (
+            <div className="grid grid-cols-4 items-start gap-4">
+              <Label className="text-right pt-2">Documentos</Label>
 
-            <div className="col-span-3 space-y-2">
-              <div
-                onClick={() => fileInputRef.current?.click()}
-                className="border-2 border-dashed rounded-md h-[90px] flex flex-col items-center justify-center gap-1 cursor-pointer hover:border-primary transition"
-              >
-                <span className="text-xl">📎</span>
-                <span className="text-sm text-muted-foreground">
-                  Clique para selecionar documentos (máx. 5)
-                </span>
-              </div>
+              <div className="col-span-3 space-y-2">
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  className="border-2 border-dashed rounded-md h-[90px] flex flex-col items-center justify-center gap-1 cursor-pointer hover:border-primary transition"
+                >
+                  <span className="text-xl">📎</span>
+                  <span className="text-sm text-muted-foreground">
+                    Clique para selecionar documentos (máx. 5)
+                  </span>
+                </div>
 
-              <input
-                ref={fileInputRef}
-                type="file"
-                multiple
-                className="hidden"
-                onChange={handleFilesChange}
-              />
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  multiple
+                  className="hidden"
+                  onChange={handleFilesChange}
+                />
 
-              {selectedFiles.length > 0 && (
-                <ul className="text-sm space-y-1">
-                  {selectedFiles.map((file, index) => (
-                    <li
-                      key={index}
-                      className="flex items-center justify-between bg-muted px-3 py-1 rounded"
-                    >
-                      <span className="truncate">{file.name}</span>
-                      <button
-                        type="button"
-                        className="text-red-500 text-xs"
-                        onClick={() => {
-                          const updated = selectedFiles.filter(
-                            (_, i) => i !== index
-                          );
-                          setSelectedFiles(updated);
-                          setValue("attachments", updated as any);
-                        }}
+                {selectedFiles.length > 0 && (
+                  <ul className="text-sm space-y-1">
+                    {selectedFiles.map((file, index) => (
+                      <li
+                        key={index}
+                        className="flex items-center justify-between bg-muted px-3 py-1 rounded"
                       >
-                        Remover
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
+                        <span className="truncate">{file.name}</span>
+                        <button
+                          type="button"
+                          className="text-red-500 text-xs"
+                          onClick={() => {
+                            const updated = selectedFiles.filter(
+                              (_, i) => i !== index
+                            );
+                            setSelectedFiles(updated);
+                            setValue("attachments", updated as any);
+                          }}
+                        >
+                          Remover
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             </div>
-          </div>
+          )}
 
           <DialogFooter>
             <DialogClose asChild>

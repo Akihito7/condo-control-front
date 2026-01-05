@@ -1,7 +1,4 @@
-import {
-  fetchAttachment,
-  File as FileCondo,
-} from "@/api/fetch-attachement";
+import { fetchAttachment, File as FileCondo } from "@/api/fetch-attachement";
 import {
   Dialog,
   DialogContent,
@@ -68,7 +65,11 @@ export function ModalAttchament({
           {attachments &&
             attachments.length > 0 &&
             attachments.map((attachment: FileCondo) => (
-              <CardAttachement file={attachment} />
+              <CardAttachement
+                file={attachment}
+                relatedId={relatedId}
+                relatedType={relatedType}
+              />
             ))}
 
           {attachments?.length === 0 && <span>Sem documentos</span>}

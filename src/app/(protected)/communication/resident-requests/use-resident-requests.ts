@@ -1,8 +1,10 @@
 import { fetchApartaments } from "@/api/fetch-apartaments";
 import { fetchResidentCallGravities } from "@/api/fetch-resident-call-gravities";
 import { fetchResidentCallStatus } from "@/api/fetch-resident-call-status";
+import { fetchResidentCalls } from "@/api/fetch-resident-calls";
 import { useUserContext } from "@/providers/use-user-context";
 import { useQuery } from "@tanstack/react-query";
+import { format } from "date-fns";
 import { useState } from "react";
 
 export function useResidentRequests() {
@@ -12,8 +14,14 @@ export function useResidentRequests() {
     to: date,
   });
 
+  const startDateFormatted = format(range.from, "yyyy-MM-dd");
+  const endDateFormatted = format(range.to, "yyyy-MM-dd");
+
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [requestSelected, setRequestSelected] = useState<any>(undefined);
+  const [apartamentIdSelected, setApartamentIdSelected] =
+    useState<string>("-1");
+  const [statusIdSelected, setStatusIdSelected] = useState<string>("-1");
 
   const { user } = useUserContext();
 
@@ -34,6 +42,20 @@ export function useResidentRequests() {
     queryFn: fetchResidentCallGravities,
   });
 
+  const { data: residentCalls } = useQuery({
+    queryKey: [
+      "resident-calls",
+      condominiumId,
+      startDateFormatted,
+      endDateFormatted,
+    ],
+    queryFn: () =>
+      fetchResidentCalls({
+        startDate: startDateFormatted,
+        endDate: endDateFormatted,
+      }),
+  });
+
   return {
     range,
     setRange,
@@ -44,5 +66,10 @@ export function useResidentRequests() {
     setRequestSelected,
     status,
     gravities,
+    residentCalls,
+    apartamentIdSelected,
+    setApartamentIdSelected,
+    setStatusIdSelected,
+    statusIdSelected,
   };
 }

@@ -16,17 +16,22 @@ import { fetchSupabasePublicUrl } from "@/api/fetch-supabase-public-url";
 
 interface CardAttachentProps {
   file: File;
+  relatedType: string;
+  relatedId: number;
 }
 
-export function CardAttachement({ file }: CardAttachentProps) {
+export function CardAttachement({
+  file,
+  relatedId,
+  relatedType,
+}: CardAttachentProps) {
   const queryClient = useQueryClient();
 
   const { mutateAsync: mutate } = useMutation({
     mutationFn: deleteAttachement,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        exact: false,
-        queryKey: ["attachments"],
+        queryKey: [relatedId, relatedType, "attachments"],
       });
     },
   });
@@ -48,7 +53,7 @@ export function CardAttachement({ file }: CardAttachentProps) {
     link.download = attachment.originalName || "arquivo.svg";
     link.click();
 
-    window.URL.revokeObjectURL(url)
+    window.URL.revokeObjectURL(url);
   }
 
   return (

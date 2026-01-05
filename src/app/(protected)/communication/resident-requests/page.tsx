@@ -18,12 +18,23 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { DatePickRange } from "@/components/date-pick-ranger";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { FileDown } from "lucide-react";
+import { FileDown, MoreHorizontal, Paperclip } from "lucide-react";
 import { useResidentRequests } from "./use-resident-requests";
 import { ModalActionResident } from "./modal-action-resident";
+import { useCommandDelete } from "@/commands/use-command.delete";
+import { ModalAttchament } from "@/components/attachments/modal-attachament";
+import { format } from "date-fns";
+import { Option } from "@/api/fetch-work-areas";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function ResidentRequests() {
   const {
@@ -36,7 +47,55 @@ export default function ResidentRequests() {
     gravities,
     status,
     setRequestSelected,
+    residentCalls,
+    apartamentIdSelected,
+    setApartamentIdSelected,
+    setStatusIdSelected,
+    statusIdSelected,
   } = useResidentRequests();
+
+  const [dropDownIsOpen, setDropDownIsOpen] = useState(false);
+  const [dropDownItemSelected, setDropDownItemSelected] = useState<
+    number | null
+  >(null);
+
+  const queryClient = useQueryClient();
+  function onDeleteSuccess() {
+    queryClient.invalidateQueries({
+      exact: false,
+      queryKey: ["resident-calls"],
+    });
+  }
+  const { execute: handleDeleteRegister } = useCommandDelete({
+    onSuccess: onDeleteSuccess,
+  });
+
+  function getOptionName(
+    optionSelected: string | number,
+    options: Option[] = []
+  ) {
+    const optionFound = options.find(
+      (option) => option.id.toString() === optionSelected.toString()
+    );
+
+    return optionFound?.name ?? "-";
+  }
+
+  const callsFiltered = residentCalls?.filter((call: any) => {
+    if (!apartamentIdSelected && !statusIdSelected) return true;
+
+    const apartamentIdMatch =
+      Number(apartamentIdSelected) > 0
+        ? apartamentIdSelected.toString() === call.apartamentId.toString()
+        : true;
+
+    const statusIdMatch =
+      Number(statusIdSelected) > 0
+        ? statusIdSelected.toString() === call.statusId.toString()
+        : true;
+
+    return apartamentIdMatch && statusIdMatch;
+  });
 
   return (
     <main className="bg-gray-50 min-h-screen w-full p-0 py-8 px-2 sm:p-8 flex flex-col gap-6 overflow-x-auto">
@@ -63,11 +122,21 @@ export default function ResidentRequests() {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Status
             </label>
-            <Select>
+            <Select
+              value={statusIdSelected}
+              onValueChange={setStatusIdSelected}
+            >
               <SelectTrigger className="col-span-3 w-full">
                 <SelectValue placeholder="Selecione o tipo de problema" />
               </SelectTrigger>
-              <SelectContent></SelectContent>
+              <SelectContent>
+                <SelectItem value="-1">Todos</SelectItem>
+                {status?.map(({ name, id }: any) => (
+                  <SelectItem key={id} value={id.toString()}>
+                    {name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
             </Select>
           </div>
 
@@ -75,7 +144,25 @@ export default function ResidentRequests() {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Apartamento
             </label>
-            <Input placeholder="21" style={{ height: 39 }} />
+            <Select
+              value={apartamentIdSelected}
+              onValueChange={setApartamentIdSelected}
+            >
+              <SelectTrigger className="col-span-3 w-full">
+                <SelectValue placeholder="Apartamento" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="-1">Todos</SelectItem>
+                {apartaments?.map((apartament) => (
+                  <SelectItem
+                    key={apartament.id}
+                    value={apartament.id.toString()}
+                  >
+                    {apartament.apartmentNumber}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <Button
@@ -97,6 +184,9 @@ export default function ResidentRequests() {
               setModalIsOpen={setModalIsOpen}
               gravityOptions={gravities}
               statusOptions={status}
+              requestSelected={requestSelected}
+              setRequestSelected={setRequestSelected}
+              type={requestSelected ? "edit" : "create"}
             />
           </div>
 
@@ -116,14 +206,116 @@ export default function ResidentRequests() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                <TableRow>
-                  <TableCell
-                    colSpan={10}
-                    className="text-center py-4 text-gray-500"
-                  >
-                    No interventions found.
-                  </TableCell>
-                </TableRow>
+                {callsFiltered?.length === 0 ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={9}
+                      className="text-center py-4 text-gray-500"
+                    >
+                      No interventions found.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  callsFiltered?.map((call: any) => (
+                    <TableRow key={call.id}>
+                      {/* Data */}
+                      <TableCell>
+                        {format(call.createdAt, "yyyy/MM/dd")}
+                      </TableCell>
+
+                      {/* Apartamento */}
+                      <TableCell>
+                        {getOptionName(
+                          call.apartamentId,
+                          apartaments?.map((ap) => ({
+                            name: ap.apartmentNumber,
+                            id: ap.id,
+                          }))
+                        )}
+                      </TableCell>
+
+                      {/* Descrição */}
+                      <TableCell className="max-w-[250px] truncate">
+                        {call.description}
+                      </TableCell>
+
+                      {/* Gravidade */}
+                      <TableCell>
+                        {getOptionName(call.gravityId, gravities)}
+                      </TableCell>
+
+                      {/* Status */}
+                      <TableCell>
+                        {getOptionName(call.statusId, status)}
+                      </TableCell>
+
+                      {/* Início Atuação */}
+                      <TableCell className="text-center">
+                        {call.startDate
+                          ? format(call.startDate, "yyyy/MM/dd")
+                          : "-"}
+                      </TableCell>
+
+                      {/* Fim Atuação */}
+                      <TableCell>
+                        {call.endDate
+                          ? format(call.endDate, "yyyy/MM/dd")
+                          : "-"}
+                      </TableCell>
+
+                      {/* Anexos */}
+                      <TableCell className="text-center">
+                        <ModalAttchament
+                          relatedId={call.id}
+                          relatedType="resident_calls"
+                        >
+                          <Button variant="ghost">
+                            <Paperclip className="w-5 h-5" />
+                          </Button>
+                        </ModalAttchament>
+                      </TableCell>
+
+                      {/* Ações */}
+                      <TableCell className="text-center">
+                        <DropdownMenu
+                          open={
+                            dropDownIsOpen && dropDownItemSelected === call.id
+                          }
+                          onOpenChange={(open) => {
+                            setDropDownItemSelected(call.id);
+                            setDropDownIsOpen(open);
+                          }}
+                        >
+                          <DropdownMenuTrigger className="outline-none">
+                            <MoreHorizontal className="w-5 h-5 cursor-pointer text-gray-600" />
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setDropDownIsOpen(false);
+                                setDropDownItemSelected(null);
+                                setModalIsOpen(true);
+                                setRequestSelected(call);
+                              }}
+                            >
+                              <span>Editar</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={async () => {
+                                handleDeleteRegister({
+                                  registerId: call.id,
+                                  tableName: "resident_calls",
+                                });
+                              }}
+                            >
+                              Excluir
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </div>
