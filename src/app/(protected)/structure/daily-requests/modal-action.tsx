@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
+import snakecaseKeys from "snakecase-keys";
 import {
   Dialog,
   DialogClose,
@@ -28,6 +29,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addDailyRequest } from "@/api/add-daily-request";
+import { updateGenericRegister } from "@/api/update-generic.register";
 
 interface Option {
   id: number;
@@ -38,6 +40,11 @@ interface ModalActionProps {
   gravities?: Option[];
   statuses?: Option[];
   responsibles?: Option[];
+  isOpen: boolean;
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  type: "edit" | "create";
+  dailyRequest: any;
+  setDailyRequest: React.Dispatch<React.SetStateAction<any>>;
 }
 
 const schema = z.object({
@@ -55,6 +62,11 @@ export function ModalAction({
   gravities,
   statuses,
   responsibles,
+  isOpen,
+  setIsOpen,
+  type,
+  dailyRequest,
+  setDailyRequest,
 }: ModalActionProps) {
   const closeRef = useRef<HTMLButtonElement>(null);
 
@@ -75,8 +87,28 @@ export function ModalAction({
     },
   });
 
+  const modalTitle = type === "create" ? "Criar Ação" : "Editar Ação";
+
+  const queryClient = useQueryClient();
+  const { mutateAsync: handleCreateTask } = useMutation({
+    mutationFn: (form: FormDataDailyRequest) => addDailyRequest(form),
+  });
+
+  const { mutateAsync: handleUpdateDailyRequest } = useMutation({
+    mutationFn: updateGenericRegister<any>,
+  });
+
   async function onSubmit(data: FormDataDailyRequest) {
-    await handleCreateTask(data);
+    if (type === "create") {
+      await handleCreateTask(data);
+    } else {
+      await handleUpdateDailyRequest({
+        registerId: dailyRequest.id,
+        tableName: "task_day",
+        data: snakecaseKeys(data, { deep: true }),
+      });
+    }
+
     closeRef.current?.click();
     reset();
     queryClient.invalidateQueries({
@@ -85,20 +117,46 @@ export function ModalAction({
     });
   }
 
-  const queryClient = useQueryClient();
-  const { mutateAsync: handleCreateTask } = useMutation({
-    mutationFn: (form: FormDataDailyRequest) => addDailyRequest(form),
-  });
+  useEffect(() => {
+    if (dailyRequest) {
+      const date = new Date(dailyRequest.date);
+      reset({
+        date,
+        gravityId: dailyRequest.gravityId.toString(),
+        observation: dailyRequest.observation,
+        name: dailyRequest.name,
+        responsibleId: dailyRequest.responsibleId.toString(),
+        statusId: dailyRequest.statusId.toString(),
+      });
+    }
+  }, [dailyRequest]);
 
   return (
-    <Dialog>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) {
+          reset({
+            date: new Date(),
+            gravityId: "",
+            name: "",
+            observation: "",
+            responsibleId: "",
+            statusId: "",
+          });
+          setIsOpen(open);
+          setDailyRequest(undefined);
+        }
+        setIsOpen(open);
+      }}
+    >
       <DialogTrigger asChild>
         <Button variant="outline">Nova Ação</Button>
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>Criar Ação</DialogTitle>
+          <DialogTitle>{modalTitle}</DialogTitle>
           <DialogDescription>Preencha as informações abaixo</DialogDescription>
         </DialogHeader>
 

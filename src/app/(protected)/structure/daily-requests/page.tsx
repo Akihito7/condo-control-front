@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/table";
 import { useDailyRequests } from "./use-daily-requests";
 import { Button } from "@/components/ui/button";
-import { FileDown, Pencil } from "lucide-react";
+import { FileDown, MoreHorizontal } from "lucide-react";
 import { DatePicker } from "@/components/date-picker";
 import { ModalAction } from "./modal-action";
 import {
@@ -29,6 +29,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useCommandDelete } from "@/commands/use-command.delete";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function DailyRequests() {
   const {
@@ -44,6 +46,13 @@ export default function DailyRequests() {
     setGravityId,
     setResponsibleId,
   } = useDailyRequests();
+
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [dropDownIsOpen, setDropDownIsOpen] = useState(false);
+  const [dropDownItemSelected, setDropDownItemSelected] = useState<
+    number | null
+  >(null);
+  const [dailySelected, setDailySelected] = useState<any>(undefined);
 
   const filteredDailyRequests = React.useMemo(() => {
     return dailyRequestRegisters?.filter((item: any) => {
@@ -78,6 +87,18 @@ export default function DailyRequests() {
       statusOptions?.find((s) => String(s.id) === String(statusId))?.name || "-"
     );
   };
+
+  const queryClient = useQueryClient();
+
+  function onDeleteSuccess() {
+    queryClient.invalidateQueries({
+      exact: false,
+      queryKey: ["daily"],
+    });
+  }
+  const { execute: handleDeleteRegister } = useCommandDelete({
+    onSuccess: onDeleteSuccess,
+  });
 
   return (
     <main className="bg-gray-50 min-h-screen w-full p-0 py-8 px-2 sm:p-8 flex flex-col gap-6">
@@ -144,6 +165,11 @@ export default function DailyRequests() {
               gravities={gravitiesOptions}
               responsibles={responsibleOptions}
               statuses={statusOptions}
+              type={dailySelected ? "edit" : "create"}
+              dailyRequest={dailySelected}
+              setDailyRequest={setDailySelected}
+              isOpen={modalIsOpen}
+              setIsOpen={setModalIsOpen}
             />
           </div>
 
@@ -204,10 +230,40 @@ export default function DailyRequests() {
                     </TableCell>
 
                     <TableCell className="text-center">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger className="outline-none ring-0 focus:outline-none focus:ring-0 cursor-pointer">
-                          <Pencil className="w-4 h-4 text-gray-700" />
+                      <DropdownMenu
+                        open={
+                          dropDownIsOpen && dropDownItemSelected === item.id
+                        }
+                        onOpenChange={(open) => {
+                          setDropDownItemSelected(item.id);
+                          setDropDownIsOpen(open);
+                        }}
+                      >
+                        <DropdownMenuTrigger className="outline-none">
+                          <MoreHorizontal className="w-5 h-5 cursor-pointer text-gray-600" />
                         </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              setDropDownIsOpen(false);
+                              setDropDownItemSelected(null);
+                              setModalIsOpen(true);
+                              setDailySelected(item);
+                            }}
+                          >
+                            <span>Editar</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={async () => {
+                              handleDeleteRegister({
+                                registerId: item.id,
+                                tableName: "task_day",
+                              });
+                            }}
+                          >
+                            Excluir
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
                   </TableRow>
