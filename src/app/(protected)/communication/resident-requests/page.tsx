@@ -41,12 +41,16 @@ export default function ResidentRequests() {
       <div className="space-y-6">
         <div className="flex flex-col gap-4 md:items-end md:flex-row">
           <div className="w-[250px] space-y-2">
-            <Label>Periodo</Label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Periodo
+            </label>
             <DatePickRange setRange={setRange} range={range} className="h-9" />
           </div>
 
           <div className="space-y-2">
-            <Label>Status</Label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Status
+            </label>
             <Select>
               <SelectTrigger className="col-span-3 w-full">
                 <SelectValue placeholder="Selecione o tipo de problema" />
@@ -56,7 +60,9 @@ export default function ResidentRequests() {
           </div>
 
           <div className="w-[250px] space-y-2">
-            <Label>Apartamento</Label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Apartamento
+            </label>
             <Input placeholder="21" style={{ height: 39 }} />
           </div>
 

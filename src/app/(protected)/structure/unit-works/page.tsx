@@ -111,12 +111,17 @@ export default function UnitWorks() {
       <div className="space-y-6">
         <div className="flex flex-col gap-4 md:items-end md:flex-row">
           <div className="w-[250px] space-y-2">
-            <Label>Previsão</Label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Previsão
+            </label>
             <DatePickRange setRange={setRange} range={range} className="h-9" />
           </div>
 
           <div className="w-[250px] space-y-2">
-            <Label>Apartamentos</Label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Apartamentos
+            </label>
+
             <Input
               placeholder="21"
               style={{ height: 39 }}
@@ -126,7 +131,10 @@ export default function UnitWorks() {
           </div>
 
           <div className="space-y-2">
-            <Label>Status</Label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Status
+            </label>
+
             <Select onValueChange={setStatusFilter}>
               <SelectTrigger className="col-span-3 w-full">
                 <SelectValue placeholder="Selecione o status" />

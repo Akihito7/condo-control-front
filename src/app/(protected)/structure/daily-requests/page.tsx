@@ -112,12 +112,17 @@ export default function DailyRequests() {
       <div className="space-y-6">
         <div className="flex flex-col gap-4 md:items-end md:flex-row">
           <div className="w-[250px] space-y-2">
-            <Label>Data da Tarefa</Label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Data da Tarefa
+            </label>
             <DatePicker setDate={setDate} date={date} />
           </div>
 
           <div className="w-[250px] space-y-2">
-            <Label>Urgência / Gravidade</Label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Urgência / Gravidade
+            </label>
+
             <Select value={gravityId} onValueChange={setGravityId}>
               <SelectTrigger className="col-span-3 w-full">
                 <SelectValue placeholder="Selecione a gravidade" />
@@ -133,7 +138,10 @@ export default function DailyRequests() {
           </div>
 
           <div className="space-y-2">
-            <Label>Responsável</Label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Responsável
+            </label>
+
             <Select value={responsibleId} onValueChange={setResponsibleId}>
               <SelectTrigger className="col-span-3 w-full">
                 <SelectValue placeholder="Selecione o responsável" />

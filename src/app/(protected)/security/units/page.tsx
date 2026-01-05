@@ -89,7 +89,6 @@ export default function Units() {
         ? statusIdSelected.toString() === unit.statusId.toString()
         : true;
 
-
     return statusMatch && (searchApartmentMatch || searchGuest);
   });
 
@@ -123,7 +122,10 @@ export default function Units() {
       <div className="space-y-6">
         <div className="flex flex-col gap-4 md:items-end md:flex-row">
           <div className="w-[350px] space-y-2">
-            <Label>Apartamento/Morador</Label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Apartamento/Morador
+            </label>
+
             <Input
               placeholder="Busque por apartamento ou morador"
               style={{ height: 39 }}
@@ -131,7 +133,10 @@ export default function Units() {
             />
           </div>
           <div className="space-y-2">
-            <Label>Status</Label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Status
+            </label>
+
             <Select
               value={statusIdSelected}
               onValueChange={setStatusIdSelected}
