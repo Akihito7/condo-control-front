@@ -168,7 +168,7 @@ export function ModalAction({
           <fieldset className="border border-gray-200 rounded-md p-4 space-y-4">
             {/* Nome */}
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label className="text-right">Nome</Label>
+              <Label className="text-right">Tarefa</Label>
               <Controller
                 name="name"
                 control={control}
@@ -197,7 +197,7 @@ export function ModalAction({
 
             {/* Gravidade */}
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label className="text-right">Gravidade</Label>
+              <Label className="text-right">Prioridade</Label>
               <Controller
                 name="gravityId"
                 control={control}
