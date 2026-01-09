@@ -170,9 +170,11 @@ export function ModalActionMaintenance({
     if (actionType === "edit") {
       const apartament_id = data.apartment_id;
 
-      delete data.employees;
-      delete data.apartment_id;
-      delete data.attachments;
+      const dataCloned: Partial<WorkOrderFormData> = data;
+
+      delete dataCloned.employees;
+      delete dataCloned.apartment_id;
+      delete dataCloned.attachments;
       await handleUpdateRegister({
         registerId: work!.id,
         tableName: "works_units",
@@ -414,6 +416,7 @@ export function ModalActionMaintenance({
                     className="col-span-5"
                   />
                   <Input
+                    type="number"
                     placeholder="CPF"
                     {...register(`employees.${index}.cpf`)}
                     className="col-span-4"

@@ -33,7 +33,7 @@ export function useResidentRequests() {
   });
 
   const { data: status } = useQuery({
-    queryKey: ["statuses"],
+    queryKey: ["statuses", "residents", "requests"],
     queryFn: fetchResidentCallStatus,
   });
 
