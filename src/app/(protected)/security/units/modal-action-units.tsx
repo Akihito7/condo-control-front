@@ -102,12 +102,13 @@ export function ModalActionUnits({
       await handleCreateUnit(data);
     } else {
       const apartament_id = data.apartment_id;
-      delete data.apartment_id;
+      const dataCloned: Partial<UnitFormData> = data;
+      delete dataCloned.apartment_id;
       await handleUpdateRegister({
         registerId: unit.id,
         tableName: "units",
         data: {
-          ...data,
+          ...dataCloned,
           apartament_id,
         },
       });

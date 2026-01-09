@@ -141,7 +141,7 @@ export function ModalActionMaintenance({
   });
 
   const { mutateAsync: handleUpdateRegister } = useMutation({
-    mutationFn: updateGenericRegister<WorkDataFormDataUpdate>,
+    mutationFn: updateGenericRegister<Partial<WorkDataFormDataUpdate>>,
   });
 
   async function onSubmit(data: WorkOrderFormData) {
@@ -179,7 +179,7 @@ export function ModalActionMaintenance({
         registerId: work!.id,
         tableName: "works_units",
         data: {
-          ...data,
+          ...dataCloned,
           apartament_id,
         },
       });
