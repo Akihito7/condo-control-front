@@ -2,7 +2,6 @@ import { api } from "@/services/api";
 
 interface FetchUnitWorksProps {
   startDate: string;
-  endDate: string;
 }
 
 export interface WorkUnit {
@@ -20,10 +19,9 @@ export interface WorkUnit {
 
 export async function fetchUnitWorks({
   startDate,
-  endDate,
 }: FetchUnitWorksProps): Promise<WorkUnit[]> {
   const response = await api.get(
-    `structure/unit-works/${startDate}/${endDate}`
+    `structure/unit-works/${startDate}`
   );
   return response.data;
 }

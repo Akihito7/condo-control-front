@@ -8,13 +8,9 @@ import { useState } from "react";
 
 export function useUnitWorks() {
   const date = new Date();
-  const [range, setRange] = useState({
-    from: date,
-    to: date,
-  });
+  const [startDate, setStartDate] = useState(date);
 
-  const startDateFormatted = format(range.from, "yyyy-MM-dd");
-  const endDateFormatted = format(range.to, "yyyy-MM-dd");
+  const startDateFormatted = format(startDate, "yyyy-MM-dd");
 
   const { user } = useUserContext();
   const condominiumId = user.condominiumId;
@@ -32,17 +28,16 @@ export function useUnitWorks() {
   });
 
   const { data: unitWorks, status: unitWorksStatus } = useQuery({
-    queryKey: ["works", startDateFormatted, endDateFormatted],
+    queryKey: ["works", startDateFormatted],
     queryFn: () =>
       fetchUnitWorks({
-        startDate: startDateFormatted,
-        endDate: endDateFormatted,
+        startDate: startDateFormatted
       }),
   });
 
   return {
-    range,
-    setRange,
+    startDate,
+    setStartDate,
     unitWorksStatuses,
     unitWorksStatusesStatus,
     apartaments,

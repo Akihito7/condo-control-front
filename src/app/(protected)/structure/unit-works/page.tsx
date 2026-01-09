@@ -35,10 +35,24 @@ import {
 import { useCommandDelete } from "@/commands/use-command.delete";
 import { useQueryClient } from "@tanstack/react-query";
 import { WorkUnit } from "@/api/fetch-unit-works";
+import { cn } from "@/lib/utils";
+import { MonthYearPicker } from "@/components/month-year-select";
+
+const STATUS_BADGE: Record<number, string> = {
+  1: "bg-slate-200 text-slate-700", // EM ESPERA
+  2: "bg-amber-400 text-amber-950", // EM ANDAMENTO
+  3: "bg-red-500 text-white", // PARALISADA
+  4: "bg-green-400 text-white", // FINALIZADA
+};
 
 export default function UnitWorks() {
-  const { range, setRange, unitWorksStatuses, apartaments, unitWorks } =
-    useUnitWorks();
+  const {
+    startDate,
+    setStartDate,
+    unitWorksStatuses,
+    apartaments,
+    unitWorks,
+  } = useUnitWorks();
 
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [dropDownIsOpen, setDropDownIsOpen] = useState(false);
@@ -61,12 +75,15 @@ export default function UnitWorks() {
     onSuccess: onDeleteSuccess,
   });
   const [apartmentFilter, setApartmentFilter] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string | undefined>();
+  const [statusFilter, setStatusFilter] = useState<string>("-1");
 
   const filteredUnitWorks = useMemo(() => {
     return (
       unitWorks?.filter((work) => {
-        if (statusFilter && work.statusId !== Number(statusFilter)) {
+        if (
+          Number(statusFilter) > 0 &&
+          work.statusId !== Number(statusFilter)
+        ) {
           return false;
         }
 
@@ -79,22 +96,16 @@ export default function UnitWorks() {
             return false;
           }
         }
-
-        if (range?.from && range?.to) {
-          const forecast = new Date(work.forecastDate);
-          const from = new Date(range.from);
-          const to = new Date(range.to);
-          to.setHours(23, 59, 59, 999);
-
-          if (forecast < from || forecast > to) {
-            return false;
-          }
-        }
-
         return true;
       }) ?? []
     );
-  }, [unitWorks, statusFilter, apartmentFilter, range, apartaments]);
+  }, [
+    unitWorks,
+    statusFilter,
+    apartmentFilter,
+    startDate,
+    apartaments,
+  ]);
 
   return (
     <main className="bg-gray-50 min-h-screen w-full p-0 py-8 px-2 sm:p-8 flex flex-col gap-6 overflow-x-auto">
@@ -110,11 +121,11 @@ export default function UnitWorks() {
 
       <div className="space-y-6">
         <div className="flex flex-col gap-4 md:items-end md:flex-row">
-          <div className="w-[250px] space-y-2">
+          <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Previsão
             </label>
-            <DatePickRange setRange={setRange} range={range} className="h-9" />
+            <MonthYearPicker selectedDate={startDate} onChange={setStartDate} />
           </div>
 
           <div className="w-[250px] space-y-2">
@@ -135,11 +146,12 @@ export default function UnitWorks() {
               Status
             </label>
 
-            <Select onValueChange={setStatusFilter}>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="col-span-3 w-full">
                 <SelectValue placeholder="Selecione o status" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="-1">Todos</SelectItem>
                 {unitWorksStatuses?.map((status: any) => (
                   <SelectItem key={status.id} value={status.id.toString()}>
                     {status.name}
@@ -200,9 +212,16 @@ export default function UnitWorks() {
                       </TableCell>
 
                       <TableCell>
-                        {unitWorksStatuses?.find(
-                          (status: any) => status.id === work.statusId
-                        )?.name ?? "-"}
+                        <span
+                          className={cn(
+                            "inline-flex items-center justify-center px-2 py-1 text-xs font-semibold rounded-md",
+                            STATUS_BADGE[work.statusId]
+                          )}
+                        >
+                          {unitWorksStatuses?.find(
+                            (status: any) => status.id === work.statusId
+                          )?.name ?? "-"}
+                        </span>
                       </TableCell>
 
                       <TableCell>
