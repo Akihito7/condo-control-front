@@ -31,6 +31,12 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addDailyRequest } from "@/api/add-daily-request";
 import { updateGenericRegister } from "@/api/update-generic.register";
 
+
+const PRIORITY_BADGE = {
+
+
+}
+
 interface Option {
   id: number;
   name: string;

@@ -32,6 +32,21 @@ import {
 import { useCommandDelete } from "@/commands/use-command.delete";
 import { useQueryClient } from "@tanstack/react-query";
 
+const PRIORITY_COLORS: Record<number, string> = {
+  1: "bg-red-500 text-white", // Alta
+  2: "bg-green-500 text-white", // Baixa
+  3: "bg-yellow-400 text-black", // Média
+};
+
+const STATUS_COLORS: Record<number, string> = {
+  1: "bg-white text-gray-800 border border-gray-300", // Pendente
+  2: "bg-blue-500 text-white", // Em andamento
+  3: "bg-green-500 text-white", // Finalizada
+};
+
+const badgeBase =
+  "inline-flex items-center justify-center px-2 py-1 rounded-md text-xs font-medium whitespace-nowrap";
+
 export default function DailyRequests() {
   const {
     date,
@@ -120,12 +135,12 @@ export default function DailyRequests() {
 
           <div className="w-[250px] space-y-2">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Urgência / Gravidade
+              Prioridade
             </label>
 
             <Select value={gravityId} onValueChange={setGravityId}>
               <SelectTrigger className="col-span-3 w-full">
-                <SelectValue placeholder="Selecione a gravidade" />
+                <SelectValue placeholder="Selecione a prioridade" />
               </SelectTrigger>
               <SelectContent>
                 {gravitiesOptions?.map(({ id, name }) => (
@@ -187,7 +202,7 @@ export default function DailyRequests() {
                 <TableRow>
                   <TableHead>Tarefa</TableHead>
                   <TableHead>Data</TableHead>
-                  <TableHead>Gravidade</TableHead>
+                  <TableHead>Prioridade</TableHead>
                   <TableHead className="text-left">Responsável</TableHead>
                   <TableHead className="text-left">Observações</TableHead>
                   <TableHead className="text-center">Status</TableHead>
@@ -223,7 +238,16 @@ export default function DailyRequests() {
                       {new Date(item.date).toLocaleDateString("pt-BR")}
                     </TableCell>
 
-                    <TableCell>{getGravityName(item.gravityId)}</TableCell>
+                    <TableCell>
+                      <span
+                        className={`${badgeBase} ${
+                          PRIORITY_COLORS[item.gravityId] ??
+                          "bg-gray-200 text-gray-800"
+                        }`}
+                      >
+                        {getGravityName(item.gravityId)}
+                      </span>
+                    </TableCell>
 
                     <TableCell>
                       {getResponsibleName(item.responsibleId)}
@@ -234,7 +258,14 @@ export default function DailyRequests() {
                     </TableCell>
 
                     <TableCell className="text-center">
-                      {getStatusName(item.statusId)}
+                      <span
+                        className={`${badgeBase} ${
+                          STATUS_COLORS[item.statusId] ??
+                          "bg-gray-200 text-gray-800"
+                        }`}
+                      >
+                        {getStatusName(item.statusId)}
+                      </span>
                     </TableCell>
 
                     <TableCell className="text-center">
