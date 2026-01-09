@@ -43,9 +43,9 @@ export function MonthYearPicker({
   );
 
   useEffect(() => {
-    console.log("mudei", selectedYear, selectedMonth);
     onChange(new Date(selectedYear, selectedMonth));
   }, [selectedMonth, selectedYear]);
+
 
   function isNotFutureMonth(month: string) {
     const currentYear = new Date().getFullYear();

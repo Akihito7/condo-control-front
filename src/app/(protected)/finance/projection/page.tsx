@@ -56,6 +56,8 @@ export default function FinancialForecast() {
     return date;
   });
 
+  const selectedDateFormatted = format(selectedDate, 'yyyy-MM')
+
   const componentMainRef = useRef<HTMLElement>(null);
   const componentFilterRef = useRef<HTMLDivElement>(null);
 
@@ -66,6 +68,7 @@ export default function FinancialForecast() {
     registersProjectionStatus,
   } = useProjection({
     selectedDate,
+    selectedDateFormatted
   });
 
   const dateFormatted = format(selectedDate, "MMMM/yyyy", { locale: ptBR });

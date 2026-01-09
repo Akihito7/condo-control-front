@@ -3,7 +3,7 @@ import { api } from "@/services/api";
 
 interface GetProjectionProps {
   condominiumId: number;
-  date: Date;
+  date: string;
 }
 
 interface ProjectionCardsResponse {

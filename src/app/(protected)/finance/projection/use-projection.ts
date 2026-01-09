@@ -7,33 +7,37 @@ import { redirect } from "next/navigation";
 
 interface UseProjectionProps {
   selectedDate: Date;
+  selectedDateFormatted: string;
 }
-export function useProjection({ selectedDate }: UseProjectionProps) {
+export function useProjection({
+  selectedDate,
+  selectedDateFormatted,
+}: UseProjectionProps) {
   const { edit, read } = userPagePermission({ pageId: 3 });
 
-  const {
-    user
-  } = useUserContext();
+  const { user } = useUserContext();
 
   const condominiumId = user.condominiumId;
 
   const { data: cardsProjection, status: cardsProjectionStatus } = useQuery({
-    queryKey: ['projectionCards', condominiumId, selectedDate],
-    queryFn: async () => fetchProjectionCards({ condominiumId, date: selectedDate }),
-    enabled: !!user.condominiumId && !!selectedDate
-  })
+    queryKey: ["projectionCards", condominiumId, selectedDateFormatted],
+    queryFn: async () =>
+      fetchProjectionCards({ condominiumId, date: selectedDateFormatted }),
+    enabled: !!user.condominiumId && !!selectedDateFormatted,
+  });
 
-  const { data: registersProjection, status: registersProjectionStatus } = useQuery({
-    queryKey: ['projectionRegisters', condominiumId, selectedDate],
-    queryFn: async () => fetchProjectionRegisters({ condominiumId, date: selectedDate }),
-    enabled: !!user.condominiumId && !!selectedDate
-  })
+  const { data: registersProjection, status: registersProjectionStatus } =
+    useQuery({
+      queryKey: ["projectionRegisters", condominiumId, selectedDate],
+      queryFn: async () =>
+        fetchProjectionRegisters({ condominiumId, date: selectedDate }),
+      enabled: !!user.condominiumId && !!selectedDate,
+    });
 
   return {
     cardsProjection,
     cardsProjectionStatus,
     registersProjection,
-    registersProjectionStatus
-  }
-
+    registersProjectionStatus,
+  };
 }
