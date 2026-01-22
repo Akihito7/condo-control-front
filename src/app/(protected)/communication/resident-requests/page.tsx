@@ -35,6 +35,13 @@ import { ModalAttchament } from "@/components/attachments/modal-attachament";
 import { format } from "date-fns";
 import { Option } from "@/api/fetch-work-areas";
 import { useQueryClient } from "@tanstack/react-query";
+import { cn } from "@/lib/utils";
+
+const STATUS_BADGE: Record<number, string> = {
+  1: "bg-slate-200 text-slate-700", // PENDENTE
+  2: "bg-amber-400 text-amber-950", // EM ANDAMENTO
+  3: "bg-green-400 text-white", // RESOLVIDO
+};
 
 export default function ResidentRequests() {
   const {
@@ -72,10 +79,10 @@ export default function ResidentRequests() {
 
   function getOptionName(
     optionSelected: string | number,
-    options: Option[] = []
+    options: Option[] = [],
   ) {
     const optionFound = options.find(
-      (option) => option.id.toString() === optionSelected.toString()
+      (option) => option.id.toString() === optionSelected.toString(),
     );
 
     return optionFound?.name ?? "-";
@@ -230,7 +237,7 @@ export default function ResidentRequests() {
                           apartaments?.map((ap) => ({
                             name: ap.apartmentNumber,
                             id: ap.id,
-                          }))
+                          })),
                         )}
                       </TableCell>
 
@@ -246,20 +253,27 @@ export default function ResidentRequests() {
 
                       {/* Status */}
                       <TableCell>
-                        {getOptionName(call.statusId, status)}
+                        <span
+                          className={cn(
+                            "inline-flex items-center justify-center px-2 py-1 text-xs font-semibold rounded-md",
+                            STATUS_BADGE[call.statusId],
+                          )}
+                        >
+                          {getOptionName(call.statusId, status)}
+                        </span>
                       </TableCell>
 
                       {/* Início Atuação */}
                       <TableCell className="text-center">
                         {call.startDate
-                          ? format(call.startDate, "yyyy/MM/dd")
+                          ? format(call.startDate, "dd/MM/yyyy hh:mm")
                           : "-"}
                       </TableCell>
 
                       {/* Fim Atuação */}
                       <TableCell>
                         {call.endDate
-                          ? format(call.endDate, "yyyy/MM/dd")
+                          ? format(call.endDate, "dd/MM/yyyy hh:mm")
                           : "-"}
                       </TableCell>
 
