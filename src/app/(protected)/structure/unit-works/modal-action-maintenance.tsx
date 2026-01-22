@@ -41,6 +41,7 @@ const workOrderSchema = z.object({
   apartment_id: z.string().min(1, "Selecione o apartamento"),
   status_id: z.string().min(1, "Selecione o status"),
   forecast_date: z.date(),
+  forecast_end_date: z.date(),
   description: z.string().min(1, "Descrição obrigatória"),
   has_art_rrt: z.boolean(),
   observations: z.string().optional(),
@@ -51,7 +52,7 @@ const workOrderSchema = z.object({
       employeeId: z.number().optional().nullable(),
       full_name: z.string().min(1, "Nome obrigatório"),
       cpf: z.string().min(11, "CPF inválido").max(14, "CPF inválido"),
-    })
+    }),
   ),
 });
 
@@ -154,7 +155,7 @@ export function ModalActionMaintenance({
 
       if (key === "attachments" && value?.length) {
         Array.from(value).forEach((file: any) =>
-          formData.append("attachments", file)
+          formData.append("attachments", file),
         );
         return;
       }
@@ -184,7 +185,7 @@ export function ModalActionMaintenance({
         },
       });
       const employeesInMemory = employees.filter(
-        ({ employeeId }) => !employeeId
+        ({ employeeId }) => !employeeId,
       );
 
       const saveEmployeesPromisses = employeesInMemory.map(
@@ -194,7 +195,7 @@ export function ModalActionMaintenance({
             cpf,
             workId: work!.id,
           });
-        }
+        },
       );
 
       await Promise.all(saveEmployeesPromisses);
@@ -212,7 +213,7 @@ export function ModalActionMaintenance({
             cpf,
             workId: unitWorkId,
           });
-        }
+        },
       );
 
       await Promise.all(saveEmployeesPromisses);
@@ -247,6 +248,7 @@ export function ModalActionMaintenance({
     setValue("apartment_id", workUnit.apartamentId.toString());
     setValue("description", workUnit.description.toString());
     setValue("forecast_date", new Date(workUnit.forecastDate));
+    setValue("forecast_end_date", new Date(workUnit.forecastEndDate));
     setValue("has_art_rrt", workUnit.hasArtRrt);
     setValue("observations", workUnit.observations);
     setValue("status_id", workUnit.statusId.toString());
@@ -266,7 +268,7 @@ export function ModalActionMaintenance({
   useEffect(() => {
     if (work) {
       const emplooyesAlreadyInMemory = getValues("employees").filter(
-        ({ employeeId }) => !employeeId
+        ({ employeeId }) => !employeeId,
       );
       setValue("employees", [
         ...emplooyesQuery?.map((employee: any) => ({
@@ -290,6 +292,7 @@ export function ModalActionMaintenance({
           has_art_rrt: false,
           observations: "",
           forecast_date: new Date(),
+          forecast_end_date: new Date(),
           attachments: [],
           employees: [{ employeeId: null, full_name: "", cpf: "" }],
         });
@@ -365,6 +368,19 @@ export function ModalActionMaintenance({
             <div className="col-span-3">
               <Controller
                 name="forecast_date"
+                control={control}
+                render={({ field }) => (
+                  <DatePicker date={field.value} setDate={field.onChange} />
+                )}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label className="text-right">Data prevista fim</Label>
+            <div className="col-span-3">
+              <Controller
+                name="forecast_end_date"
                 control={control}
                 render={({ field }) => (
                   <DatePicker date={field.value} setDate={field.onChange} />
@@ -510,7 +526,7 @@ export function ModalActionMaintenance({
                           className="text-red-500 text-xs"
                           onClick={() => {
                             const updated = selectedFiles.filter(
-                              (_, i) => i !== index
+                              (_, i) => i !== index,
                             );
                             setSelectedFiles(updated);
                             setValue("attachments", updated as any);

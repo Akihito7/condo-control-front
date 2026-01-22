@@ -46,13 +46,8 @@ const STATUS_BADGE: Record<number, string> = {
 };
 
 export default function UnitWorks() {
-  const {
-    startDate,
-    setStartDate,
-    unitWorksStatuses,
-    apartaments,
-    unitWorks,
-  } = useUnitWorks();
+  const { startDate, setStartDate, unitWorksStatuses, apartaments, unitWorks } =
+    useUnitWorks();
 
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [dropDownIsOpen, setDropDownIsOpen] = useState(false);
@@ -60,7 +55,7 @@ export default function UnitWorks() {
     number | null
   >(null);
   const [workSelected, setWorkSelected] = useState<WorkUnit | undefined>(
-    undefined
+    undefined,
   );
 
   const queryClient = useQueryClient();
@@ -99,13 +94,7 @@ export default function UnitWorks() {
         return true;
       }) ?? []
     );
-  }, [
-    unitWorks,
-    statusFilter,
-    apartmentFilter,
-    startDate,
-    apartaments,
-  ]);
+  }, [unitWorks, statusFilter, apartmentFilter, startDate, apartaments]);
 
   return (
     <main className="bg-gray-50 min-h-screen w-full p-0 py-8 px-2 sm:p-8 flex flex-col gap-6 overflow-x-auto">
@@ -121,13 +110,6 @@ export default function UnitWorks() {
 
       <div className="space-y-6">
         <div className="flex flex-col gap-4 md:items-end md:flex-row">
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Previsão
-            </label>
-            <MonthYearPicker selectedDate={startDate} onChange={setStartDate} />
-          </div>
-
           <div className="w-[250px] space-y-2">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Apartamentos
@@ -190,7 +172,8 @@ export default function UnitWorks() {
             <Table className="min-w-full border-collapse">
               <TableHeader className="sticky top-0 bg-white shadow-md z-10">
                 <TableRow>
-                  <TableHead>Previsão</TableHead>
+                  <TableHead>Previsão Inicio</TableHead>
+                  <TableHead>Previsão Fim</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Unidade</TableHead>
                   <TableHead>Descrição</TableHead>
@@ -206,27 +189,32 @@ export default function UnitWorks() {
                   filteredUnitWorks.map((work) => (
                     <TableRow key={work.id}>
                       <TableCell>
-                        {new Date(work.forecastDate).toLocaleDateString(
-                          "pt-BR"
-                        )}
+                        {new Date(
+                          `${work.forecastDate}T12:00:00`,
+                        ).toLocaleDateString("pt-BR")}
+                      </TableCell>
+                      <TableCell>
+                        {new Date(
+                          `${work.forecastEndDate}T12:00:00`,
+                        ).toLocaleDateString("pt-BR")}
                       </TableCell>
 
                       <TableCell>
                         <span
                           className={cn(
                             "inline-flex items-center justify-center px-2 py-1 text-xs font-semibold rounded-md",
-                            STATUS_BADGE[work.statusId]
+                            STATUS_BADGE[work.statusId],
                           )}
                         >
                           {unitWorksStatuses?.find(
-                            (status: any) => status.id === work.statusId
+                            (status: any) => status.id === work.statusId,
                           )?.name ?? "-"}
                         </span>
                       </TableCell>
 
                       <TableCell>
                         {apartaments?.find(
-                          (apt) => apt.id === work.apartamentId
+                          (apt) => apt.id === work.apartamentId,
                         )?.apartmentNumber ?? "-"}
                       </TableCell>
 

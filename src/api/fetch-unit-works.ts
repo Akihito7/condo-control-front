@@ -1,9 +1,5 @@
 import { api } from "@/services/api";
 
-interface FetchUnitWorksProps {
-  startDate: string;
-}
-
 export interface WorkUnit {
   id: number;
   condominiumId: number;
@@ -11,17 +7,14 @@ export interface WorkUnit {
   apartamentId: number;
   statusId: number;
   forecastDate: string;
+  forecastEndDate: string;
   description: string;
   hasArtRrt: boolean;
   observations: string;
   createdAt: string;
 }
 
-export async function fetchUnitWorks({
-  startDate,
-}: FetchUnitWorksProps): Promise<WorkUnit[]> {
-  const response = await api.get(
-    `structure/unit-works/${startDate}`
-  );
+export async function fetchUnitWorks(): Promise<WorkUnit[]> {
+  const response = await api.get(`structure/unit-works/`);
   return response.data;
 }

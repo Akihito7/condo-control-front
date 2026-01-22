@@ -19,7 +19,7 @@ export function useUnitWorks() {
     {
       queryKey: ["statuses"],
       queryFn: fetchUnitWorksStatus,
-    }
+    },
   );
 
   const { data: apartaments, status: apartamentsStatus } = useQuery({
@@ -29,10 +29,7 @@ export function useUnitWorks() {
 
   const { data: unitWorks, status: unitWorksStatus } = useQuery({
     queryKey: ["works", startDateFormatted],
-    queryFn: () =>
-      fetchUnitWorks({
-        startDate: startDateFormatted
-      }),
+    queryFn: fetchUnitWorks,
   });
 
   return {
