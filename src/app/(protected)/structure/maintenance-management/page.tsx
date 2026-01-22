@@ -9,6 +9,7 @@ import { Maintenances } from "./tabs/maintenances";
 import { Indicators } from "./tabs/indicators";
 import { CalendarMaintenance } from "./tabs/calendar-maintenance";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function MaintenanceManagement() {
   const [tabSelected, setTabSelected] = useState("asset-maintenance");

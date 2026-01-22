@@ -227,7 +227,7 @@ export default function ResidentRequests() {
                     <TableRow key={call.id}>
                       {/* Data */}
                       <TableCell>
-                        {format(call.createdAt, "yyyy/MM/dd")}
+                        {format(call.createdAt, "dd/MM/yyyy")}
                       </TableCell>
 
                       {/* Apartamento */}

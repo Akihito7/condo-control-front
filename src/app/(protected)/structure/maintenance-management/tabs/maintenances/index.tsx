@@ -266,7 +266,7 @@ export function Maintenances({ date, setDate }: MaintenancesProps) {
                   </TableCell>
                   <TableCell>
                     {maintenance.plannedStart
-                      ? format(maintenance.plannedStart, "yyyy/MM/dd HH:mm")
+                      ? format(maintenance.plannedStart, "dd/MM/yyyy HH:mm")
                       : ""}
                   </TableCell>
                   <TableCell>{maintenance.supplier}</TableCell>
@@ -370,7 +370,7 @@ export function Maintenances({ date, setDate }: MaintenancesProps) {
                 ? "para a data " +
                   format(
                     maintenanceSelectedToDelete.plannedStart,
-                    "yyyy/MM/dd HH:mm"
+                    "dd/MM/yyyy HH:mm"
                   ) +
                   "?"
                 : ""}

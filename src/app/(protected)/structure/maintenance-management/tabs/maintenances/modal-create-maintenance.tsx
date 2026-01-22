@@ -96,12 +96,6 @@ export function ModalCreateMaintenance({
   const { mutateAsync: handleCreateIntervention } = useMutation({
     mutationFn: async (payload: { condominiumId: number; data: FormData }) =>
       createIntervention<FormData>(payload),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["summary"],
-        exact: false,
-      });
-    },
   });
 
   async function onSubmit(data: InterventionFormData) {
@@ -134,6 +128,20 @@ export function ModalCreateMaintenance({
     queryClient.invalidateQueries({
       queryKey: ["maintenances"],
       exact: false,
+    });
+    queryClient.invalidateQueries({
+      queryKey: ["summary"],
+      exact: false,
+    });
+    queryClient.refetchQueries({
+      queryKey: ["summary"],
+    });
+    queryClient.invalidateQueries({
+      queryKey: ["maintenances-calendar"],
+      exact: false,
+    });
+    queryClient.refetchQueries({
+      queryKey: ["maintenances-calendar"],
     });
     closeButtonRef?.current?.click();
     reset();
