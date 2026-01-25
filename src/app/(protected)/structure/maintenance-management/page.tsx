@@ -4,12 +4,11 @@ import { Breadcrumb } from "@/components/breadcrumb";
 import { ButtonOpenSidebar } from "@/components/button-open-sidebar";
 import { AssetsMaintenance } from "./tabs/assets-maintenance";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Suspense, useState } from "react";
+import {useState } from "react";
 import { Maintenances } from "./tabs/maintenances";
 import { Indicators } from "./tabs/indicators";
 import { CalendarMaintenance } from "./tabs/calendar-maintenance";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { useQueryClient } from "@tanstack/react-query";
 
 export default function MaintenanceManagement() {
   const [tabSelected, setTabSelected] = useState("asset-maintenance");

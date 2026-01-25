@@ -42,6 +42,8 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { ModalViewAsset } from "./modal-view-asset";
+import { AssetMaintenanceReport } from "@/api/get-asset-maintenances-details";
 
 export function AssetsMaintenance() {
   const query = useQueryClient();
@@ -52,12 +54,15 @@ export function AssetsMaintenance() {
   const [usefulLifeLessThanTwoYears, setUsefulLifeLessThanTwoYears] =
     useState("2");
   const [assetToDelete, setAssetToDelete] = useState<Asset | null>(null);
-    const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const [dropdownOpenToThisItem, setDropdownOpenToThisItem] = useState<
     number | undefined
   >();
+  const [isOpenModalView, setIsOpenModalView] = useState(false);
+  const [assetDetailsSelected, setAssetDetailsSelected] =
+    useState<AssetMaintenanceReport | null>(null);
 
-  const { assetsTypes, assetsTypesStatus, assets, assetsStatus } =
+  const { assetsTypes, assets, assetIsLoading, assetDetails } =
     useAssetsMaintenance();
 
   const getType = (typeId: number): string => {
@@ -169,7 +174,7 @@ export function AssetsMaintenance() {
                     asset.code.toLowerCase().includes(normalizedSearchCode);
 
                   const remainingYears = Number(
-                    asset.remainingUsefulLife.split(" ")?.[0]
+                    asset.remainingUsefulLife.split(" ")?.[0],
                   );
                   const matchesUsefulLife =
                     usefulLifeLessThanTwoYears === "2" || remainingYears < 2;
@@ -202,28 +207,41 @@ export function AssetsMaintenance() {
 
                     <TableCell className="text-center">
                       <DropdownMenu
-                          open={
-                            dropdownOpen &&
-                            dropdownOpenToThisItem === asset.id
+                        open={
+                          dropdownOpen && dropdownOpenToThisItem === asset.id
+                        }
+                        onOpenChange={(open) => {
+                          if (!open) {
+                            setDropdownOpenToThisItem(undefined);
+                          } else {
+                            setDropdownOpenToThisItem(asset.id);
                           }
-                          onOpenChange={(open) => {
-                            if (!open) {
-                              setDropdownOpenToThisItem(undefined);
-                            } else {
-                              setDropdownOpenToThisItem(asset.id);
-                            }
-                            setDropdownOpen(open);
-                          }}
-                      > 
+                          setDropdownOpen(open);
+                        }}
+                      >
                         <DropdownMenuTrigger className="outline-none">
                           <MoreHorizontal className="w-5 h-5 cursor-pointer text-gray-600" />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              const findAssetDetails = assetDetails?.find(
+                                (a) => a.asset_id === asset.id,
+                              );
+                              if (!findAssetDetails) return;
+                              setDropdownOpen(false);
+                              setDropdownOpenToThisItem(undefined);
+                              setIsOpenModalView(true);
+                              setAssetDetailsSelected(findAssetDetails);
+                            }}
+                          >
+                            Ver
+                          </DropdownMenuItem>
                           <DropdownMenuItem>Editar</DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => {
-                              setDropdownOpen(false)
-                              setAssetToDelete(asset)
+                              setDropdownOpen(false);
+                              setAssetToDelete(asset);
                             }}
                           >
                             Excluir
@@ -245,7 +263,12 @@ export function AssetsMaintenance() {
         setIsOpen={setModalAttchamentIsOpen}
       />
 
-      <Dialog open={!!assetToDelete} onOpenChange={(open) => {if(!open) setAssetToDelete(null)}}>
+      <Dialog
+        open={!!assetToDelete}
+        onOpenChange={(open) => {
+          if (!open) setAssetToDelete(null);
+        }}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Confirmar exclusão</DialogTitle>
@@ -257,15 +280,12 @@ export function AssetsMaintenance() {
           </DialogHeader>
 
           <DialogFooter>
-            <Button
-            variant="outline"
-              onClick={() => setAssetToDelete(null)}
-            >
+            <Button variant="outline" onClick={() => setAssetToDelete(null)}>
               Cancelar
-            </Button> 
+            </Button>
 
             <Button
-            variant="destructive"
+              variant="destructive"
               onClick={async () => {
                 if (!assetToDelete) return;
                 await handleDeleteMaintenanceAsset(assetToDelete.id);
@@ -278,7 +298,12 @@ export function AssetsMaintenance() {
         </DialogContent>
       </Dialog>
 
+      <ModalViewAsset
+        assetSelected={assetDetailsSelected}
+        isOpen={isOpenModalView && !!assetDetailsSelected}
+        setIsOpen={setIsOpenModalView}
 
+      />
     </div>
   );
 }
