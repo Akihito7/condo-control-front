@@ -24,11 +24,12 @@ import {
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { DatePicker } from "@/components/date-picker";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addResidentRequest } from "@/api/add-resident-request";
 import { updateGenericRegister } from "@/api/update-generic.register";
 import snakecaseKeys from "snakecase-keys";
+import { DatePickerWithHours } from "@/components/date-picker-with-hours";
+import { subHours } from "date-fns";
 
 const residentSchema = z.object({
   apartament_id: z.string().min(1, "Selecione o apartamento"),
@@ -117,7 +118,7 @@ export function ModalActionResident({
     Object.entries(data).forEach(([key, value]) => {
       if (key === "attachments" && value?.length) {
         Array.from(value).forEach((file: any) =>
-          formData.append("attachments", file)
+          formData.append("attachments", file),
         );
         return;
       }
@@ -152,11 +153,12 @@ export function ModalActionResident({
   useEffect(() => {
     if (requestSelected) {
       const startDateFormatted = requestSelected.startDate
-        ? new Date(requestSelected.startDate)
-        : new Date();
+        ? subHours(new Date(requestSelected.startDate), 3)
+        : subHours(new Date(), 3);
+
       const endDateFormatted = requestSelected.endDate
-        ? new Date(requestSelected.startDate)
-        : new Date();
+        ? subHours(new Date(requestSelected.endDate), 3)
+        : subHours(new Date(), 3);
       reset({
         apartament_id: requestSelected.apartamentId.toString(),
         observation: requestSelected.observation,
@@ -286,7 +288,10 @@ export function ModalActionResident({
                 name="start_date"
                 control={control}
                 render={({ field }) => (
-                  <DatePicker date={field.value} setDate={field.onChange} />
+                  <DatePickerWithHours
+                    date={field.value}
+                    setDate={field.onChange}
+                  />
                 )}
               />
             </div>
@@ -299,7 +304,10 @@ export function ModalActionResident({
                 name="end_date"
                 control={control}
                 render={({ field }) => (
-                  <DatePicker date={field.value} setDate={field.onChange} />
+                  <DatePickerWithHours
+                    date={field.value}
+                    setDate={field.onChange}
+                  />
                 )}
               />
             </div>
@@ -354,7 +362,7 @@ export function ModalActionResident({
                           className="text-red-500 text-xs"
                           onClick={() => {
                             const updated = selectedFiles.filter(
-                              (_, i) => i !== index
+                              (_, i) => i !== index,
                             );
                             setSelectedFiles(updated);
                             setValue("attachments", updated as any);

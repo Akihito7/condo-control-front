@@ -1,6 +1,7 @@
 "use client";
 import { Breadcrumb } from "@/components/breadcrumb";
 import { ButtonOpenSidebar } from "@/components/button-open-sidebar";
+
 import React, { useState } from "react";
 import {
   Select,
@@ -30,7 +31,7 @@ import { useResidentRequests } from "./use-resident-requests";
 import { ModalActionResident } from "./modal-action-resident";
 import { useCommandDelete } from "@/commands/use-command.delete";
 import { ModalAttchament } from "@/components/attachments/modal-attachament";
-import { format } from "date-fns";
+import { format, subHours } from "date-fns";
 import { Option } from "@/api/fetch-work-areas";
 import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
@@ -274,17 +275,21 @@ export default function ResidentRequests() {
                         </span>
                       </TableCell>
 
-                      {/* Início Atuação */}
-                      <TableCell className="text-center">
+                      <TableCell>
                         {call.startDate
-                          ? format(call.startDate, "dd/MM/yyyy hh:mm")
+                          ? format(
+                              subHours(new Date(call.startDate), 3),
+                              "dd/MM/yyyy HH:mm",
+                            )
                           : "-"}
                       </TableCell>
 
-                      {/* Fim Atuação */}
                       <TableCell>
                         {call.endDate
-                          ? format(call.endDate, "dd/MM/yyyy hh:mm")
+                          ? format(
+                              subHours(new Date(call.endDate), 3),
+                              "dd/MM/yyyy HH:mm",
+                            )
                           : "-"}
                       </TableCell>
 
