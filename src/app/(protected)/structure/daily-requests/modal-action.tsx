@@ -31,12 +31,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addDailyRequest } from "@/api/add-daily-request";
 import { updateGenericRegister } from "@/api/update-generic.register";
 
-
-const PRIORITY_BADGE = {
-
-
-}
-
 interface Option {
   id: number;
   name: string;
@@ -45,7 +39,6 @@ interface Option {
 interface ModalActionProps {
   gravities?: Option[];
   statuses?: Option[];
-  responsibles?: Option[];
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   type: "edit" | "create";
@@ -57,7 +50,7 @@ const schema = z.object({
   name: z.string().min(3, "Nome obrigatório"),
   date: z.date(),
   gravityId: z.string().min(1, "Selecione a gravidade"),
-  responsibleId: z.string().min(1, "Selecione o responsável"),
+  responsibleName: z.string().min(1, "Por favor atribua um responsavel"),
   statusId: z.string().min(1, "Selecione o status"),
   observation: z.string().optional(),
 });
@@ -67,7 +60,6 @@ export type FormDataDailyRequest = z.infer<typeof schema>;
 export function ModalAction({
   gravities,
   statuses,
-  responsibles,
   isOpen,
   setIsOpen,
   type,
@@ -87,7 +79,7 @@ export function ModalAction({
       name: "",
       date: new Date(),
       gravityId: "",
-      responsibleId: "",
+      responsibleName: "",
       statusId: "",
       observation: "",
     },
@@ -131,7 +123,7 @@ export function ModalAction({
         gravityId: dailyRequest.gravityId.toString(),
         observation: dailyRequest.observation,
         name: dailyRequest.name,
-        responsibleId: dailyRequest.responsibleId.toString(),
+        responsibleName: dailyRequest.responsibleName,
         statusId: dailyRequest.statusId.toString(),
       });
     }
@@ -147,7 +139,7 @@ export function ModalAction({
             gravityId: "",
             name: "",
             observation: "",
-            responsibleId: "",
+            responsibleName: "",
             statusId: "",
           });
           setIsOpen(open);
@@ -228,21 +220,16 @@ export function ModalAction({
             <div className="grid grid-cols-4 items-center gap-4">
               <Label className="text-right">Responsável</Label>
               <Controller
-                name="responsibleId"
+                name="responsibleName"
                 control={control}
                 render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger className="col-span-3">
-                      <SelectValue placeholder="Selecione" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {responsibles?.map((r) => (
-                        <SelectItem key={r.id} value={String(r.id)}>
-                          {r.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Input
+                    value={field.value}
+                    onChange={(event) => {
+                      const value = event.target.value;
+                      field.onChange(value);
+                    }}
+                  />
                 )}
               />
             </div>

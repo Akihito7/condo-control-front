@@ -186,7 +186,6 @@ export default function DailyRequests() {
 
             <ModalAction
               gravities={gravitiesOptions}
-              responsibles={responsibleOptions}
               statuses={statusOptions}
               type={dailySelected ? "edit" : "create"}
               dailyRequest={dailySelected}
@@ -249,9 +248,7 @@ export default function DailyRequests() {
                       </span>
                     </TableCell>
 
-                    <TableCell>
-                      {getResponsibleName(item.responsibleId)}
-                    </TableCell>
+                    <TableCell>{item?.responsibleName}</TableCell>
 
                     <TableCell className="max-w-[300px] truncate">
                       {item.observation || "-"}
