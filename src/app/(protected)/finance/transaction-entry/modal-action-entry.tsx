@@ -58,28 +58,28 @@ interface ModalCreateEntryProps {
 }
 
 const SchemaCreateEntry = z.object({
-  amount: z.string(),
+  amount: z.string("Valor inválido").min(1, { message: "Valor inválido" }),
   amountPaid: z.string().optional(),
   condominiumId: z.coerce.number(),
   dueDate: z.date(),
   incomeExpenseId: z.coerce
-    .number()
-    .min(0, { message: "Tipo de registro inválido" }),
-  categoryId: z.coerce.number().min(0, { message: "Categoria inválida" }),
+    .number("Tipo de registro inválido")
+    .min(1, { message: "Tipo de registro inválido" }),
+  categoryId: z.coerce
+    .number("Categoria inválida")
+    .min(1, { message: "Categoria inválida" }),
   apartmentId: z.coerce
-    .number()
-    .min(-1, { message: "Apartamento inválido" })
-    .optional()
-    .nullable(),
+    .number("Apartamento inválido")
+    .min(1, { message: "Apartamento inválido" }),
   paymentMethodId: z.coerce
-    .number()
-    .min(0, { message: "Forma de pagamento inválida" }),
+    .number("Forma de pagamento inválida")
+    .min(1, { message: "Forma de pagamento inválida" }),
   paymentStatusId: z.coerce
-    .number()
-    .min(0, { message: "Status de pagamento inválido" }),
+    .number("Status de pagamento inválido")
+    .min(1, { message: "Status de pagamento inválido" }),
   notes: z.string().optional(),
   recurring: z.boolean(),
-  type: z.coerce.number().min(0, { message: "Tipo inválido" }),
+  type: z.coerce.number("Tipo inválido").min(0, { message: "Tipo inválido" }),
   paymentDate: z.date().optional(),
   attachments: z.any(),
 });
@@ -134,10 +134,10 @@ export function ModalActionEntry({
   const categoryId = watch("categoryId");
 
   const categoriesFiltered = categoriesOptions.filter(
-    (cat) => cat.incomeExpenseTypeId === recordTypeId
+    (cat) => cat.incomeExpenseTypeId === recordTypeId,
   );
   const selectedCategory = categoriesFiltered.find(
-    (cat) => cat.id === categoryId
+    (cat) => cat.id === categoryId,
   );
 
   function handleChangeDueDate(date: Date) {
@@ -340,6 +340,12 @@ export function ModalActionEntry({
                   )}
                 />
               </div>
+
+              {errors.dueDate && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.dueDate.message}
+                </p>
+              )}
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 items-center">
@@ -487,9 +493,9 @@ export function ModalActionEntry({
                     <CurrencyInput value={value} onChange={onChange} />
                   )}
                 />
-                {errors.type && (
+                {errors.amount && (
                   <p className="text-red-500 text-sm mt-1">
-                    {errors.type.message}
+                    {errors.amount.message}
                   </p>
                 )}
               </div>
@@ -582,9 +588,9 @@ export function ModalActionEntry({
                     <CurrencyInput value={value} onChange={onChange} />
                   )}
                 />
-                {errors.type && (
+                {errors.amountPaid && (
                   <p className="text-red-500 text-sm mt-1">
-                    {errors.type.message}
+                    {errors.amountPaid.message}
                   </p>
                 )}
               </div>
@@ -605,6 +611,12 @@ export function ModalActionEntry({
                     />
                   )}
                 />
+
+                {errors.amountPaid && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.amountPaid.message}
+                  </p>
+                )}
               </div>
             </div>
 
