@@ -2,7 +2,6 @@
 
 import { Breadcrumb } from "@/components/breadcrumb";
 import { ButtonOpenSidebar } from "@/components/button-open-sidebar";
-import { DatePickRange } from "@/components/date-pick-ranger";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -14,8 +13,6 @@ import {
 import { FileDown, Pencil } from "lucide-react";
 import { useState } from "react";
 import {
-  differenceInHours,
-  differenceInMinutes,
   format,
   parseISO,
 } from "date-fns";
@@ -54,7 +51,7 @@ import { NotificationDropdown } from "@/components/notification";
 import { MonthYearPicker } from "@/components/month-year-select";
 
 export default function OpeningOfCalls() {
-  const { read, edit } = userPagePermission({ pageId: 8 });
+  const { read } = userPagePermission({ pageId: 8 });
 
   const { userIsLoading } = useUserContext();
 
@@ -73,9 +70,7 @@ export default function OpeningOfCalls() {
   const [dropdownOpenToThisItem, setDropdownOpenToThisItem] = useState<
     number | undefined
   >();
-  const { user } = useUserContext();
 
-  const condominiumId = user.condominiumId;
   const queryClient = useQueryClient();
 
   const { mutateAsync: handleDeleteOpeningCallRecord } = useMutation({
@@ -97,11 +92,8 @@ export default function OpeningOfCalls() {
     openingCards,
     openingCardsStatus,
     issuesOptions,
-    optionsIssuesStatus,
-    optionsStatus,
     statusOptions,
     employeesOptions,
-    employeesOptionsStatus,
     date,
     setDate,
   } = useOpeningCalls();

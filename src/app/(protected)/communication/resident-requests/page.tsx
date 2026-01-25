@@ -43,6 +43,12 @@ const STATUS_BADGE: Record<number, string> = {
   3: "bg-green-400 text-white", // RESOLVIDO
 };
 
+const GRAVITIES_BADGE: Record<number, string> = {
+  1: "bg-green-400 text-white", // BAIXA
+  2: "bg-yellow-400 text-yellow-950", // MEDIA
+  3: "bg-red-400 text-white", // ALTA
+};
+
 export default function ResidentRequests() {
   const {
     range,
@@ -248,7 +254,14 @@ export default function ResidentRequests() {
 
                       {/* Gravidade */}
                       <TableCell>
-                        {getOptionName(call.gravityId, gravities)}
+                        <span
+                          className={cn(
+                            "inline-flex items-center justify-center px-2 py-1 text-xs font-semibold rounded-md",
+                            GRAVITIES_BADGE[call.gravityId],
+                          )}
+                        >
+                          {getOptionName(call.gravityId, gravities)}
+                        </span>
                       </TableCell>
 
                       {/* Status */}
