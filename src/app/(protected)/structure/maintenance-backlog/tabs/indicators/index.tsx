@@ -33,9 +33,9 @@ export function Indicators({
   year,
   setYear,
   indicatorsResume,
-  chartImprovementsByArea,
   chartMonthlyExpensesSummary,
 }: DashboardProps) {
+  const componentMainRef = useRef<HTMLDivElement>(null);
   const componentFilterRef = useRef<HTMLDivElement>(null);
 
   const formatterToCurrency = (value: any) => {
@@ -46,16 +46,13 @@ export function Indicators({
     });
   };
 
-  const COLORS = ["#3B82F6", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6"];
-
-  const costByTypeFormatted = [
-    { name: "Melhoria", value: indicatorsResume?.improvementsCost },
-  ].sort((a, b) => (b.value ?? 0) - (a.value ?? 0));
-
   return (
-    <div className="space-y-6 pb-6">
+    <div className="space-y-6 pb-6" ref={componentMainRef}>
       {/* Filtros */}
-      <div className="flex flex-col sm:flex-row gap-4 items-end">
+      <div
+        className="flex flex-col sm:flex-row gap-4 items-end"
+        ref={componentFilterRef}
+      >
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Mês de referência
@@ -67,11 +64,9 @@ export function Indicators({
           variant="outline"
           className="ml-auto flex items-center gap-2 h-10 cursor-pointer"
           onClick={() => {
-            if (!componentFilterRef.current) return;
-            printDocument(
-              componentFilterRef.current,
-              componentFilterRef.current
-            );
+            if (!componentMainRef.current || !componentFilterRef.current)
+              return;
+            printDocument(componentMainRef.current, componentFilterRef.current);
           }}
         >
           <FileDown className="w-5 h-5" />
@@ -110,8 +105,9 @@ export function Indicators({
             <div>
               <p className="text-sm text-muted-foreground">Tempo Médio</p>
               <p className="text-lg font-bold">
-                {indicatorsResume?.accuracyExecutionDaysImprovements ?
-                 `${Math.round(indicatorsResume?.accuracyExecutionDaysImprovements)} dias` : ""}
+                {indicatorsResume?.accuracyExecutionDaysImprovements
+                  ? `${Math.round(indicatorsResume?.accuracyExecutionDaysImprovements)} dias`
+                  : ""}
               </p>
             </div>
             <div>

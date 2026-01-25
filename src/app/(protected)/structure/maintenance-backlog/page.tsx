@@ -25,22 +25,14 @@ export default function MaintenanceBacklog() {
 
   const {
     areasOptions,
-    areasOptionsStatus,
     paymentMethodsOptions,
-    paymentMethodsOptionsStatus,
     priorityOptions,
-    priorityOptionsStatus,
     maintenancesStatusOptions,
-    maintenancesStatusOptionsStatus,
     maintenancesTypes,
-    maintenancesTypesStatus,
     interventions,
     interventionsCards,
-    interventionsCardsStatus,
-    interventionsStatus,
     handleDeleteIntervention,
     resumeIndicators,
-    resumeIndicatorsStatus,
     chartImprovementsByArea,
     chartMonthlyExpensesSummary,
   } = useMaintenanceBacklog({

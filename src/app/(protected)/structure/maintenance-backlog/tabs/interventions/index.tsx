@@ -1,7 +1,7 @@
 "use client";
 
 import { Intervention } from "@/api/fetch-interventions";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { CreditCard, FileDown, Pencil, TrendingUp, Wallet } from "lucide-react";
 import {
@@ -38,6 +38,7 @@ import { TypesOption } from "@/api/fetch-maintenances-types";
 import { PaymentMethod } from "@/api/fetch-payment-method.options";
 import { PriorityOption } from "@/api/fetch-priority-options";
 import { UseMutateAsyncFunction } from "@tanstack/react-query";
+import { printDocument } from "@/utils/print-document";
 
 interface InterventionsProps {
   priorityOptions: PriorityOption[] | undefined;
@@ -81,11 +82,15 @@ export function Interventions({
     "create" | "edit" | "view"
   >("create");
 
+  const componentMainRef = useRef<HTMLDivElement>(null);
+  const componentFilterRef = useRef<HTMLDivElement>(null);
+
+
   const [modalActionInvervationIsOpen, setModalActionIntervationIsOpen] =
     useState(false);
   return (
-    <div className="space-y-6">
-      <div className="flex  flex-col gap-4 md:items-end md:flex-row ">
+    <div className="space-y-6" ref={componentMainRef}>
+      <div className="flex  flex-col gap-4 md:items-end md:flex-row" ref={componentFilterRef}>
         <div className="flex gap-2">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -125,6 +130,10 @@ export function Interventions({
         <Button
           variant="outline"
           className="ml-auto flex items-center gap-2 h-10 cursor-pointer"
+          onClick={() => {
+            if (!componentFilterRef.current || !componentMainRef.current) return;
+            printDocument(componentMainRef.current, componentFilterRef.current, "l");
+          }}
         >
           <FileDown className="w-6 h-6" />
           Exportar PDF
@@ -250,7 +259,7 @@ export function Interventions({
                         <TableCell>
                           {item.paymentDate
                             ? parseISO(item.paymentDate).toLocaleDateString(
-                                "pt-BR"
+                                "pt-BR",
                               )
                             : "-"}
                         </TableCell>
@@ -258,7 +267,7 @@ export function Interventions({
                         <TableCell>
                           {item.paymentCompletionDate
                             ? new Date(
-                                item.paymentCompletionDate
+                                item.paymentCompletionDate,
                               ).toLocaleDateString("pt-BR")
                             : "-"}
                         </TableCell>
@@ -267,7 +276,7 @@ export function Interventions({
                           {item.plannedStart
                             ? format(
                                 item.plannedStart as any,
-                                "dd/MM/yyyy HH:ss"
+                                "dd/MM/yyyy HH:ss",
                               )
                             : "-"}
                         </TableCell>
@@ -276,7 +285,7 @@ export function Interventions({
                           {item.actualStart
                             ? format(
                                 item.actualStart as any,
-                                "dd/MM/yyyy HH:ss"
+                                "dd/MM/yyyy HH:ss",
                               )
                             : "-"}
                         </TableCell>
