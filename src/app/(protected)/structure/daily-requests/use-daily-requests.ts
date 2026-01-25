@@ -11,7 +11,7 @@ export function useDailyRequests() {
   const [date, setDate] = useState(new Date());
   const dateFormatted = format(date, "yyyy-MM-dd");
   const [gravityId, setGravityId] = useState<string>("");
-  const [responsibleId, setResponsibleId] = useState<string>("");
+  const [responsibleName, setResponsibleName] = useState<string>("");
 
   const { user } = useUserContext();
   const condominiumId = user.condominiumId;
@@ -47,7 +47,7 @@ export function useDailyRequests() {
     dailyRequestRegistersStatus,
     gravityId,
     setGravityId,
-    responsibleId,
-    setResponsibleId,
+    responsibleName,
+    setResponsibleName,
   };
 }

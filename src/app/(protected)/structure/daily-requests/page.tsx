@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useCommandDelete } from "@/commands/use-command.delete";
 import { useQueryClient } from "@tanstack/react-query";
+import { Input } from "@/components/ui/input";
 
 const PRIORITY_COLORS: Record<number, string> = {
   1: "bg-red-500 text-white", // Alta
@@ -57,9 +58,9 @@ export default function DailyRequests() {
     dailyRequestRegisters,
     dailyRequestRegistersStatus,
     gravityId,
-    responsibleId,
+    responsibleName,
     setGravityId,
-    setResponsibleId,
+    setResponsibleName,
   } = useDailyRequests();
 
   const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -75,25 +76,23 @@ export default function DailyRequests() {
         return false;
       }
 
-      if (responsibleId && String(item.responsibleId) !== responsibleId) {
+      if (
+        responsibleName &&
+        !item.responsibleName
+          .toLocaleLowerCase()
+          .includes(responsibleName.toLocaleLowerCase())
+      ) {
         return false;
       }
 
       return true;
     });
-  }, [dailyRequestRegisters, gravityId, responsibleId]);
+  }, [dailyRequestRegisters, gravityId, responsibleName]);
 
   const getGravityName = (gravityId: number | string) => {
     return (
       gravitiesOptions?.find((g) => String(g.id) === String(gravityId))?.name ||
       "-"
-    );
-  };
-
-  const getResponsibleName = (responsibleId: number | string) => {
-    return (
-      responsibleOptions?.find((r) => String(r.id) === String(responsibleId))
-        ?.name || "-"
     );
   };
 
@@ -156,19 +155,13 @@ export default function DailyRequests() {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Responsável
             </label>
-
-            <Select value={responsibleId} onValueChange={setResponsibleId}>
-              <SelectTrigger className="col-span-3 w-full">
-                <SelectValue placeholder="Selecione o responsável" />
-              </SelectTrigger>
-              <SelectContent>
-                {responsibleOptions?.map(({ id, name }) => (
-                  <SelectItem key={id} value={id.toString()}>
-                    {name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Input
+              value={responsibleName}
+              onChange={(event) => {
+                const value = event.target.value;
+                setResponsibleName(value);
+              }}
+            />
           </div>
 
           <Button
