@@ -65,7 +65,7 @@ const schema = z.object({
   description: z.string().min(3, "Descrição muito curta"),
   statusId: z.string().min(1, "Selecione o status"),
   startDate: z.date().optional().nullable(),
-  responsibleId: z.string().min(1, "Selecione o status"),
+  responsibleName: z.string().min(1, "Atribua um responsavel"),
   resolutionDate: z.date().optional().nullable(),
   document: z.any().optional(),
 });
@@ -114,7 +114,7 @@ export function ModalActionOpeningOfCalls({
     document,
     resolutionDate,
     startDate,
-    responsibleId,
+    responsibleName,
   }: FormDataType) {
     const formData = new FormData();
 
@@ -124,7 +124,7 @@ export function ModalActionOpeningOfCalls({
 
     formData.append("issueTypeId", problemTypeId);
 
-    formData.append("responsibleId", responsibleId);
+    formData.append("responsibleName", responsibleName);
 
     if (startDate) {
       formData.append("startedDate", toLocalISOString(startDate));
@@ -157,7 +157,7 @@ export function ModalActionOpeningOfCalls({
             ? toLocalISOString(resolutionDate)
             : null,
           startedDate: startDate ? toLocalISOString(startDate) : null,
-          responsibleId,
+          responsibleName,
         },
       });
     }
@@ -170,7 +170,7 @@ export function ModalActionOpeningOfCalls({
       document: "",
       problemTypeId: "",
       resolutionDate: null,
-      responsibleId: "",
+      responsibleName: "",
       startDate: null,
       statusId: "",
     });
@@ -220,7 +220,7 @@ export function ModalActionOpeningOfCalls({
         date: parseISO(openingRecordSelected.date),
         description: openingRecordSelected.description,
         problemTypeId: String(openingRecordSelected.issueTypeId),
-        responsibleId: String(openingRecordSelected.responsibleUserId),
+        responsibleName: String(openingRecordSelected.responsibleName),
         resolutionDate: resolutionDateFormmated,
         startDate: startedDateFormmated,
         statusId: String(openingRecordSelected.statusId),
@@ -241,7 +241,7 @@ export function ModalActionOpeningOfCalls({
             document: "",
             problemTypeId: "",
             resolutionDate: null,
-            responsibleId: "",
+            responsibleName: "",
             startDate: null,
             statusId: "",
           });
@@ -337,26 +337,21 @@ export function ModalActionOpeningOfCalls({
                 Responsável
               </Label>
               <Controller
-                name="responsibleId"
+                name="responsibleName"
                 control={control}
                 render={({ field: { onChange, value } }) => (
-                  <Select value={value} onValueChange={onChange}>
-                    <SelectTrigger className="col-span-3 w-full">
-                      <SelectValue placeholder="Selecione o responsável" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {responsibles.map((employee, index) => (
-                        <SelectItem key={index} value={String(employee.userId)}>
-                          {employee.userName}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Input
+                    value={value}
+                    onChange={(event) => {
+                      const value = event.target.value;
+                      onChange(value);
+                    }}
+                  />
                 )}
               />
-              {errors.responsibleId && (
+              {errors.responsibleName && (
                 <p className="col-start-2 col-span-3 text-sm text-red-600">
-                  {errors.responsibleId.message}
+                  {errors.responsibleName.message}
                 </p>
               )}
             </div>

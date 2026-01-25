@@ -26,6 +26,7 @@ export type OpeningCall = {
   issueTypesId: number;
   issueTypesName: string;
   attachments: Attachment[]
+  responsibleName : string
 };
 
 
@@ -42,6 +43,7 @@ interface Attachment {
   createdAt: string;           // ISO datetime
   updatedAt: string;           // ISO datetime
   supabaseId: string | null;   // ID interno do Supabase (se for usado)
+  responsibleName : string;
 }
 
 

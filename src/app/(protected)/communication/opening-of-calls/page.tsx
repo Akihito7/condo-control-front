@@ -318,7 +318,7 @@ export default function OpeningOfCalls() {
                       <TableCell>{openingRecord.issueTypesName}</TableCell>
                       <TableCell>{openingRecord.description}</TableCell>
                       <TableCell className="text-left">
-                        {openingRecord.userName}
+                        {openingRecord.responsibleName}
                       </TableCell>
                       <TableCell>{openingRecord.callStatusesName}</TableCell>
                       <TableCell className="text-left">
