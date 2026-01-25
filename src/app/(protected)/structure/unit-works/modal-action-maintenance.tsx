@@ -445,7 +445,7 @@ export function ModalActionMaintenance({
                       const modalType = work ? "edit" : "create";
 
                       if (modalType === "create") {
-                        const canRemove = employees.length > 1;
+                        const canRemove = employees.length > 0;
                         if (!canRemove) return;
                         remove(index);
                       }
@@ -453,7 +453,7 @@ export function ModalActionMaintenance({
                       if (modalType === "edit") {
                         const canRemove =
                           employees.filter((employee) => employee.employeeId)
-                            .length > 1;
+                            .length > 0;
 
                         const isInMemoryEmployee = employees[index].employeeId
                           ? false
