@@ -15,6 +15,7 @@ import {
 import { Calendar, CheckCircle2, ClipboardList, Info } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { format, subHours } from "date-fns";
 
 interface ModalViewAssetProps {
   isOpen: boolean;
@@ -92,7 +93,12 @@ export function ModalViewAsset({
                       </span>
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
                         <Info className="w-3 h-3" />
-                        {m.carriedOutDate ? "vai tomando" : ""}
+                        {m.carriedOutDate
+                          ? format(
+                              new Date(m.carriedOutDate),
+                              "dd/MM/yyyy, HH:mm",
+                            )
+                          : ""}
                       </div>
                     </div>
 
