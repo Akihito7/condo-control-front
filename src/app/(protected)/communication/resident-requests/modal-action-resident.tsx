@@ -37,8 +37,8 @@ const residentSchema = z.object({
   gravity_id: z.string().min(1, "Selecione a gravidade"),
   description: z.string().min(1, "Descrição obrigatória"),
   observation: z.string().optional(),
-  start_date: z.date(),
-  end_date: z.date(),
+  start_date: z.date().optional(),
+  end_date: z.date().optional(),
   attachments: z.any().optional(),
 });
 
@@ -154,11 +154,11 @@ export function ModalActionResident({
     if (requestSelected) {
       const startDateFormatted = requestSelected.startDate
         ? subHours(new Date(requestSelected.startDate), 3)
-        : subHours(new Date(), 3);
+        : undefined
 
       const endDateFormatted = requestSelected.endDate
         ? subHours(new Date(requestSelected.endDate), 3)
-        : subHours(new Date(), 3);
+        : undefined
       reset({
         apartament_id: requestSelected.apartamentId.toString(),
         observation: requestSelected.observation,
