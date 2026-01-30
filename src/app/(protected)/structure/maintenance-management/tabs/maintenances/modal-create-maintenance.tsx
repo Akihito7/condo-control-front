@@ -144,11 +144,11 @@ export function ModalCreateMaintenance({
       queryKey: ["maintenances-calendar"],
     });
     queryClient.invalidateQueries({
-      queryKey: ["assets"],
+      queryKey: ["asset-details"],
       exact: false,
     });
     queryClient.refetchQueries({
-      queryKey: ["assets"], 
+      queryKey: ["asset-details"], 
       exact : false
     });
     closeButtonRef?.current?.click();
