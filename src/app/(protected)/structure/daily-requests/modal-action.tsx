@@ -152,7 +152,13 @@ export function ModalAction({
         <Button variant="outline">Nova Ação</Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent
+        className="
+    w-screen h-screen max-w-none max-h-none rounded-none
+    md:w-auto md:h-auto md:max-w-[600px] md:rounded-lg
+    flex flex-col
+  "
+      >
         <DialogHeader>
           <DialogTitle>{modalTitle}</DialogTitle>
           <DialogDescription>Preencha as informações abaixo</DialogDescription>

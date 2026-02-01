@@ -82,7 +82,13 @@ export function AddEventModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="max-w-xl">
+      <DialogContent
+        className="
+    w-screen h-screen max-w-none max-h-none rounded-none
+    md:w-auto md:h-auto md:max-w-[600px] md:rounded-lg
+    flex flex-col
+  "
+      >
         <DialogHeader>
           <DialogTitle>Adicionar Novo Evento</DialogTitle>
         </DialogHeader>

@@ -92,7 +92,7 @@ export function ActionPollModal({
       updatePoll({
         pollId: pollSelected!.id,
         ...data,
-        optionsToRemove
+        optionsToRemove,
       });
     },
     onSuccess: () => {
@@ -111,7 +111,7 @@ export function ActionPollModal({
     } else {
       const optionsNewOrUpdated = data.options.filter((option) => {
         const initialOptionValue: any = optionsRef.current.find(
-          (initialOption: any) => initialOption.id === option.optionId
+          (initialOption: any) => initialOption.id === option.optionId,
         );
         if (initialOptionValue) {
           return initialOptionValue.name !== option.name;
@@ -184,7 +184,13 @@ export function ActionPollModal({
       <DialogTrigger asChild>
         <Button variant="outline">Criar Enquete</Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-lg rounded-2xl shadow-xl">
+      <DialogContent
+        className="
+    w-screen h-screen max-w-none max-h-none rounded-none
+    md:w-auto md:h-auto md:max-w-[600px] md:rounded-lg
+    flex flex-col
+  "
+      >
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold">
             {type === "create" ? "Nova Enquete" : "Editar Enquete"}

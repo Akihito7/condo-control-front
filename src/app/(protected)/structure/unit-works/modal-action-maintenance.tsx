@@ -301,7 +301,13 @@ export function ModalActionMaintenance({
     >
       <DialogTrigger asChild>{children}</DialogTrigger>
 
-      <DialogContent className="sm:max-w-[750px] max-h-[80vh] overflow-auto">
+      <DialogContent
+        className="
+    w-screen h-screen max-w-none max-h-none rounded-none
+    md:w-auto md:h-auto md:max-w-[600px] md:rounded-lg
+    flex flex-col
+  "
+      >
         <DialogHeader>
           <DialogTitle className="text-2xl">{title}</DialogTitle>
           <DialogDescription>Preencha os dados abaixo</DialogDescription>

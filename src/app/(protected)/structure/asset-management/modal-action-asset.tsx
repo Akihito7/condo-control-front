@@ -42,7 +42,7 @@ const assetSchema = z.object({
     .any()
     .refine(
       (file) => file?.length === 1,
-      "Por favor, envie exatamente uma foto"
+      "Por favor, envie exatamente uma foto",
     )
     .optional(),
 });
@@ -172,15 +172,15 @@ export function ModalActionAsset({
     type === "create"
       ? "Adicionar Patrimônio"
       : type === "edit"
-      ? "Editar Patrimônio"
-      : "Visualizar Patrimônio";
+        ? "Editar Patrimônio"
+        : "Visualizar Patrimônio";
 
   const modalDescription =
     type === "create"
       ? "Preencha os campos para adicionar um novo asset."
       : type === "edit"
-      ? "Atualize os campos abaixo para editar o asset."
-      : "Visualize os detalhes do asset.";
+        ? "Atualize os campos abaixo para editar o asset."
+        : "Visualize os detalhes do asset.";
 
   return (
     <Dialog
@@ -203,7 +203,13 @@ export function ModalActionAsset({
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-auto">
+      <DialogContent
+        className="
+    w-screen h-screen max-w-none max-h-none rounded-none
+    md:w-auto md:h-auto md:max-w-[600px] md:rounded-lg
+    flex flex-col
+  "
+      >
         <DialogHeader>
           <DialogTitle className="text-2xl">{modalTitle}</DialogTitle>
           <DialogDescription>{modalDescription}</DialogDescription>

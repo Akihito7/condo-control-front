@@ -123,15 +123,15 @@ export function ModalActionUnits({
     type === "create"
       ? "Adicionar Unidade"
       : type === "edit"
-      ? "Editar Unidade"
-      : "Visualizar Unidade";
+        ? "Editar Unidade"
+        : "Visualizar Unidade";
 
   const modalDescription =
     type === "create"
       ? "Preencha os campos para adicionar uma nova unidade."
       : type === "edit"
-      ? "Atualize os dados da unidade."
-      : "Visualize as informações da unidade.";
+        ? "Atualize os dados da unidade."
+        : "Visualize as informações da unidade.";
 
   useEffect(() => {
     if (type === "edit") {
@@ -168,7 +168,13 @@ export function ModalActionUnits({
         <Button variant="outline">Adicionar Unidade</Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent
+        className="
+    w-screen h-screen max-w-none max-h-none rounded-none
+    md:w-auto md:h-auto md:max-w-[600px] md:rounded-lg
+    flex flex-col
+  "
+      >
         <DialogHeader>
           <DialogTitle className="text-2xl">{modalTitle}</DialogTitle>
           <DialogDescription>{modalDescription}</DialogDescription>

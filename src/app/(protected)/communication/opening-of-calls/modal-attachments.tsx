@@ -62,7 +62,7 @@ export function ModalAttachments({
           return {
             ...prev,
             attachments: prev.attachments.filter(
-              (attachment) => attachment.id !== attachmentId
+              (attachment) => attachment.id !== attachmentId,
             ),
           };
         }
@@ -145,7 +145,13 @@ export function ModalAttachments({
         }
       }}
     >
-      <DialogContent className="max-w-4xl">
+      <DialogContent
+        className="
+    w-screen h-screen max-w-none max-h-none rounded-none
+    md:w-auto md:h-auto md:max-w-[600px] md:rounded-lg
+    flex flex-col
+  "
+      >
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold text-gray-800">
             Anexos do chamado

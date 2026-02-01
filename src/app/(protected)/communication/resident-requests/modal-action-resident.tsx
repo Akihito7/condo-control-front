@@ -154,11 +154,11 @@ export function ModalActionResident({
     if (requestSelected) {
       const startDateFormatted = requestSelected.startDate
         ? subHours(new Date(requestSelected.startDate), 3)
-        : undefined
+        : undefined;
 
       const endDateFormatted = requestSelected.endDate
         ? subHours(new Date(requestSelected.endDate), 3)
-        : undefined
+        : undefined;
       reset({
         apartament_id: requestSelected.apartamentId.toString(),
         observation: requestSelected.observation,
@@ -194,7 +194,13 @@ export function ModalActionResident({
         <Button variant="outline">Abrir Chamado</Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-auto">
+      <DialogContent
+        className="
+    w-screen h-screen max-w-none max-h-none rounded-none
+    md:w-auto md:h-auto md:max-w-[600px] md:rounded-lg
+    flex flex-col
+  "
+      >
         <DialogHeader>
           <DialogTitle className="text-2xl">Criar Solicitação</DialogTitle>
           <DialogDescription>Preencha os dados abaixo</DialogDescription>

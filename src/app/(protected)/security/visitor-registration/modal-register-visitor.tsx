@@ -117,7 +117,13 @@ export function ModalRegisterVisitor({
         <Button variant="outline">Registrar Visitante</Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-auto">
+      <DialogContent
+        className="
+    w-screen h-screen max-w-none max-h-none rounded-none
+    md:w-auto md:h-auto md:max-w-[600px] md:rounded-lg
+    flex flex-col
+  "
+      >
         <DialogHeader>
           <DialogTitle>Registro de Visitantes</DialogTitle>
           <DialogDescription>

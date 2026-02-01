@@ -53,7 +53,13 @@ export function ModalAddAttachment({
       <DialogTrigger asChild>
         <Button>Adicionar Anexos</Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl">
+      <DialogContent
+        className="
+    w-screen h-screen max-w-none max-h-none rounded-none
+    md:w-auto md:h-auto md:max-w-[600px] md:rounded-lg
+    flex flex-col
+  "
+      >
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold text-gray-800">
             Adicionar Anexos

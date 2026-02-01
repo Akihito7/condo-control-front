@@ -82,7 +82,7 @@ export function EventDetailsModal({
     if (eventSelected) {
       const dateFormatted = format(
         new Date(eventSelected.startTime),
-        "yyyy-MM-dd"
+        "yyyy-MM-dd",
       );
 
       const formattedStart = format(new Date(eventSelected.startTime), "HH:mm");
@@ -122,7 +122,13 @@ export function EventDetailsModal({
         setIsOpen(open);
       }}
     >
-      <DialogContent className="max-w-lg">
+      <DialogContent
+        className="
+    w-screen h-screen max-w-none max-h-none rounded-none
+    md:w-auto md:h-auto md:max-w-[600px] md:rounded-lg
+    flex flex-col
+  "
+      >
         <DialogHeader>
           <DialogTitle>
             {isEditing ? "Editar Evento" : eventSelected?.title}

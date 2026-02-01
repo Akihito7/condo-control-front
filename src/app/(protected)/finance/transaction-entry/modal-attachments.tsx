@@ -70,7 +70,7 @@ export function ModalAttachments({
       invalidQueries();
       const attachmentsFiltered =
         transactionSelected?.attachments.filter(
-          (attachment) => attachment.id !== fileId
+          (attachment) => attachment.id !== fileId,
         ) ?? [];
 
       setTransactionSelected((prev) => {
@@ -116,7 +116,13 @@ export function ModalAttachments({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="sm:max-w-md w-full rounded-lg">
+        <DialogContent
+          className="
+    w-screen h-screen max-w-none max-h-none rounded-none
+    md:w-auto md:h-auto md:max-w-[600px] md:rounded-lg
+    flex flex-col
+  "
+        >
           <DialogHeader>
             <DialogTitle className="text-xl font-semibold text-gray-800">
               Anexos

@@ -252,7 +252,13 @@ export function ModalActionOpeningOfCalls({
         <Button variant="outline">Abrir Chamado</Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
+      <DialogContent
+        className="
+    w-screen h-screen max-w-none max-h-none rounded-none
+    md:w-auto md:h-auto md:max-w-[600px] md:rounded-lg
+    flex flex-col
+  "
+      >
         <DialogHeader>
           <DialogTitle>
             {type === "create" ? "Abrir Chamado" : "Editar Chamado"}
