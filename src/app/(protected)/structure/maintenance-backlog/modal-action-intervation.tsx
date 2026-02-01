@@ -205,21 +205,21 @@ export function ModalActionIntervention({
     type === "create"
       ? "Adicionar Intervenção"
       : type === "edit"
-      ? "Editar Intervenção"
-      : "Visualizar Intervenção";
+        ? "Editar Intervenção"
+        : "Visualizar Intervenção";
   const modalDescription =
     type === "create"
       ? "Preencha o formulário abaixo para adicionar uma nova intervenção."
       : type === "edit"
-      ? "Atualize os campos abaixo para editar a intervenção."
-      : "Visualize os detalhes da intervenção.";
+        ? "Atualize os campos abaixo para editar a intervenção."
+        : "Visualize os detalhes da intervenção.";
 
   const triggerButtonText =
     type === "create"
       ? "Adicionar Intervenção"
       : type === "edit"
-      ? "Editar Intervenção"
-      : "Visualizar Intervenção";
+        ? "Editar Intervenção"
+        : "Visualizar Intervenção";
 
   useEffect(() => {
     if (interventionSelected && (type === "edit" || type === "view")) {
@@ -320,363 +320,373 @@ export function ModalActionIntervention({
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-auto">
-        <DialogHeader>
+      <DialogContent
+        className="
+    w-screen h-screen max-w-none max-h-none rounded-none
+    md:w-auto md:h-auto md:max-w-[700px] md:rounded-lg
+    flex flex-col
+  "
+      >
+        <DialogHeader className="shrink-0 border-b pb-4">
           <DialogTitle className="text-2xl">{modalTitle}</DialogTitle>
           <DialogDescription>{modalDescription}</DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-4">
-          {/* Priority */}
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Prioridade</Label>
-            <div className="col-span-3">
-              <Controller
-                name="priority"
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    value={field.value}
-                    onValueChange={field.onChange}
-                    disabled={isDisabled}
-                  >
-                    <SelectTrigger className="min-w-[200px]">
-                      <SelectValue placeholder="Selecione a prioridade" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {priorityOptions.map(({ id, name }) => (
-                        <SelectItem key={id} value={id.toString()}>
-                          {name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-            </div>
-          </div>
-          {errors.priority && !isDisabled && (
-            <p className="text-red-500 text-sm -mt-2 ml-[145px]">
-              {errors.priority.message}
-            </p>
-          )}
-
-          {/* Area */}
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Área</Label>
-            <div className="col-span-3">
-              <Controller
-                name="area"
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    value={field.value}
-                    onValueChange={field.onChange}
-                    disabled={isDisabled}
-                  >
-                    <SelectTrigger className="min-w-[200px]">
-                      <SelectValue placeholder="Selecione a área" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {areasOptions.map(({ id, name }) => (
-                        <SelectItem key={id} value={id.toString()}>
-                          {name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-            </div>
-          </div>
-          {errors.area && !isDisabled && (
-            <p className="text-red-500 text-sm -mt-2 ml-[145px]">
-              {errors.area.message}
-            </p>
-          )}
-
-          {/* Description */}
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Descrição</Label>
-            <textarea
-              {...register("description")}
-              className="col-span-3 border rounded-md p-2"
-              rows={3}
-              disabled={isDisabled}
-            />
-          </div>
-          {errors.description && !isDisabled && (
-            <p className="text-red-500 text-sm -mt-2 ml-[145px]">
-              {errors.description.message}
-            </p>
-          )}
-
-          {/* Provider */}
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Fornecedor</Label>
-            <Input
-              {...register("provider")}
-              className="col-span-3"
-              disabled={isDisabled}
-            />
-          </div>
-
-          {/* Value */}
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Valor</Label>
-            <Input
-              {...register("value")}
-              className="col-span-3"
-              placeholder="Ex: 1000,00"
-              disabled={isDisabled}
-            />
-          </div>
-          {errors.value && !isDisabled && (
-            <p className="text-red-500 text-sm -mt-2 ml-[145px]">
-              {errors.value.message}
-            </p>
-          )}
-
-          {/* Payment Method */}
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Método de Pagamento</Label>
-            <div className="col-span-3">
-              <Controller
-                name="paymentMethod"
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    value={field.value}
-                    onValueChange={field.onChange}
-                    disabled={isDisabled}
-                  >
-                    <SelectTrigger className="min-w-[200px]">
-                      <SelectValue placeholder="Selecione o método de pagamento" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {paymentMethodsOptions.map(({ id, name }) => (
-                        <SelectItem key={id} value={id.toString()}>
-                          {name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-            </div>
-          </div>
-          {errors.paymentMethod && !isDisabled && (
-            <p className="text-red-500 text-sm -mt-2 ml-[145px]">
-              {errors.paymentMethod.message}
-            </p>
-          )}
-
-          {/* Checkbox isInstallment */}
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">É Parcelado</Label>
-            <div className="col-span-3 flex items-center">
-              <input
-                type="checkbox"
-                {...register("isInstallment")}
-                disabled={isDisabled}
-                className="w-5 h-5 mr-2"
-              />
-            </div>
-          </div>
-
-          {/* Number of Installments */}
-          {isInstallment && (
+        <div className="flex-1 overflow-y-auto">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-4">
+            {/* Priority */}
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label className="text-right">Número de Parcelas</Label>
+              <Label className="text-right">Prioridade</Label>
               <div className="col-span-3">
-                <Input
-                  type="number"
-                  {...register("numberOfInstallments", { valueAsNumber: true })}
-                  className="w-full"
-                  disabled={isDisabled}
-                  min={1}
-                  step={1}
-                  placeholder="Insira o número de parcelas"
+                <Controller
+                  name="priority"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      disabled={isDisabled}
+                    >
+                      <SelectTrigger className="min-w-[200px]">
+                        <SelectValue placeholder="Selecione a prioridade" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {priorityOptions.map(({ id, name }) => (
+                          <SelectItem key={id} value={id.toString()}>
+                            {name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
                 />
-                {errors.numberOfInstallments && !isDisabled && (
-                  <p className="text-red-500 text-sm -mt-2 ml-[145px]">
-                    {errors.numberOfInstallments.message as string}
-                  </p>
-                )}
               </div>
             </div>
-          )}
-
-          {/* Payment Date */}
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Data do Pagamento</Label>
-            <div className="col-span-3">
-              <Controller
-                name="paymentDate"
-                control={control}
-                render={({ field: { onChange, value } }) => (
-                  <DatePicker
-                    date={value as any}
-                    setDate={(value) => {
-                      if (!isInstallment) {
-                        setValue("paymentCompletionDate", value);
-                      }
-                      onChange(value);
-                    }}
-                    disabled={isDisabled}
-                    label="Data do Pagamento"
-                  />
-                )}
-              />
-            </div>
-          </div>
-
-          {/* Payment Completion Date */}
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Dt. Conclusão Pgto</Label>
-            <div className="col-span-3">
-              <Controller
-                name="paymentCompletionDate"
-                control={control}
-                render={({ field: { onChange, value } }) => (
-                  <DatePicker
-                    date={value as any}
-                    setDate={(value) => {
-                      if (isInstallment) {
-                        onChange(value);
-                      }
-                    }}
-                    disabled={isDisabled || !isInstallment}
-                    label="Data de Conclusão do Pagamento"
-                  />
-                )}
-              />
-            </div>
-          </div>
-
-          {/* Planned Start */}
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Início Planejado</Label>
-            <div className="col-span-3">
-              <Controller
-                name="plannedStart"
-                control={control}
-                render={({ field: { onChange, value } }) => (
-                  <DatePicker
-                    date={value as any}
-                    setDate={onChange}
-                    disabled={isDisabled}
-                    label="Início Planejado"
-                  />
-                )}
-              />
-            </div>
-          </div>
-
-          {/* Planned End */}
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Término Planejado</Label>
-            <div className="col-span-3">
-              <Controller
-                name="plannedEnd"
-                control={control}
-                render={({ field: { onChange, value } }) => (
-                  <DatePicker
-                    date={value as any}
-                    setDate={onChange}
-                    disabled={isDisabled}
-                    label="Término Planejado"
-                  />
-                )}
-              />
-            </div>
-          </div>
-
-          {/* Actual Start */}
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Início Real</Label>
-            <div className="col-span-3">
-              <Controller
-                name="actualStart"
-                control={control}
-                render={({ field: { onChange, value } }) => (
-                  <DatePicker
-                    date={value as any}
-                    setDate={onChange}
-                    disabled={isDisabled}
-                    label="Início Real"
-                  />
-                )}
-              />
-            </div>
-          </div>
-
-          {/* Actual End */}
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Término Real</Label>
-            <div className="col-span-3">
-              <Controller
-                name="actualEnd"
-                control={control}
-                render={({ field: { onChange, value } }) => (
-                  <DatePicker
-                    date={value as any}
-                    setDate={onChange}
-                    disabled={isDisabled}
-                    label="Término Real"
-                  />
-                )}
-              />
-            </div>
-          </div>
-
-          {/* Status */}
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Status</Label>
-            <div className="col-span-3">
-              <Controller
-                name="status"
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    value={field.value}
-                    onValueChange={field.onChange}
-                    disabled={isDisabled}
-                  >
-                    <SelectTrigger className="min-w-[200px]">
-                      <SelectValue placeholder="Selecione o status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {statusOptions.map(({ id, name }) => (
-                        <SelectItem key={id} value={id.toString()}>
-                          {name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-            </div>
-          </div>
-          {errors.status && !isDisabled && (
-            <p className="text-red-500 text-sm -mt-2 ml-[145px]">
-              {errors.status.message}
-            </p>
-          )}
-
-          <DialogFooter className="pt-4">
-            <DialogClose asChild>
-              <Button ref={closeButtonRef} variant="ghost">
-                {type === "view" ? "Fechar" : "Cancelar"}
-              </Button>
-            </DialogClose>
-            {type !== "view" && (
-              <Button type="submit">
-                {type === "create" ? "Salvar" : "Atualizar"}
-              </Button>
+            {errors.priority && !isDisabled && (
+              <p className="text-red-500 text-sm -mt-2 ml-[145px]">
+                {errors.priority.message}
+              </p>
             )}
-          </DialogFooter>
-        </form>
+
+            {/* Area */}
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label className="text-right">Área</Label>
+              <div className="col-span-3">
+                <Controller
+                  name="area"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      disabled={isDisabled}
+                    >
+                      <SelectTrigger className="min-w-[200px]">
+                        <SelectValue placeholder="Selecione a área" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {areasOptions.map(({ id, name }) => (
+                          <SelectItem key={id} value={id.toString()}>
+                            {name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              </div>
+            </div>
+            {errors.area && !isDisabled && (
+              <p className="text-red-500 text-sm -mt-2 ml-[145px]">
+                {errors.area.message}
+              </p>
+            )}
+
+            {/* Description */}
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label className="text-right">Descrição</Label>
+              <textarea
+                {...register("description")}
+                className="col-span-3 border rounded-md p-2"
+                rows={3}
+                disabled={isDisabled}
+              />
+            </div>
+            {errors.description && !isDisabled && (
+              <p className="text-red-500 text-sm -mt-2 ml-[145px]">
+                {errors.description.message}
+              </p>
+            )}
+
+            {/* Provider */}
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label className="text-right">Fornecedor</Label>
+              <Input
+                {...register("provider")}
+                className="col-span-3"
+                disabled={isDisabled}
+              />
+            </div>
+
+            {/* Value */}
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label className="text-right">Valor</Label>
+              <Input
+                {...register("value")}
+                className="col-span-3"
+                placeholder="Ex: 1000,00"
+                disabled={isDisabled}
+              />
+            </div>
+            {errors.value && !isDisabled && (
+              <p className="text-red-500 text-sm -mt-2 ml-[145px]">
+                {errors.value.message}
+              </p>
+            )}
+
+            {/* Payment Method */}
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label className="text-right">Método de Pagamento</Label>
+              <div className="col-span-3">
+                <Controller
+                  name="paymentMethod"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      disabled={isDisabled}
+                    >
+                      <SelectTrigger className="min-w-[200px]">
+                        <SelectValue placeholder="Selecione o método de pagamento" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {paymentMethodsOptions.map(({ id, name }) => (
+                          <SelectItem key={id} value={id.toString()}>
+                            {name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              </div>
+            </div>
+            {errors.paymentMethod && !isDisabled && (
+              <p className="text-red-500 text-sm -mt-2 ml-[145px]">
+                {errors.paymentMethod.message}
+              </p>
+            )}
+
+            {/* Checkbox isInstallment */}
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label className="text-right">É Parcelado</Label>
+              <div className="col-span-3 flex items-center">
+                <input
+                  type="checkbox"
+                  {...register("isInstallment")}
+                  disabled={isDisabled}
+                  className="w-5 h-5 mr-2"
+                />
+              </div>
+            </div>
+
+            {/* Number of Installments */}
+            {isInstallment && (
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label className="text-right">Número de Parcelas</Label>
+                <div className="col-span-3">
+                  <Input
+                    type="number"
+                    {...register("numberOfInstallments", {
+                      valueAsNumber: true,
+                    })}
+                    className="w-full"
+                    disabled={isDisabled}
+                    min={1}
+                    step={1}
+                    placeholder="Insira o número de parcelas"
+                  />
+                  {errors.numberOfInstallments && !isDisabled && (
+                    <p className="text-red-500 text-sm -mt-2 ml-[145px]">
+                      {errors.numberOfInstallments.message as string}
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Payment Date */}
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label className="text-right">Data do Pagamento</Label>
+              <div className="col-span-3">
+                <Controller
+                  name="paymentDate"
+                  control={control}
+                  render={({ field: { onChange, value } }) => (
+                    <DatePicker
+                      date={value as any}
+                      setDate={(value) => {
+                        if (!isInstallment) {
+                          setValue("paymentCompletionDate", value);
+                        }
+                        onChange(value);
+                      }}
+                      disabled={isDisabled}
+                      label="Data do Pagamento"
+                    />
+                  )}
+                />
+              </div>
+            </div>
+
+            {/* Payment Completion Date */}
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label className="text-right">Dt. Conclusão Pgto</Label>
+              <div className="col-span-3">
+                <Controller
+                  name="paymentCompletionDate"
+                  control={control}
+                  render={({ field: { onChange, value } }) => (
+                    <DatePicker
+                      date={value as any}
+                      setDate={(value) => {
+                        if (isInstallment) {
+                          onChange(value);
+                        }
+                      }}
+                      disabled={isDisabled || !isInstallment}
+                      label="Data de Conclusão do Pagamento"
+                    />
+                  )}
+                />
+              </div>
+            </div>
+
+            {/* Planned Start */}
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label className="text-right">Início Planejado</Label>
+              <div className="col-span-3">
+                <Controller
+                  name="plannedStart"
+                  control={control}
+                  render={({ field: { onChange, value } }) => (
+                    <DatePicker
+                      date={value as any}
+                      setDate={onChange}
+                      disabled={isDisabled}
+                      label="Início Planejado"
+                    />
+                  )}
+                />
+              </div>
+            </div>
+
+            {/* Planned End */}
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label className="text-right">Término Planejado</Label>
+              <div className="col-span-3">
+                <Controller
+                  name="plannedEnd"
+                  control={control}
+                  render={({ field: { onChange, value } }) => (
+                    <DatePicker
+                      date={value as any}
+                      setDate={onChange}
+                      disabled={isDisabled}
+                      label="Término Planejado"
+                    />
+                  )}
+                />
+              </div>
+            </div>
+
+            {/* Actual Start */}
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label className="text-right">Início Real</Label>
+              <div className="col-span-3">
+                <Controller
+                  name="actualStart"
+                  control={control}
+                  render={({ field: { onChange, value } }) => (
+                    <DatePicker
+                      date={value as any}
+                      setDate={onChange}
+                      disabled={isDisabled}
+                      label="Início Real"
+                    />
+                  )}
+                />
+              </div>
+            </div>
+
+            {/* Actual End */}
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label className="text-right">Término Real</Label>
+              <div className="col-span-3">
+                <Controller
+                  name="actualEnd"
+                  control={control}
+                  render={({ field: { onChange, value } }) => (
+                    <DatePicker
+                      date={value as any}
+                      setDate={onChange}
+                      disabled={isDisabled}
+                      label="Término Real"
+                    />
+                  )}
+                />
+              </div>
+            </div>
+
+            {/* Status */}
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label className="text-right">Status</Label>
+              <div className="col-span-3">
+                <Controller
+                  name="status"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      disabled={isDisabled}
+                    >
+                      <SelectTrigger className="min-w-[200px]">
+                        <SelectValue placeholder="Selecione o status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {statusOptions.map(({ id, name }) => (
+                          <SelectItem key={id} value={id.toString()}>
+                            {name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              </div>
+            </div>
+            {errors.status && !isDisabled && (
+              <p className="text-red-500 text-sm -mt-2 ml-[145px]">
+                {errors.status.message}
+              </p>
+            )}
+
+            <DialogFooter className="shrink-0 border-t pt-4 flex flex-col-reverse sm:flex-row gap-2">
+              <DialogClose asChild>
+                <Button ref={closeButtonRef} variant="ghost">
+                  {type === "view" ? "Fechar" : "Cancelar"}
+                </Button>
+              </DialogClose>
+              {type !== "view" && (
+                <Button type="submit">
+                  {type === "create" ? "Salvar" : "Atualizar"}
+                </Button>
+              )}
+            </DialogFooter>
+          </form>
+        </div>
       </DialogContent>
     </Dialog>
   );
