@@ -148,8 +148,8 @@ export function ModalCreateMaintenance({
       exact: false,
     });
     queryClient.refetchQueries({
-      queryKey: ["asset-details"], 
-      exact : false
+      queryKey: ["asset-details"],
+      exact: false,
     });
     closeButtonRef?.current?.click();
     reset();
@@ -199,180 +199,202 @@ export function ModalCreateMaintenance({
         <Button variant="outline">Adicionar Manutenção</Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-auto">
-        <DialogHeader>
-          <DialogTitle className="text-2xl">Criar manutenção</DialogTitle>
+      <DialogContent
+        className="
+    w-screen h-screen max-w-none max-h-none rounded-none
+    md:w-auto md:h-auto md:max-w-[700px] md:rounded-lg
+    flex flex-col
+  "
+      >
+        {/* HEADER */}
+        <DialogHeader className="shrink-0 border-b pb-4">
+          <DialogTitle className="text-xl md:text-2xl">
+            Criar manutenção
+          </DialogTitle>
           <DialogDescription>
             Preencha os campos para adicionar uma manutenção
           </DialogDescription>
         </DialogHeader>
 
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="space-y-4 py-4"
-          encType="multipart/form-data"
-        >
-          {/* Asset */}
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Ativo</Label>
-            <div className="col-span-3">
-              <Controller
-                name="assetType"
-                control={control}
-                render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione o ativo" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {assets?.map(({ id, name }) => (
-                        <SelectItem key={id} value={String(id)}>
-                          {name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-            </div>
-          </div>
-          {errors.assetType && (
-            <p className="text-red-500 text-sm ml-[145px]">
-              {errors.assetType.message}
-            </p>
-          )}
-
-          {/* Provider */}
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Fornecedor</Label>
-            <Input {...register("provider")} className="col-span-3" />
-          </div>
-
-          {/* Contact */}
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Contato</Label>
-            <Input {...register("contact")} className="col-span-3" />
-          </div>
-
-          {/* Tipo de manutenção */}
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Tipo de manutenção</Label>
-            <div className="col-span-3">
-              <Controller
-                name="typeMaintenance"
-                control={control}
-                render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione o tipo" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1">Preventiva</SelectItem>
-                      <SelectItem value="2">Corretiva</SelectItem>
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-            </div>
-          </div>
-
-          {/* Valor */}
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Valor</Label>
-            <Input
-              {...register("value")}
-              className="col-span-3"
-              placeholder="Ex: 1000,00"
-            />
-          </div>
-
-          {/* Datas */}
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Data</Label>
-            <div className="col-span-3">
-              <Controller
-                name="plannedStart"
-                control={control}
-                render={({ field: { onChange, value } }) => (
-                  <DatePickerWithHours date={value!} setDate={onChange} />
-                )}
-              />
-            </div>
-          </div>
-
-          {/* Status */}
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Status</Label>
-            <div className="col-span-3">
-              <Controller
-                name="status"
-                control={control}
-                render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione o status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {maintenancesStatusOptions?.map(({ id, name }) => (
-                        <SelectItem key={id} value={String(id)}>
-                          {name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-            </div>
-          </div>
-
-          {/* Documents */}
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Documentos</Label>
-            <Input
-              type="file"
-              {...register("documents")}
-              multiple
-              className="col-span-3"
-            />
-          </div>
-
-          {/* ✅ Próxima manutenção preventiva (auto + editável) */}
-          {assetSelected?.maintenanceFrequency && typeMaintenance === "1" && (
-            <fieldset className="border border-muted-foreground/20 rounded-xl p-4 space-y-4">
-              <legend className="px-2 text-sm font-semibold text-muted-foreground">
-                Próxima Manutenção Preventiva
-              </legend>
-
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label className="text-right">Data prevista</Label>
-                <div className="col-span-3">
-                  <Controller
-                    name="nextMaintenance"
-                    control={control}
-                    render={({ field: { onChange, value } }) => (
-                      <DatePickerWithHours date={value!} setDate={onChange} />
-                    )}
-                  />
-                </div>
+        {/* CONTEÚDO COM SCROLL */}
+        <div className="flex-1 overflow-y-auto">
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="space-y-4 py-4"
+            encType="multipart/form-data"
+          >
+            {/* Asset */}
+            <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-2 md:gap-4">
+              <Label className="md:text-right">Ativo</Label>
+              <div className="md:col-span-3">
+                <Controller
+                  name="assetType"
+                  control={control}
+                  render={({ field }) => (
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Selecione o ativo" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {assets?.map(({ id, name }) => (
+                          <SelectItem key={id} value={String(id)}>
+                            {name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
               </div>
+            </div>
 
-              {/* Dica opcional abaixo da data */}
-              <p className="text-xs text-muted-foreground text-center">
-                A data foi calculada automaticamente com base na frequência do
-                ativo, mas pode ser ajustada manualmente.
-              </p>
-            </fieldset>
-          )}
+            {errors.assetType && (
+              <p className="text-red-500 text-sm">{errors.assetType.message}</p>
+            )}
 
-          <DialogFooter className="pt-4">
-            <DialogClose asChild>
-              <Button ref={closeButtonRef} variant="ghost">
-                Cancelar
-              </Button>
-            </DialogClose>
-            <Button type="submit">Salvar</Button>
-          </DialogFooter>
-        </form>
+            {/* Provider */}
+            <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-2 md:gap-4">
+              <Label className="md:text-right">Fornecedor</Label>
+              <Input
+                {...register("provider")}
+                className="md:col-span-3 w-full"
+              />
+            </div>
+
+            {/* Contact */}
+            <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-2 md:gap-4">
+              <Label className="md:text-right">Contato</Label>
+              <Input
+                {...register("contact")}
+                className="md:col-span-3 w-full"
+              />
+            </div>
+
+            {/* Tipo manutenção */}
+            <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-2 md:gap-4">
+              <Label className="md:text-right">Tipo de manutenção</Label>
+              <div className="md:col-span-3">
+                <Controller
+                  name="typeMaintenance"
+                  control={control}
+                  render={({ field }) => (
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Selecione o tipo" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1">Preventiva</SelectItem>
+                        <SelectItem value="2">Corretiva</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              </div>
+            </div>
+
+            {/* Valor */}
+            <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-2 md:gap-4">
+              <Label className="md:text-right">Valor</Label>
+              <Input
+                {...register("value")}
+                className="md:col-span-3 w-full"
+                placeholder="Ex: 1000,00"
+              />
+            </div>
+
+            {/* Data */}
+            <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-2 md:gap-4">
+              <Label className="md:text-right">Data</Label>
+              <div className="md:col-span-3">
+                <Controller
+                  name="plannedStart"
+                  control={control}
+                  render={({ field }) => (
+                    <DatePickerWithHours
+                      date={field.value!}
+                      setDate={field.onChange}
+                    />
+                  )}
+                />
+              </div>
+            </div>
+
+            {/* Status */}
+            <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-2 md:gap-4">
+              <Label className="md:text-right">Status</Label>
+              <div className="md:col-span-3">
+                <Controller
+                  name="status"
+                  control={control}
+                  render={({ field }) => (
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Selecione o status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {maintenancesStatusOptions?.map(({ id, name }) => (
+                          <SelectItem key={id} value={String(id)}>
+                            {name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              </div>
+            </div>
+
+            {/* Documents */}
+            <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-2 md:gap-4">
+              <Label className="md:text-right">Documentos</Label>
+              <Input
+                type="file"
+                {...register("documents")}
+                multiple
+                className="md:col-span-3 w-full"
+              />
+            </div>
+
+            {/* Próxima manutenção */}
+            {assetSelected?.maintenanceFrequency && typeMaintenance === "1" && (
+              <fieldset className="border border-muted-foreground/20 rounded-xl p-4 space-y-4">
+                <legend className="px-2 text-sm font-semibold text-muted-foreground">
+                  Próxima Manutenção Preventiva
+                </legend>
+
+                <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-2 md:gap-4">
+                  <Label className="md:text-right">Data prevista</Label>
+                  <div className="md:col-span-3">
+                    <Controller
+                      name="nextMaintenance"
+                      control={control}
+                      render={({ field }) => (
+                        <DatePickerWithHours
+                          date={field.value!}
+                          setDate={field.onChange}
+                        />
+                      )}
+                    />
+                  </div>
+                </div>
+
+                <p className="text-xs text-muted-foreground text-center">
+                  A data foi calculada automaticamente, mas pode ser ajustada.
+                </p>
+              </fieldset>
+            )}
+          </form>
+        </div>
+
+        {/* FOOTER FIXO */}
+        <DialogFooter className="shrink-0 border-t pt-4 flex flex-col-reverse sm:flex-row gap-2">
+          <DialogClose asChild>
+            <Button ref={closeButtonRef} variant="ghost">
+              Cancelar
+            </Button>
+          </DialogClose>
+          <Button type="submit">Salvar</Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
