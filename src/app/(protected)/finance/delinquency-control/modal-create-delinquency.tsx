@@ -88,7 +88,7 @@ export function ModalCreateDelinquency({
   });
 
   const categoriesFiltered = categoriesOptions.filter(
-    (category) => category.incomeExpenseTypeId === INCOME_TYPE_ID
+    (category) => category.incomeExpenseTypeId === INCOME_TYPE_ID,
   );
 
   async function handleSubmitDeliquency(data: any) {
@@ -185,9 +185,16 @@ export function ModalCreateDelinquency({
         <Button variant="outline">Registrar Inadimplência</Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
+      <DialogContent
+        className="
+    w-screen h-screen max-w-none max-h-none rounded-none
+    sm:w-[95vw] sm:max-w-[600px]
+    md:max-w-[800px] md:h-auto md:rounded-lg
+    flex flex-col
+  "
+      >
         <DialogHeader>
-          <DialogTitle className="text-2xl">
+          <DialogTitle className="text-xl md:text-2xl">
             {type === "create"
               ? "Adicionar Inadimplência"
               : "Editar Inadimplência"}
@@ -202,112 +209,130 @@ export function ModalCreateDelinquency({
           className="space-y-6 py-4"
         >
           <fieldset className="border border-gray-200 rounded-md p-4">
-            <legend className="text-sm font-semibold mb-2">
+            <legend className="text-sm font-semibold mb-4">
               Dados da Inadimplência
             </legend>
 
-            <div className="grid grid-cols-4 items-center gap-4 mb-4 ">
-              <Label htmlFor="apartment" className="text-right">
-                Apartamento
-              </Label>
-              <Controller
-                name="apartamentId"
-                control={control}
-                render={({ field: { value, onChange } }) => (
-                  <Select value={value} onValueChange={onChange}>
-                    <SelectTrigger className="col-span-3 w-[150px]">
-                      <SelectValue placeholder="Selecione o apartamento." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {apartaments.map((apartament, index) => (
-                        <SelectItem key={index} value={String(apartament.id)}>
-                          {apartament.apartmentNumber}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
+            {/* Apartamento */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-2 md:gap-4 mb-4">
+              <Label className="md:text-right">Apartamento</Label>
+              <div className="md:col-span-3">
+                <Controller
+                  name="apartamentId"
+                  control={control}
+                  render={({ field: { value, onChange } }) => (
+                    <Select value={value} onValueChange={onChange}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Selecione o apartamento" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {apartaments.map((apartament) => (
+                          <SelectItem
+                            key={apartament.id}
+                            value={String(apartament.id)}
+                          >
+                            {apartament.apartmentNumber}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              </div>
             </div>
 
-            <div className="grid grid-cols-4 items-center gap-4 mb-4">
-              <Label htmlFor="category" className="text-right">
-                Categoria
-              </Label>
-              <Controller
-                name="categoryId"
-                control={control}
-                render={({ field: { value, onChange } }) => (
-                  <Select value={value} onValueChange={onChange}>
-                    <SelectTrigger className="col-span-3 w-[250px] focus:border-blue-500">
-                      <SelectValue placeholder="Selecione a categoria" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categoriesFiltered.map((category, index) => (
-                        <SelectItem key={index} value={String(category.id)}>
-                          {category.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
+            {/* Categoria */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-2 md:gap-4 mb-4">
+              <Label className="md:text-right">Categoria</Label>
+              <div className="md:col-span-3">
+                <Controller
+                  name="categoryId"
+                  control={control}
+                  render={({ field: { value, onChange } }) => (
+                    <Select value={value} onValueChange={onChange}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Selecione a categoria" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {categoriesFiltered.map((category) => (
+                          <SelectItem
+                            key={category.id}
+                            value={String(category.id)}
+                          >
+                            {category.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              </div>
             </div>
 
-            <div className="grid grid-cols-4 items-center gap-4 mb-4">
-              <Label htmlFor="dueDate" className="text-right">
-                Data de Vencimento
-              </Label>
-              <Controller
-                name="dueDate"
-                control={control}
-                render={({ field: { onChange, value } }) => (
-                  <DatePicker date={value!} setDate={onChange} />
-                )}
-              />
+            {/* Data de vencimento */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-2 md:gap-4 mb-4">
+              <Label className="md:text-right">Data de Vencimento</Label>
+              <div className="md:col-span-3">
+                <Controller
+                  name="dueDate"
+                  control={control}
+                  render={({ field }) => (
+                    <DatePicker date={field.value!} setDate={field.onChange} />
+                  )}
+                />
+              </div>
             </div>
 
-            <div className="grid grid-cols-4 items-center gap-4 mb-4">
-              <Label htmlFor="amount" className="text-right">
-                Valor (R$)
-              </Label>
-              <Controller
-                name="amount"
-                control={control}
-                render={({ field: { onChange, value } }) => (
-                  <CurrencyInput value={value} onChange={onChange} />
-                )}
-              />
+            {/* Valor */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-2 md:gap-4 mb-4">
+              <Label className="md:text-right">Valor (R$)</Label>
+              <div className="md:col-span-3">
+                <Controller
+                  name="amount"
+                  control={control}
+                  render={({ field }) => (
+                    <CurrencyInput
+                      value={field.value}
+                      onChange={field.onChange}
+                    />
+                  )}
+                />
+              </div>
             </div>
 
-            <div className="grid grid-cols-4 items-center gap-4 mb-4">
-              <Label htmlFor="paymentDate" className="text-right">
-                Data do Pagamento
-              </Label>
-              <Controller
-                name="paymentDate"
-                control={control}
-                render={({ field: { onChange, value } }) => (
-                  <DatePicker date={value!} setDate={onChange} />
-                )}
-              />
+            {/* Data pagamento */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-2 md:gap-4 mb-4">
+              <Label className="md:text-right">Data do Pagamento</Label>
+              <div className="md:col-span-3">
+                <Controller
+                  name="paymentDate"
+                  control={control}
+                  render={({ field }) => (
+                    <DatePicker date={field.value!} setDate={field.onChange} />
+                  )}
+                />
+              </div>
             </div>
 
-            <div className="grid grid-cols-4 items-center gap-4 mb-4">
-              <Label htmlFor="amount" className="text-right">
-                Valor Pago (R$)
-              </Label>
-              <Controller
-                name="amountPaid"
-                control={control}
-                render={({ field: { onChange, value } }) => (
-                  <CurrencyInput value={value} onChange={onChange} />
-                )}
-              />
+            {/* Valor pago */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-2 md:gap-4 mb-4">
+              <Label className="md:text-right">Valor Pago (R$)</Label>
+              <div className="md:col-span-3">
+                <Controller
+                  name="amountPaid"
+                  control={control}
+                  render={({ field }) => (
+                    <CurrencyInput
+                      value={field.value}
+                      onChange={field.onChange}
+                    />
+                  )}
+                />
+              </div>
             </div>
           </fieldset>
 
-          <DialogFooter>
+          <DialogFooter className="flex flex-col-reverse sm:flex-row gap-2">
             <DialogClose asChild>
               <Button variant="ghost" type="button" ref={buttonCloseRef}>
                 Cancelar
