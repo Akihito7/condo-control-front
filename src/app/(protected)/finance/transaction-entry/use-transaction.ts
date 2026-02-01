@@ -17,123 +17,160 @@ import { fetchChartRevenueFixedVsVariable } from "@/api/fetch-chart-revenue-fixe
 import { fetchChartExpensiveFixedVsVariable } from "@/api/fetch-chart-expensive-fixed-vs-variable";
 import { fetchFinancialSummaryMonthlyBalance } from "@/api/fetch-financial-summary-monthly-balance";
 
-
-
 interface UseTransactionProps {
   selectedDate: Date;
-  incomeExpenseOptionsSelected: MultiValue<OptionType>
-  condominiumId: number
+  incomeExpenseOptionsSelected: MultiValue<OptionType>;
+  condominiumId: number;
 }
-export function useTransaction({ selectedDate, incomeExpenseOptionsSelected, condominiumId }: UseTransactionProps) {
+export function useTransaction({
+  selectedDate,
+  incomeExpenseOptionsSelected,
+  condominiumId,
+}: UseTransactionProps) {
+  const queryClient = useQueryClient();
+  const selectedDateFormatted = format(selectedDate, "yyyy-MM-dd");
+  const { startDate, endDate } = getFullMonthInterval(selectedDateFormatted);
 
-  const queryClient = useQueryClient()
-  const selectedDateFormatted = format(selectedDate, 'yyyy-MM-dd');
+  const year = format(selectedDate, "yyyy");
+
+  const incomeExpenseOptionsSelectedId = incomeExpenseOptionsSelected?.map(
+    (option: any) => option.value,
+  );
   const {
-    startDate, endDate
-  } = getFullMonthInterval(selectedDateFormatted);
-
-  const year = format(selectedDate, 'yyyy')
-
-  const incomeExpenseOptionsSelectedId = incomeExpenseOptionsSelected?.map((option: any) => option.value)
-  const { data: transactions, error: errorTransactions, status: transactionsStatus } = useQuery({
-    queryKey: ["transactions", selectedDateFormatted, incomeExpenseOptionsSelected, condominiumId],
-    queryFn: () => fetchFinancialRecords({ condominiumId, selectedDate: selectedDateFormatted, incomeExpenseOptionsSelectedId }),
-    enabled: incomeExpenseOptionsSelectedId ? incomeExpenseOptionsSelectedId.length > 0 && !!condominiumId : false
+    data: transactions,
+    error: errorTransactions,
+    status: transactionsStatus,
+  } = useQuery({
+    queryKey: [
+      "transactions",
+      selectedDateFormatted,
+      incomeExpenseOptionsSelected,
+      condominiumId,
+    ],
+    queryFn: () =>
+      fetchFinancialRecords({
+        condominiumId,
+        selectedDate: selectedDateFormatted,
+        incomeExpenseOptionsSelectedId,
+      }),
+    enabled: incomeExpenseOptionsSelectedId
+      ? incomeExpenseOptionsSelectedId.length > 0 && !!condominiumId
+      : false,
   });
 
   const { data: categoriesOptions, error: erorrCategoriesOptions } = useQuery({
-    queryKey: ['categoriesOptions'],
-    queryFn: fetchCategoriesOptions
-  })
+    queryKey: ["categoriesOptions"],
+    queryFn: fetchCategoriesOptions,
+  });
 
-  const { data: incomeExpenseOptions, error: errorIncomeExpenseOptions } = useQuery({
-    queryKey: ['incomeExpenseOptions'],
-    queryFn: fetchIncomeExpenseOptions
-  })
+  const { data: incomeExpenseOptions, error: errorIncomeExpenseOptions } =
+    useQuery({
+      queryKey: ["incomeExpenseOptions"],
+      queryFn: fetchIncomeExpenseOptions,
+    });
 
-  const { data: paymentMethodsOptions, error: errorPaymentMethodsOptions } = useQuery({
-    queryKey: ['paymentsMethodsOptions'],
-    queryFn: fetchPaymentMethodOptions
-  })
+  const { data: paymentMethodsOptions, error: errorPaymentMethodsOptions } =
+    useQuery({
+      queryKey: ["paymentsMethodsOptions"],
+      queryFn: fetchPaymentMethodOptions,
+    });
 
   const { data: apartments, error: errorApartments } = useQuery({
-    queryKey: ['apartments'],
-    queryFn: async () => fetchApartments({ condominiumId })
-  })
+    queryKey: ["apartments"],
+    queryFn: async () => fetchApartments({ condominiumId }),
+  });
 
   const { data: paymentStatusOptions, error: errorPaymentStatus } = useQuery({
-    queryKey: ['payment-status'],
-    queryFn: fetchPaymentStatusOptions
-  })
+    queryKey: ["payment-status"],
+    queryFn: fetchPaymentStatusOptions,
+  });
 
-  const { data: cardsTransaction, isLoading: cardsTransactionIsLoading, status: cardsTransactionStatus } = useQuery({
-    queryKey: ['revenueTotal', startDate, endDate, condominiumId],
-    queryFn: async () => fetchCardsTransactionEntry({
-      condominiumId,
-      startDate,
-      endDate,
-    }),
-    enabled: !!condominiumId
-  })
+  const {
+    data: cardsTransaction,
+    isLoading: cardsTransactionIsLoading,
+    status: cardsTransactionStatus,
+  } = useQuery({
+    queryKey: ["revenueTotal", startDate, endDate, condominiumId],
+    queryFn: async () =>
+      fetchCardsTransactionEntry({
+        condominiumId,
+        startDate,
+        endDate,
+      }),
+    enabled: !!condominiumId,
+  });
 
   const { mutateAsync: handleDeleteRegister } = useMutation({
     mutationFn: (registerId: number) => deleteRegister({ registerId }),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['transactions', startDate, endDate, incomeExpenseOptionsSelected, condominiumId],
-        exact: false
+        queryKey: ["transactions"],
+        exact: false,
       });
       queryClient.invalidateQueries({
-        queryKey: ['revenueTotal', startDate, endDate, condominiumId],
-        exact: false
+        queryKey: ["revenueTotal"],
+        exact: false,
       });
-    }
-  })
+    },
+  });
 
   const { data: chartRevenue, status: chartRevenueStatus } = useQuery({
-    queryKey: ['chart-revenue', startDate, endDate],
-    queryFn: async () => fetchChartRevenueByCategory({
-      condominiumId,
-      startDate: startDate,
-      endDate: endDate
-    })
-  })
+    queryKey: ["chart-revenue", startDate, endDate],
+    queryFn: async () =>
+      fetchChartRevenueByCategory({
+        condominiumId,
+        startDate: startDate,
+        endDate: endDate,
+      }),
+  });
 
   const { data: chartExpense, status: chartExpenseStatus } = useQuery({
-    queryKey: ['chart','chart-expense', startDate, endDate],
-    queryFn: async () => fetchChartExpenseByCategory({
-      condominiumId,
-      startDate: startDate,
-      endDate: endDate
-    })
-  })
+    queryKey: ["chart", "chart-expense", startDate, endDate],
+    queryFn: async () =>
+      fetchChartExpenseByCategory({
+        condominiumId,
+        startDate: startDate,
+        endDate: endDate,
+      }),
+  });
 
+  const {
+    data: chartRevenueFixedVsVariable,
+    status: chartRevenueFixedVsVariableStatus,
+  } = useQuery({
+    queryKey: ["chart", "chart-revenue-fixed-variable", startDate, endDate],
+    queryFn: async () =>
+      fetchChartRevenueFixedVsVariable({
+        condominiumId,
+        startDate: startDate,
+        endDate: endDate,
+      }),
+  });
 
-  const { data: chartRevenueFixedVsVariable, status: chartRevenueFixedVsVariableStatus } = useQuery({
-    queryKey: ['chart','chart-revenue-fixed-variable', startDate, endDate],
-    queryFn: async () => fetchChartRevenueFixedVsVariable({
-      condominiumId,
-      startDate: startDate,
-      endDate: endDate
-    })
-  })
+  const {
+    data: chartExpensiveFixedVsVariable,
+    status: chartExpensiveFixedVsVariableStatus,
+  } = useQuery({
+    queryKey: ["chart", "chart-expensive-fixed-variable", startDate, endDate],
+    queryFn: async () =>
+      fetchChartExpensiveFixedVsVariable({
+        condominiumId,
+        startDate: startDate,
+        endDate: endDate,
+      }),
+  });
 
-  const { data: chartExpensiveFixedVsVariable, status: chartExpensiveFixedVsVariableStatus } = useQuery({
-    queryKey: ['chart', 'chart-expensive-fixed-variable', startDate, endDate],
-    queryFn: async () => fetchChartExpensiveFixedVsVariable({
-      condominiumId,
-      startDate: startDate,
-      endDate: endDate
-    })
-  })
-
-  const { data: chartFinacialSummaryMonthlyBalance, status: chartFinacialSummaryMonthlyBalanceStatus } = useQuery({
-    queryKey: ['chart', 'chart-financial-summary-monthly-balance', year],
-    queryFn: async () => fetchFinancialSummaryMonthlyBalance({
-      condominiumId,
-      year
-    })
-  })
+  const {
+    data: chartFinacialSummaryMonthlyBalance,
+    status: chartFinacialSummaryMonthlyBalanceStatus,
+  } = useQuery({
+    queryKey: ["chart", "chart-financial-summary-monthly-balance", year],
+    queryFn: async () =>
+      fetchFinancialSummaryMonthlyBalance({
+        condominiumId,
+        year,
+      }),
+  });
 
   return {
     transactions,
@@ -162,6 +199,6 @@ export function useTransaction({ selectedDate, incomeExpenseOptionsSelected, con
     chartExpensiveFixedVsVariable,
     chartExpensiveFixedVsVariableStatus,
     chartFinacialSummaryMonthlyBalance,
-    chartFinacialSummaryMonthlyBalanceStatus
-  }
+    chartFinacialSummaryMonthlyBalanceStatus,
+  };
 }
