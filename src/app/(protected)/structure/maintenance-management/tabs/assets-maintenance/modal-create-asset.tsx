@@ -201,33 +201,35 @@ export function ModalCreateAsset({ assetsTypes }: ModalCreateAssetProps) {
 
           {/* Type */}
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
-            <Controller
-              name="type"
-              control={control}
-              render={({ field: { value, onChange } }) => (
-                <>
-                  <Label className="text-right">Tipo</Label>
+          <div className="flex flex-col gap-4 mb-4 sm:grid sm:grid-cols-3 md:grid-cols-4 sm:items-center">
+            <Label className="text-left sm:text-right">Tipo</Label>
+
+            <div className="col-span-2 md:col-span-3 flex items-center gap-2">
+              <Controller
+                name="type"
+                control={control}
+                render={({ field: { value, onChange } }) => (
                   <Select value={value} onValueChange={onChange}>
-                    <SelectTrigger>
+                    <SelectTrigger className="w-full">
                       <SelectValue placeholder="Selecione um tipo" />
                     </SelectTrigger>
 
                     <SelectContent>
                       {assetsTypes?.map((type) => (
-                        <SelectItem value={String(type.id)}>
+                        <SelectItem key={type.id} value={String(type.id)}>
                           {type.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
+                )}
+              />
 
-                  <div className="ml-4">
-                    <ModalCreateType />
-                  </div>
-                </>
-              )}
-            />
+              {/* Botão de criar sempre ao lado */}
+              <div className="flex-shrink-0">
+                <ModalCreateType />
+              </div>
+            </div>
           </div>
 
           {/* Frequency */}
