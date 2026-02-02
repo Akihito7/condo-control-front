@@ -30,7 +30,7 @@ export function ModalViewAsset({
 }: ModalViewAssetProps) {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="sm:max-w-[650px] max-h-[85vh] overflow-hidden flex flex-col">
+      <DialogContent className="max-w-full sm:max-w-[700px] md:max-w-[900px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl flex items-center gap-2">
             Detalhes do Ativo

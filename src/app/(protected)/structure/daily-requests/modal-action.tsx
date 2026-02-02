@@ -152,7 +152,7 @@ export function ModalAction({
         <Button variant="outline">Nova Ação</Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="max-w-full sm:max-w-[700px] md:max-w-[900px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{modalTitle}</DialogTitle>
           <DialogDescription>Preencha as informações abaixo</DialogDescription>
@@ -165,7 +165,7 @@ export function ModalAction({
         >
           <fieldset className="border border-gray-200 rounded-md p-4 space-y-4">
             {/* Nome */}
-            <div className="grid grid-cols-4 items-center gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
               <Label className="text-right">Tarefa</Label>
               <Controller
                 name="name"
@@ -182,7 +182,7 @@ export function ModalAction({
             </div>
 
             {/* Data */}
-            <div className="grid grid-cols-4 items-center gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
               <Label className="text-right">Data</Label>
               <Controller
                 name="date"
@@ -194,7 +194,7 @@ export function ModalAction({
             </div>
 
             {/* Gravidade */}
-            <div className="grid grid-cols-4 items-center gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
               <Label className="text-right">Prioridade</Label>
               <Controller
                 name="gravityId"
@@ -217,7 +217,7 @@ export function ModalAction({
             </div>
 
             {/* Responsável */}
-            <div className="grid grid-cols-4 items-center gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
               <Label className="text-right">Responsável</Label>
               <Controller
                 name="responsibleName"
@@ -235,7 +235,7 @@ export function ModalAction({
             </div>
 
             {/* Status */}
-            <div className="grid grid-cols-4 items-center gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
               <Label className="text-right">Status</Label>
               <Controller
                 name="statusId"
@@ -258,7 +258,7 @@ export function ModalAction({
             </div>
 
             {/* Observação */}
-            <div className="grid grid-cols-4 items-start gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
               <Label className="text-right">Observação</Label>
               <Controller
                 name="observation"

@@ -42,7 +42,7 @@ const assetSchema = z.object({
     .any()
     .refine(
       (file) => file?.length === 1,
-      "Por favor, envie exatamente uma foto"
+      "Por favor, envie exatamente uma foto",
     )
     .optional(),
 });
@@ -172,15 +172,15 @@ export function ModalActionAsset({
     type === "create"
       ? "Adicionar Patrimônio"
       : type === "edit"
-      ? "Editar Patrimônio"
-      : "Visualizar Patrimônio";
+        ? "Editar Patrimônio"
+        : "Visualizar Patrimônio";
 
   const modalDescription =
     type === "create"
       ? "Preencha os campos para adicionar um novo asset."
       : type === "edit"
-      ? "Atualize os campos abaixo para editar o asset."
-      : "Visualize os detalhes do asset.";
+        ? "Atualize os campos abaixo para editar o asset."
+        : "Visualize os detalhes do asset.";
 
   return (
     <Dialog
@@ -203,7 +203,7 @@ export function ModalActionAsset({
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-auto">
+      <DialogContent className="max-w-full sm:max-w-[700px] md:max-w-[900px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl">{modalTitle}</DialogTitle>
           <DialogDescription>{modalDescription}</DialogDescription>
@@ -211,7 +211,7 @@ export function ModalActionAsset({
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-4">
           {/* Item */}
-          <div className="grid grid-cols-4 items-center gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right">Item</Label>
             <Input
               {...register("item")}
@@ -226,7 +226,7 @@ export function ModalActionAsset({
           )}
 
           {/* Código */}
-          <div className="grid grid-cols-4 items-center gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right">Código</Label>
             <Input
               {...register("code")}
@@ -241,7 +241,7 @@ export function ModalActionAsset({
           )}
 
           {/* Área */}
-          <div className="grid grid-cols-4 items-center gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right">Área</Label>
             <Controller
               name="areaId"
@@ -273,7 +273,7 @@ export function ModalActionAsset({
           )}
 
           {/* Categoria */}
-          <div className="grid grid-cols-4 items-center gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right">Categoria</Label>
             <Controller
               name="categoryId"
@@ -305,7 +305,7 @@ export function ModalActionAsset({
           )}
 
           {/* Status */}
-          <div className="grid grid-cols-4 items-center gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right">Status</Label>
             <Controller
               name="statusId"
@@ -339,7 +339,7 @@ export function ModalActionAsset({
           {/* Foto */}
 
           {type === "create" && (
-            <div className="grid grid-cols-4 items-start gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
               <Label className="text-right pt-2">Foto</Label>
               <div className="col-span-3 flex flex-col gap-2">
                 <label className="flex flex-col items-center justify-center gap-2 rounded-md border-2 border-dashed border-gray-400 text-gray-600 cursor-pointer p-8 hover:border-gray-600">

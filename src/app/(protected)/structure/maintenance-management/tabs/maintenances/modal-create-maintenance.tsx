@@ -148,8 +148,8 @@ export function ModalCreateMaintenance({
       exact: false,
     });
     queryClient.refetchQueries({
-      queryKey: ["asset-details"], 
-      exact : false
+      queryKey: ["asset-details"],
+      exact: false,
     });
     closeButtonRef?.current?.click();
     reset();
@@ -199,7 +199,7 @@ export function ModalCreateMaintenance({
         <Button variant="outline">Adicionar Manutenção</Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-auto">
+      <DialogContent className="max-w-full sm:max-w-[700px] md:max-w-[900px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl">Criar manutenção</DialogTitle>
           <DialogDescription>
@@ -213,7 +213,7 @@ export function ModalCreateMaintenance({
           encType="multipart/form-data"
         >
           {/* Asset */}
-          <div className="grid grid-cols-4 items-center gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right">Ativo</Label>
             <div className="col-span-3">
               <Controller
@@ -241,21 +241,18 @@ export function ModalCreateMaintenance({
               {errors.assetType.message}
             </p>
           )}
-
           {/* Provider */}
-          <div className="grid grid-cols-4 items-center gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right">Fornecedor</Label>
             <Input {...register("provider")} className="col-span-3" />
           </div>
-
           {/* Contact */}
-          <div className="grid grid-cols-4 items-center gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right">Contato</Label>
             <Input {...register("contact")} className="col-span-3" />
           </div>
-
           {/* Tipo de manutenção */}
-          <div className="grid grid-cols-4 items-center gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right">Tipo de manutenção</Label>
             <div className="col-span-3">
               <Controller
@@ -275,9 +272,8 @@ export function ModalCreateMaintenance({
               />
             </div>
           </div>
-
           {/* Valor */}
-          <div className="grid grid-cols-4 items-center gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right">Valor</Label>
             <Input
               {...register("value")}
@@ -285,9 +281,8 @@ export function ModalCreateMaintenance({
               placeholder="Ex: 1000,00"
             />
           </div>
-
           {/* Datas */}
-          <div className="grid grid-cols-4 items-center gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right">Data</Label>
             <div className="col-span-3">
               <Controller
@@ -299,9 +294,8 @@ export function ModalCreateMaintenance({
               />
             </div>
           </div>
-
-          {/* Status */}
-          <div className="grid grid-cols-4 items-center gap-4">
+          {/* Status */}{" "}
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right">Status</Label>
             <div className="col-span-3">
               <Controller
@@ -324,9 +318,8 @@ export function ModalCreateMaintenance({
               />
             </div>
           </div>
-
           {/* Documents */}
-          <div className="grid grid-cols-4 items-center gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right">Documentos</Label>
             <Input
               type="file"
@@ -335,7 +328,6 @@ export function ModalCreateMaintenance({
               className="col-span-3"
             />
           </div>
-
           {/* ✅ Próxima manutenção preventiva (auto + editável) */}
           {assetSelected?.maintenanceFrequency && typeMaintenance === "1" && (
             <fieldset className="border border-muted-foreground/20 rounded-xl p-4 space-y-4">
@@ -343,7 +335,7 @@ export function ModalCreateMaintenance({
                 Próxima Manutenção Preventiva
               </legend>
 
-              <div className="grid grid-cols-4 items-center gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
                 <Label className="text-right">Data prevista</Label>
                 <div className="col-span-3">
                   <Controller
@@ -363,7 +355,6 @@ export function ModalCreateMaintenance({
               </p>
             </fieldset>
           )}
-
           <DialogFooter className="pt-4">
             <DialogClose asChild>
               <Button ref={closeButtonRef} variant="ghost">

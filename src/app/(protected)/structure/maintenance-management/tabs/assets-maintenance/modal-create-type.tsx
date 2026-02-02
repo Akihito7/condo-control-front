@@ -65,7 +65,7 @@ export function ModalCreateType() {
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[450px]">
+      <DialogContent className="max-w-full sm:max-w-[700px] md:max-w-[900px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl">Cadastrar Tipo</DialogTitle>
           <DialogDescription>
@@ -74,7 +74,7 @@ export function ModalCreateType() {
         </DialogHeader>
 
         <form className="space-y-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right">Nome</Label>
             <Input
               {...register("name")}

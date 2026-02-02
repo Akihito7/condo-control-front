@@ -47,7 +47,7 @@ const assetSchema = z.object({
     .any()
     .refine(
       (files) => !files || files.length <= 5,
-      "Máximo de 5 documentos permitidos"
+      "Máximo de 5 documentos permitidos",
     )
     .optional(),
 });
@@ -142,7 +142,7 @@ export function ModalCreateAsset({ assetsTypes }: ModalCreateAssetProps) {
         <Button variant="outline">Adicionar Ativo</Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[650px] max-h-[80vh] overflow-auto">
+      <DialogContent className="max-w-full sm:max-w-[700px] md:max-w-[900px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl">Cadastrar Ativo</DialogTitle>
           <DialogDescription>
@@ -152,7 +152,8 @@ export function ModalCreateAsset({ assetsTypes }: ModalCreateAssetProps) {
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-4">
           {/* Code */}
-          <div className="grid grid-cols-4 items-center gap-4">
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right">Codigo</Label>
             <Input
               {...register("code")}
@@ -167,7 +168,8 @@ export function ModalCreateAsset({ assetsTypes }: ModalCreateAssetProps) {
           )}
 
           {/* Name */}
-          <div className="grid grid-cols-4 items-center gap-4">
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right">Nome</Label>
             <Input
               {...register("name")}
@@ -182,7 +184,8 @@ export function ModalCreateAsset({ assetsTypes }: ModalCreateAssetProps) {
           )}
 
           {/* Type */}
-          <div className="grid grid-cols-4 items-center gap-4">
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Controller
               name="type"
               control={control}
@@ -212,7 +215,8 @@ export function ModalCreateAsset({ assetsTypes }: ModalCreateAssetProps) {
           </div>
 
           {/* Frequency */}
-          <div className="grid grid-cols-4 items-center gap-4">
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right">Frequência</Label>
             <div className="col-span-3 flex items-center gap-2">
               <Controller
@@ -242,7 +246,8 @@ export function ModalCreateAsset({ assetsTypes }: ModalCreateAssetProps) {
           )}
 
           {/* Supplier */}
-          <div className="grid grid-cols-4 items-center gap-4">
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right">Fornecedor</Label>
             <Input
               {...register("supplier")}
@@ -257,7 +262,8 @@ export function ModalCreateAsset({ assetsTypes }: ModalCreateAssetProps) {
           )}
 
           {/* Contact */}
-          <div className="grid grid-cols-4 items-center gap-4">
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right">Contato</Label>
             <Input
               {...register("contact")}
@@ -272,7 +278,8 @@ export function ModalCreateAsset({ assetsTypes }: ModalCreateAssetProps) {
           )}
 
           {/* Lifespan */}
-          <div className="grid grid-cols-4 items-center gap-4">
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right col-span-1">
               Vida útil est. (anos)
             </Label>
@@ -290,18 +297,20 @@ export function ModalCreateAsset({ assetsTypes }: ModalCreateAssetProps) {
           )}
 
           {/* Installation Date */}
-          <div className="grid grid-cols-4 items-center gap-4">
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right">Data de instalação</Label>
             <Controller
               name="installationDate"
               control={control}
               render={({ field }) => {
                 return (
-                 <CalendarCustom 
-                 date={field.value}
-                 setDate={field.onChange}
-                 label="Data de instalação"
-                 />)
+                  <CalendarCustom
+                    date={field.value}
+                    setDate={field.onChange}
+                    label="Data de instalação"
+                  />
+                );
               }}
             />
           </div>
@@ -312,7 +321,8 @@ export function ModalCreateAsset({ assetsTypes }: ModalCreateAssetProps) {
           )}
 
           {/* Documents */}
-          <div className="grid grid-cols-4 items-start gap-4">
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right pt-2">Documentos</Label>
             <div className="col-span-3 flex flex-col gap-2">
               <label className="flex flex-col items-center justify-center gap-2 rounded-md border-2 border-dashed border-gray-400 text-gray-600 cursor-pointer p-6 hover:border-gray-600">

@@ -174,7 +174,7 @@ export function ModalActionEmployee({
 
   useEffect(() => {
     const currentRoleSelected = employeeRoles.find(
-      (role) => String(role.id) === String(roleSelectedId)
+      (role) => String(role.id) === String(roleSelectedId),
     );
 
     if (!currentRoleSelected) return;
@@ -235,7 +235,7 @@ export function ModalActionEmployee({
         <Button onClick={() => setIsOpen(true)}>Adicionar Funcionário</Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-auto">
+      <DialogContent className="max-w-full sm:max-w-[700px] md:max-w-[900px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl">
             {type === "create" ? "Adicionar Funcionário" : "Editar Funcionário"}
@@ -249,14 +249,12 @@ export function ModalActionEmployee({
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-4">
-        
           <fieldset className="space-y-4 border border-gray-200 p-4 rounded-md">
             <legend className="text-sm font-medium text-gray-700 px-1">
               Informações Pessoais
             </legend>
 
-         
-            <div className="grid grid-cols-4 items-center gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
               <Label className="text-right">Nome Completo</Label>
               <Input {...register("name")} className="col-span-3" />
             </div>
@@ -266,7 +264,7 @@ export function ModalActionEmployee({
               </p>
             )}
 
-            <div className="grid grid-cols-4 items-center gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
               <Label className="text-right">CPF</Label>
               <Input {...register("cpf")} className="col-span-3 w-[200px]" />
             </div>
@@ -276,8 +274,7 @@ export function ModalActionEmployee({
               </p>
             )}
 
-          
-            <div className="grid grid-cols-4 items-center gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
               <Label className="text-right">Número</Label>
               <Input
                 {...register("phoneNumber")}
@@ -291,14 +288,12 @@ export function ModalActionEmployee({
             )}
           </fieldset>
 
-       
           <fieldset className="space-y-4 border border-gray-200 p-4 rounded-md">
             <legend className="text-sm font-medium text-gray-700 px-1">
               Informações Profissionais
             </legend>
 
-       
-            <div className="grid grid-cols-4 items-center gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
               <Label className="text-right">Área</Label>
               <div className="col-span-3">
                 <Controller
@@ -327,7 +322,7 @@ export function ModalActionEmployee({
               </p>
             )}
 
-            <div className="grid grid-cols-4 items-center gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
               <Label className="text-right">Cargo</Label>
               <div className="col-span-3">
                 <Controller
@@ -356,8 +351,7 @@ export function ModalActionEmployee({
               </p>
             )}
 
-    
-            <div className="grid grid-cols-4 items-center gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
               <Label className="text-right">Salário</Label>
               <div className="col-span-3">
                 <Controller
@@ -378,8 +372,7 @@ export function ModalActionEmployee({
               </p>
             )}
 
-       
-            <div className="grid grid-cols-4 items-center gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
               <Label className="text-right">Status</Label>
               <div className="col-span-3">
                 <Controller
@@ -412,15 +405,13 @@ export function ModalActionEmployee({
             )}
           </fieldset>
 
-    
           {hasLogin && (
             <fieldset className="space-y-4 border border-gray-200 p-4 rounded-md">
               <legend className="text-sm font-medium text-gray-700 px-1">
                 Acesso ao Sistema
               </legend>
 
-          
-              <div className="grid grid-cols-4 items-center gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
                 <Label className="text-right">Email</Label>
                 <Input
                   {...register("email")}
@@ -433,8 +424,7 @@ export function ModalActionEmployee({
                 </p>
               )}
 
-           
-              <div className="grid grid-cols-4 items-center gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
                 <Label className="text-right">Senha</Label>
                 <Input
                   {...register("password")}
@@ -449,7 +439,6 @@ export function ModalActionEmployee({
             </fieldset>
           )}
 
-     
           <DialogFooter className="pt-4">
             <DialogClose asChild>
               <Button ref={closeButtonRef} variant="ghost">

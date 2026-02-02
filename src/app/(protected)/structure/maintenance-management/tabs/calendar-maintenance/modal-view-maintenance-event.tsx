@@ -72,7 +72,7 @@ export function ModalViewMaintenance({
         setIsOpen(open);
       }}
     >
-      <DialogContent className="sm:max-w-[500px] rounded-2xl shadow-xl">
+      <DialogContent className="sm:max-w-[700px] rounded-2xl shadow-xl">
         <DialogHeader className="space-y-2">
           <DialogTitle className="flex items-center gap-2 text-lg font-semibold">
             <Wrench className="w-5 h-5 text-blue-600" />

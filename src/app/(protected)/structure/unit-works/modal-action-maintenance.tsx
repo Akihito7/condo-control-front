@@ -300,8 +300,7 @@ export function ModalActionMaintenance({
       }}
     >
       <DialogTrigger asChild>{children}</DialogTrigger>
-
-      <DialogContent className="sm:max-w-[750px] max-h-[80vh] overflow-auto">
+      <DialogContent className="max-w-full sm:max-w-[700px] md:max-w-[900px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl">{title}</DialogTitle>
           <DialogDescription>Preencha os dados abaixo</DialogDescription>
@@ -313,7 +312,7 @@ export function ModalActionMaintenance({
           encType="multipart/form-data"
         >
           {/* Apartamento */}
-          <div className="grid grid-cols-4 items-center gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right">Apartamento</Label>
             <div className="col-span-3">
               <Controller
@@ -338,7 +337,7 @@ export function ModalActionMaintenance({
           </div>
 
           {/* Status */}
-          <div className="grid grid-cols-4 items-center gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right">Status</Label>
             <div className="col-span-3">
               <Controller
@@ -363,7 +362,7 @@ export function ModalActionMaintenance({
           </div>
 
           {/* Data prevista */}
-          <div className="grid grid-cols-4 items-center gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right">Data prevista</Label>
             <div className="col-span-3">
               <Controller
@@ -376,7 +375,7 @@ export function ModalActionMaintenance({
             </div>
           </div>
 
-          <div className="grid grid-cols-4 items-center gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right">Data prevista fim</Label>
             <div className="col-span-3">
               <Controller
@@ -390,13 +389,13 @@ export function ModalActionMaintenance({
           </div>
 
           {/* Descrição */}
-          <div className="grid grid-cols-4 items-start gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right">Descrição</Label>
             <Textarea {...register("description")} className="col-span-3" />
           </div>
 
           {/* ART / RRT */}
-          <div className="grid grid-cols-4 items-center gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right">ART/RRT</Label>
             <Controller
               name="has_art_rrt"
@@ -411,7 +410,7 @@ export function ModalActionMaintenance({
           </div>
 
           {/* Observações */}
-          <div className="grid grid-cols-4 items-start gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right">Observações</Label>
             <Textarea {...register("observations")} className="col-span-3" />
           </div>
@@ -488,7 +487,7 @@ export function ModalActionMaintenance({
 
           {/* Anexos */}
           {!work?.id && (
-            <div className="grid grid-cols-4 items-start gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
               <Label className="text-right pt-2">Documentos</Label>
 
               <div className="col-span-3 space-y-2">

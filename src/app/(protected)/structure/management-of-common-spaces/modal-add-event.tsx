@@ -95,13 +95,13 @@ export function ModalAddEvent({
   });
 
   const currentCondominiumArea = spacesCommom?.find(
-    (space) => String(space.id) === condominiumAreaId
+    (space) => String(space.id) === condominiumAreaId,
   );
 
   const events = dayWithEventSelected?.events || [];
 
   const hoursAlreadyReserved = events.flatMap(
-    (event) => event.areaAvailabilityIdSelecteds
+    (event) => event.areaAvailabilityIdSelecteds,
   );
 
   const date = dayWithEventSelected?.date
@@ -115,7 +115,7 @@ export function ModalAddEvent({
     setIsOpen(false);
     reset({
       apartmentId: "",
-      condominiumAreaId : condominiumAreaId,
+      condominiumAreaId: condominiumAreaId,
       eventDate: undefined,
       guests: [],
       periodSelecteds: [],
@@ -137,7 +137,7 @@ export function ModalAddEvent({
       (Array.isArray(periodsSelected) && periodsSelected.length === 0)
     )
       return alert(
-        "Você precisa selecionar um período antes de criar o evento."
+        "Você precisa selecionar um período antes de criar o evento.",
       );
 
     await handleCreateSpaceEvent(dataToSend);
@@ -172,7 +172,6 @@ export function ModalAddEvent({
       ? totalPriceByPeriod * totalPeriodsSelected
       : 0;
 
-
   return (
     <Dialog
       open={open}
@@ -181,7 +180,7 @@ export function ModalAddEvent({
         if (!open) handleClose();
       }}
     >
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-full sm:max-w-[700px] md:max-w-[900px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold text-gray-800">
             Adicionar Evento
@@ -265,7 +264,7 @@ export function ModalAddEvent({
                     value={value
                       ?.map((id) => {
                         const period = areaAvailabilityOptions?.find(
-                          (p) => String(p.id) === String(id)
+                          (p) => String(p.id) === String(id),
                         );
                         return period
                           ? { label: period.name, value: String(period.id) }
@@ -277,7 +276,7 @@ export function ModalAddEvent({
                     }}
                     options={areaAvailabilityOptions
                       ?.filter(
-                        (period) => !hoursAlreadyReserved.includes(period.id)
+                        (period) => !hoursAlreadyReserved.includes(period.id),
                       )
                       .map((period) => ({
                         label: period.name,

@@ -178,7 +178,7 @@ export function ModalUpdateMaintenance({
   const maintenanceTypeId = watch("typeMaintenance");
   const assetMaintenanceId = watch("assetType");
   const currentAssetSelected = assets?.find(
-    (asset) => String(asset.id) === assetMaintenanceId
+    (asset) => String(asset.id) === assetMaintenanceId,
   );
 
   useEffect(() => {
@@ -196,14 +196,14 @@ export function ModalUpdateMaintenance({
         "assetType",
         maintenance.assetMaintenanceId
           ? String(maintenance.assetMaintenanceId)
-          : ""
+          : "",
       );
 
       setValue("provider", maintenance.supplier || "");
 
       setValue(
         "typeMaintenance",
-        maintenance.typeMaintenance ? String(maintenance.typeMaintenance) : ""
+        maintenance.typeMaintenance ? String(maintenance.typeMaintenance) : "",
       );
 
       setValue("contact", maintenance.contact || "");
@@ -214,12 +214,12 @@ export function ModalUpdateMaintenance({
 
       setValue(
         "plannedStart",
-        maintenance.plannedStart ? new Date(maintenance.plannedStart) : null
+        maintenance.plannedStart ? new Date(maintenance.plannedStart) : null,
       );
 
       setValue(
         "status",
-        maintenance.statusId ? String(maintenance.statusId) : ""
+        maintenance.statusId ? String(maintenance.statusId) : "",
       );
     }
   }, [maintenance, setValue]);
@@ -236,7 +236,7 @@ export function ModalUpdateMaintenance({
         setIsOpen(open);
       }}
     >
-      <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-auto">
+      <DialogContent className="max-w-full sm:max-w-[700px] md:max-w-[900px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl">Editar manutenção</DialogTitle>
           <DialogDescription>
@@ -250,7 +250,8 @@ export function ModalUpdateMaintenance({
           encType="multipart/form-data"
         >
           {/* Ativo */}
-          <div className="grid grid-cols-4 items-center gap-4">
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right">Ativo</Label>
             <div className="col-span-3">
               <Controller
@@ -275,19 +276,22 @@ export function ModalUpdateMaintenance({
           </div>
 
           {/* Fornecedor */}
-          <div className="grid grid-cols-4 items-center gap-4">
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right">Fornecedor</Label>
             <Input {...register("provider")} className="col-span-3" />
           </div>
 
           {/* Contato */}
-          <div className="grid grid-cols-4 items-center gap-4">
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right">Contato</Label>
             <Input {...register("contact")} className="col-span-3" />
           </div>
 
           {/* Tipo de manutenção */}
-          <div className="grid grid-cols-4 items-center gap-4">
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right">Tipo de manutenção</Label>
             <div className="col-span-3">
               <Controller
@@ -309,7 +313,8 @@ export function ModalUpdateMaintenance({
           </div>
 
           {/* Valor */}
-          <div className="grid grid-cols-4 items-center gap-4">
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right">Valor</Label>
             <Input
               {...register("value")}
@@ -319,7 +324,8 @@ export function ModalUpdateMaintenance({
           </div>
 
           {/* Datas */}
-          <div className="grid grid-cols-4 items-center gap-4">
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right">Data inicial</Label>
             <div className="col-span-3">
               <Controller
@@ -333,7 +339,8 @@ export function ModalUpdateMaintenance({
           </div>
 
           {/* Status */}
-          <div className="grid grid-cols-4 items-center gap-4">
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right">Status</Label>
             <div className="col-span-3">
               <Controller
