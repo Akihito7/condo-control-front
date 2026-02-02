@@ -137,7 +137,23 @@ export function ModalCreateAsset({ assetsTypes }: ModalCreateAssetProps) {
   });
 
   return (
-    <Dialog>
+    <Dialog
+      onOpenChange={(open) => {
+        if (!open) {
+          reset({
+            code: "",
+            contact: "",
+            documents: [],
+            frequency: "",
+            installationDate: undefined,
+            lifespan: undefined,
+            name: "",
+            supplier: undefined,
+            type: "",
+          });
+        }
+      }}
+    >
       <DialogTrigger asChild>
         <Button variant="outline">Adicionar Ativo</Button>
       </DialogTrigger>
