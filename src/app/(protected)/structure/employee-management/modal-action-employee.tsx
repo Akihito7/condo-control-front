@@ -143,15 +143,6 @@ export function ModalActionEmployee({
     closeButtonRef.current?.click();
   }
 
-  const maskCPF = (value: string) => {
-    return value
-      .replace(/\D/g, "") // Remove tudo que não é dígito
-      .replace(/(\={11}).*/, "$1") // Limita a 11 caracteres
-      .replace(/(\d{3})(\d)/, "$1.$2") // Coloca o primeiro ponto
-      .replace(/(\d{3})(\d)/, "$1.$2") // Coloca o segundo ponto
-      .replace(/(\d{3})(\d{1,2})$/, "$1-$2"); // Coloca o hífen
-  };
-
   const { mutateAsync: handleCreateEmployee } = useMutation({
     mutationFn: async (formData: EmployeeFormData) =>
       createEmployee({
@@ -279,10 +270,6 @@ export function ModalActionEmployee({
                 {...register("cpf")}
                 maxLength={14}
                 className="col-span-3 w-full sm:w-[200px]"
-                onChange={(e) => {
-                  const { value } = e.target;
-                  e.target.value = maskCPF(value);
-                }}
               />
             </div>
             {errors.cpf && (
