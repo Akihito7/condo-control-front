@@ -57,29 +57,30 @@ export default function EmployeeManagement() {
       </div>
 
       <Tabs defaultValue="employees" className="w-full">
-        <TabsList className="flex gap-2 bg-muted p-1 rounded-lg w-fit">
+        <TabsList className="overflow-y-hidden flex w-full justify-start gap-2 bg-muted p-1 rounded-lg overflow-x-auto overflow-y-hidden flex-nowrap scrollbar-hide">
           <TabsTrigger
             value="employees"
-            className="px-4 py-2 text-sm font-medium rounded-md transition-all
+            className="px-4 py-2 text-sm font-medium rounded-md transition-all whitespace-nowrap
       data-[state=active]:bg-white data-[state=active]:text-primary
-      data-[state=active]:shadow-sm hover:bg-white hover:text-primary"
+      data-[state=active]:shadow-sm hover:bg-white hover:text-primary min-w-fit"
           >
             Funcionários
           </TabsTrigger>
+
           <TabsTrigger
             value="schedule"
-            className="px-4 py-2 text-sm font-medium rounded-md transition-all
+            className="px-4 py-2 text-sm font-medium rounded-md transition-all whitespace-nowrap
       data-[state=active]:bg-white data-[state=active]:text-primary
-      data-[state=active]:shadow-sm hover:bg-white hover:text-primary"
+      data-[state=active]:shadow-sm hover:bg-white hover:text-primary min-w-fit"
           >
             Escala de Funcionários
           </TabsTrigger>
 
           <TabsTrigger
             value="indicators"
-            className="px-4 py-2 text-sm font-medium rounded-md transition-all
+            className="px-4 py-2 text-sm font-medium rounded-md transition-all whitespace-nowrap
       data-[state=active]:bg-white data-[state=active]:text-primary
-      data-[state=active]:shadow-sm hover:bg-white hover:text-primary"
+      data-[state=active]:shadow-sm hover:bg-white hover:text-primary min-w-fit"
           >
             Indicadores
           </TabsTrigger>
