@@ -236,7 +236,7 @@ export function ModalUpdateMaintenance({
         setIsOpen(open);
       }}
     >
-      <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-auto">
+      <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-auto" >
         <DialogHeader>
           <DialogTitle className="text-2xl">Editar manutenção</DialogTitle>
           <DialogDescription>
