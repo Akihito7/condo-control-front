@@ -85,13 +85,15 @@ export function Interventions({
   const componentMainRef = useRef<HTMLDivElement>(null);
   const componentFilterRef = useRef<HTMLDivElement>(null);
 
-
   const [modalActionInvervationIsOpen, setModalActionIntervationIsOpen] =
     useState(false);
   return (
     <div className="space-y-6" ref={componentMainRef}>
-      <div className="flex  flex-col gap-4 md:items-end md:flex-row" ref={componentFilterRef}>
-        <div className="flex gap-2">
+      <div
+        className="flex  flex-col gap-4 md:items-end md:flex-row"
+        ref={componentFilterRef}
+      >
+        <div className="flex flex-col gap-4 md:flex-row md:items-end w-full">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Ano de referência
@@ -131,8 +133,13 @@ export function Interventions({
           variant="outline"
           className="ml-auto flex items-center gap-2 h-10 cursor-pointer"
           onClick={() => {
-            if (!componentFilterRef.current || !componentMainRef.current) return;
-            printDocument(componentMainRef.current, componentFilterRef.current, "l");
+            if (!componentFilterRef.current || !componentMainRef.current)
+              return;
+            printDocument(
+              componentMainRef.current,
+              componentFilterRef.current,
+              "l",
+            );
           }}
         >
           <FileDown className="w-6 h-6" />

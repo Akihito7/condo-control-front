@@ -82,7 +82,7 @@ export function Maintenances({ date, setDate }: MaintenancesProps) {
 
   const getStatusName = (statusId: number) => {
     const status = maintenancesStatusOptions?.find(
-      (status) => Number(status.id) === Number(statusId)
+      (status) => Number(status.id) === Number(statusId),
     );
 
     return status?.name ?? "";
@@ -127,7 +127,7 @@ export function Maintenances({ date, setDate }: MaintenancesProps) {
 
   const getMaintenanceById = (id: number) => {
     const maintenance = maintenances?.find(
-      (maintenance) => maintenance.id === id
+      (maintenance) => maintenance.id === id,
     );
 
     return maintenance;
@@ -150,7 +150,7 @@ export function Maintenances({ date, setDate }: MaintenancesProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap gap-4">
+      <div className="flex flex-col gap-4 md:flex-row md:items-end w-full">
         <div className="space-y-2">
           <Label>Selecione o mês e ano</Label>
           <MonthYearPicker
@@ -370,7 +370,7 @@ export function Maintenances({ date, setDate }: MaintenancesProps) {
                 ? "para a data " +
                   format(
                     maintenanceSelectedToDelete.plannedStart,
-                    "dd/MM/yyyy HH:mm"
+                    "dd/MM/yyyy HH:mm",
                   ) +
                   "?"
                 : ""}

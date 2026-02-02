@@ -82,7 +82,7 @@ export function AssetsMaintenance() {
 
   return (
     <div className="space-y-6">
-      <div className="flex space-x-4">
+      <div className="flex flex-col gap-4 md:flex-row md:items-end w-full">
         <div className="w-[250px] space-y-2">
           <Label>Busca por Código</Label>
           <Input

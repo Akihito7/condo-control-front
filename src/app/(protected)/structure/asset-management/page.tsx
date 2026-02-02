@@ -119,7 +119,7 @@ export default function AssetManagement() {
       </div>
 
       <div className="flex flex-col gap-4 md:items-end md:flex-row">
-        <div className="flex gap-2">
+        <div className="flex flex-col gap-4 md:flex-row md:items-end w-full">
           {/* Filtro área */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -238,7 +238,7 @@ export default function AssetManagement() {
                         href={`asset-management/${asset.id}`}
                         className={`flex items-center justify-center gap-1 px-2 py-1 bg-gray-100 rounded hover:bg-gray-200 transition w-12 h-12 
                           ${applyStylesIfHasReportNotFinished(
-                            asset.hasReportNotFinished
+                            asset.hasReportNotFinished,
                           )}`}
                       >
                         <Paperclip
