@@ -205,21 +205,21 @@ export function ModalActionIntervention({
     type === "create"
       ? "Adicionar Intervenção"
       : type === "edit"
-      ? "Editar Intervenção"
-      : "Visualizar Intervenção";
+        ? "Editar Intervenção"
+        : "Visualizar Intervenção";
   const modalDescription =
     type === "create"
       ? "Preencha o formulário abaixo para adicionar uma nova intervenção."
       : type === "edit"
-      ? "Atualize os campos abaixo para editar a intervenção."
-      : "Visualize os detalhes da intervenção.";
+        ? "Atualize os campos abaixo para editar a intervenção."
+        : "Visualize os detalhes da intervenção.";
 
   const triggerButtonText =
     type === "create"
       ? "Adicionar Intervenção"
       : type === "edit"
-      ? "Editar Intervenção"
-      : "Visualizar Intervenção";
+        ? "Editar Intervenção"
+        : "Visualizar Intervenção";
 
   useEffect(() => {
     if (interventionSelected && (type === "edit" || type === "view")) {
@@ -320,7 +320,7 @@ export function ModalActionIntervention({
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-auto">
+      <DialogContent className="max-w-full sm:max-w-[700px] md:max-w-[900px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl">{modalTitle}</DialogTitle>
           <DialogDescription>{modalDescription}</DialogDescription>
@@ -328,7 +328,7 @@ export function ModalActionIntervention({
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-4">
           {/* Priority */}
-          <div className="grid grid-cols-4 items-center gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right">Prioridade</Label>
             <div className="col-span-3">
               <Controller
@@ -362,7 +362,7 @@ export function ModalActionIntervention({
           )}
 
           {/* Area */}
-          <div className="grid grid-cols-4 items-center gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right">Área</Label>
             <div className="col-span-3">
               <Controller
@@ -396,7 +396,7 @@ export function ModalActionIntervention({
           )}
 
           {/* Description */}
-          <div className="grid grid-cols-4 items-center gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right">Descrição</Label>
             <textarea
               {...register("description")}
@@ -412,7 +412,7 @@ export function ModalActionIntervention({
           )}
 
           {/* Provider */}
-          <div className="grid grid-cols-4 items-center gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right">Fornecedor</Label>
             <Input
               {...register("provider")}
@@ -422,7 +422,7 @@ export function ModalActionIntervention({
           </div>
 
           {/* Value */}
-          <div className="grid grid-cols-4 items-center gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right">Valor</Label>
             <Input
               {...register("value")}
@@ -438,7 +438,7 @@ export function ModalActionIntervention({
           )}
 
           {/* Payment Method */}
-          <div className="grid grid-cols-4 items-center gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right">Método de Pagamento</Label>
             <div className="col-span-3">
               <Controller
@@ -472,7 +472,7 @@ export function ModalActionIntervention({
           )}
 
           {/* Checkbox isInstallment */}
-          <div className="grid grid-cols-4 items-center gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right">É Parcelado</Label>
             <div className="col-span-3 flex items-center">
               <input
@@ -486,7 +486,7 @@ export function ModalActionIntervention({
 
           {/* Number of Installments */}
           {isInstallment && (
-            <div className="grid grid-cols-4 items-center gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
               <Label className="text-right">Número de Parcelas</Label>
               <div className="col-span-3">
                 <Input
@@ -508,7 +508,7 @@ export function ModalActionIntervention({
           )}
 
           {/* Payment Date */}
-          <div className="grid grid-cols-4 items-center gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right">Data do Pagamento</Label>
             <div className="col-span-3">
               <Controller
@@ -532,7 +532,7 @@ export function ModalActionIntervention({
           </div>
 
           {/* Payment Completion Date */}
-          <div className="grid grid-cols-4 items-center gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right">Dt. Conclusão Pgto</Label>
             <div className="col-span-3">
               <Controller
@@ -555,7 +555,7 @@ export function ModalActionIntervention({
           </div>
 
           {/* Planned Start */}
-          <div className="grid grid-cols-4 items-center gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right">Início Planejado</Label>
             <div className="col-span-3">
               <Controller
@@ -574,7 +574,7 @@ export function ModalActionIntervention({
           </div>
 
           {/* Planned End */}
-          <div className="grid grid-cols-4 items-center gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right">Término Planejado</Label>
             <div className="col-span-3">
               <Controller
@@ -593,7 +593,7 @@ export function ModalActionIntervention({
           </div>
 
           {/* Actual Start */}
-          <div className="grid grid-cols-4 items-center gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right">Início Real</Label>
             <div className="col-span-3">
               <Controller
@@ -612,7 +612,7 @@ export function ModalActionIntervention({
           </div>
 
           {/* Actual End */}
-          <div className="grid grid-cols-4 items-center gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right">Término Real</Label>
             <div className="col-span-3">
               <Controller
@@ -631,7 +631,7 @@ export function ModalActionIntervention({
           </div>
 
           {/* Status */}
-          <div className="grid grid-cols-4 items-center gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label className="text-right">Status</Label>
             <div className="col-span-3">
               <Controller
