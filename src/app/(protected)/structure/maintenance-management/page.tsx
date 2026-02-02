@@ -4,7 +4,7 @@ import { Breadcrumb } from "@/components/breadcrumb";
 import { ButtonOpenSidebar } from "@/components/button-open-sidebar";
 import { AssetsMaintenance } from "./tabs/assets-maintenance";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {useState } from "react";
+import { useState } from "react";
 import { Maintenances } from "./tabs/maintenances";
 import { Indicators } from "./tabs/indicators";
 import { CalendarMaintenance } from "./tabs/calendar-maintenance";
@@ -44,32 +44,37 @@ export default function MaintenanceManagement() {
         </h1>
       </div>
 
-      <Tabs value={tabSelected} onValueChange={handleChangeTab}>
-        <TabsList className="bg-gray-50 p-1.5 rounded-lg border border-gray-200">
+      <Tabs
+        value={tabSelected}
+        onValueChange={handleChangeTab}
+        className="w-full"
+      >
+        {/* TabsList com scroll horizontal no mobile e largura automática no desktop */}
+        <TabsList className="bg-gray-50 p-1.5 rounded-lg border border-gray-200 flex w-full justify-start overflow-x-auto overflow-y-hidden flex-nowrap scrollbar-hide touch-pan-x md:w-fit md:justify-center">
           <TabsTrigger
             value="asset-maintenance"
-            className="data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-gray-900 px-4 py-2 rounded-md font-medium text-gray-600 transition-all"
+            className="data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-gray-900 px-4 py-2 rounded-md font-medium text-gray-600 transition-all whitespace-nowrap min-w-fit"
           >
             Ativos
           </TabsTrigger>
 
           <TabsTrigger
             value="maintenances"
-            className="data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-gray-900 px-4 py-2 rounded-md font-medium text-gray-600 transition-all"
+            className="data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-gray-900 px-4 py-2 rounded-md font-medium text-gray-600 transition-all whitespace-nowrap min-w-fit"
           >
             Manutenções
           </TabsTrigger>
 
           <TabsTrigger
             value="calendar-maintenance"
-            className="data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-gray-900 px-4 py-2 rounded-md font-medium text-gray-600 transition-all"
+            className="data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-gray-900 px-4 py-2 rounded-md font-medium text-gray-600 transition-all whitespace-nowrap min-w-fit"
           >
             Calendário
           </TabsTrigger>
 
           <TabsTrigger
             value="indicators"
-            className="data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-gray-900 px-4 py-2 rounded-md font-medium text-gray-600 transition-all"
+            className="data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-gray-900 px-4 py-2 rounded-md font-medium text-gray-600 transition-all whitespace-nowrap min-w-fit"
           >
             Indicadores
           </TabsTrigger>
