@@ -57,12 +57,19 @@ export default function EmployeeManagement() {
       </div>
 
       <Tabs defaultValue="employees" className="w-full">
-        <TabsList className="overflow-y-hidden flex w-full justify-start gap-2 bg-muted p-1 rounded-lg overflow-x-auto overflow-y-hidden flex-nowrap scrollbar-hide">
+        <TabsList
+          className="
+    /* Mobile: Scroll liberado e ocupa tudo */
+    flex w-full justify-start overflow-x-auto overflow-y-hidden flex-nowrap scrollbar-hide touch-pan-x 
+    /* Desktop: Volta exatamente ao que você tinha */
+    md:w-fit md:justify-center md:overflow-visible md:flex-wrap
+    bg-muted p-1 rounded-lg gap-2"
+        >
           <TabsTrigger
             value="employees"
             className="px-4 py-2 text-sm font-medium rounded-md transition-all whitespace-nowrap
-      data-[state=active]:bg-white data-[state=active]:text-primary
-      data-[state=active]:shadow-sm hover:bg-white hover:text-primary min-w-fit"
+    data-[state=active]:bg-white data-[state=active]:text-primary
+    data-[state=active]:shadow-sm hover:bg-white hover:text-primary min-w-fit"
           >
             Funcionários
           </TabsTrigger>
@@ -70,8 +77,8 @@ export default function EmployeeManagement() {
           <TabsTrigger
             value="schedule"
             className="px-4 py-2 text-sm font-medium rounded-md transition-all whitespace-nowrap
-      data-[state=active]:bg-white data-[state=active]:text-primary
-      data-[state=active]:shadow-sm hover:bg-white hover:text-primary min-w-fit"
+    data-[state=active]:bg-white data-[state=active]:text-primary
+    data-[state=active]:shadow-sm hover:bg-white hover:text-primary min-w-fit"
           >
             Escala de Funcionários
           </TabsTrigger>
@@ -79,8 +86,8 @@ export default function EmployeeManagement() {
           <TabsTrigger
             value="indicators"
             className="px-4 py-2 text-sm font-medium rounded-md transition-all whitespace-nowrap
-      data-[state=active]:bg-white data-[state=active]:text-primary
-      data-[state=active]:shadow-sm hover:bg-white hover:text-primary min-w-fit"
+    data-[state=active]:bg-white data-[state=active]:text-primary
+    data-[state=active]:shadow-sm hover:bg-white hover:text-primary min-w-fit"
           >
             Indicadores
           </TabsTrigger>
