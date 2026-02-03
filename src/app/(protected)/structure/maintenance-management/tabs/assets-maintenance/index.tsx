@@ -68,6 +68,11 @@ export function AssetsMaintenance() {
   const [assetDetailsSelected, setAssetDetailsSelected] =
     useState<AssetMaintenanceReport | null>(null);
 
+  const [mobileDropdownOpen, setMobileDropdownOpen] = useState(false);
+  const [mobileDropdownItem, setMobileDropdownItem] = useState<
+    number | undefined
+  >();
+
   const { assetsTypes, assets, assetDetails } = useAssetsMaintenance();
 
   const getType = (typeId: number): string =>
@@ -165,7 +170,17 @@ export function AssetsMaintenance() {
                   <p className="text-sm text-muted-foreground">{asset.code}</p>
                 </div>
 
-                <DropdownMenu>
+                <DropdownMenu
+                  open={mobileDropdownOpen && mobileDropdownItem === asset.id}
+                  onOpenChange={(open) => {
+                    if (!open) {
+                      setMobileDropdownItem(undefined);
+                    } else {
+                      setMobileDropdownItem(asset.id);
+                    }
+                    setMobileDropdownOpen(open);
+                  }}
+                >
                   <DropdownMenuTrigger>
                     <MoreHorizontal className="w-5 h-5" />
                   </DropdownMenuTrigger>

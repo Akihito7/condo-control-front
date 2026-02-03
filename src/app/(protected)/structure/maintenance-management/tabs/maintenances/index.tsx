@@ -74,6 +74,11 @@ export function Maintenances({ date, setDate }: MaintenancesProps) {
   const [maintenanceSelectedToDelete, setMaintenanceSelectedToDelete] =
     useState<Maintenance | null>(null);
 
+  const [mobileDropdownOpen, setMobileDropdownOpen] = useState(false);
+  const [mobileDropdownItem, setMobileDropdownItem] = useState<
+    number | undefined
+  >();
+
   const dateFormatted = format(date, "yyyy-MM-dd");
 
   const { priorityOptions, maintenancesStatusOptions, assets, maintenances } =
@@ -236,7 +241,19 @@ export function Maintenances({ date, setDate }: MaintenancesProps) {
                   </p>
                 </div>
 
-                <DropdownMenu>
+                <DropdownMenu
+                  open={
+                    mobileDropdownOpen && mobileDropdownItem === maintenance.id
+                  }
+                  onOpenChange={(open) => {
+                    if (!open) {
+                      setMobileDropdownItem(undefined);
+                    } else {
+                      setMobileDropdownItem(maintenance.id);
+                    }
+                    setMobileDropdownOpen(open);
+                  }}
+                >
                   <DropdownMenuTrigger>
                     <MoreHorizontal className="w-5 h-5" />
                   </DropdownMenuTrigger>
