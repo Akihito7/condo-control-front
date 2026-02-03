@@ -58,7 +58,7 @@ export function ModalAttchament({
     <Dialog>
       <DialogTrigger asChild>{children}</DialogTrigger>
 
-      <DialogContent>
+      <DialogContent className="max-w-lg w-full">
         <DialogHeader>Anexos</DialogHeader>
 
         <div>

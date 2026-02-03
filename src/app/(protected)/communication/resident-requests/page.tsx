@@ -48,6 +48,24 @@ const GRAVITIES_BADGE: Record<number, string> = {
   3: "bg-red-400 text-white", // ALTA
 };
 
+// Helper para labels do mobile
+function InfoField({
+  label,
+  value,
+}: {
+  label: string;
+  value?: string | number;
+}) {
+  return (
+    <div className="space-y-0.5">
+      <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">
+        {label}
+      </p>
+      <p className="text-sm font-medium text-gray-900">{value || "-"}</p>
+    </div>
+  );
+}
+
 export default function ResidentRequests() {
   const {
     range,
@@ -186,7 +204,7 @@ export default function ResidentRequests() {
           </Button>
         </div>
 
-        <section className="rounded-xl overflow-auto border">
+        <section className="rounded-xl border bg-white overflow-hidden">
           <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200">
             <h2 className="font-medium text-gray-800 text-lg">Chamados</h2>
 
@@ -202,152 +220,289 @@ export default function ResidentRequests() {
             />
           </div>
 
-          <div className="max-h-[70vh] overflow-y-auto border border-gray-300 rounded">
-            <Table className="min-w-full border-collapse">
-              <TableHeader className="sticky top-0 bg-white shadow-md z-10">
-                <TableRow>
-                  <TableHead>Data</TableHead>
-                  <TableHead>Apartamento</TableHead>
-                  <TableHead>Descrição</TableHead>
-                  <TableHead>Gravidade</TableHead>
-                  <TableHead className="text-left">Status</TableHead>
-                  <TableHead className="text-center">Início Atuação</TableHead>
-                  <TableHead className="text-left">Fim Atuação</TableHead>
-                  <TableHead className="text-left">Anexos</TableHead>
-                  <TableHead className="text-center">Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {callsFiltered?.length === 0 ? (
-                  <TableRow>
-                    <TableCell
-                      colSpan={9}
-                      className="text-center py-4 text-gray-500"
-                    >
-                      No interventions found.
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  callsFiltered?.map((call: any) => (
-                    <TableRow key={call.id}>
-                      {/* Data */}
-                      <TableCell>
-                        {format(call.createdAt, "dd/MM/yyyy")}
-                      </TableCell>
-
-                      {/* Apartamento */}
-                      <TableCell>
-                        {getOptionName(
-                          call.apartamentId,
-                          apartaments?.map((ap) => ({
-                            name: ap.apartmentNumber,
-                            id: ap.id,
-                          })),
-                        )}
-                      </TableCell>
-
-                      {/* Descrição */}
-                      <TableCell className="max-w-[250px] truncate">
+          {/* 📱 VIEW MOBILE (Cards com Scroll Natural) */}
+          <div className="md:hidden p-4 space-y-4 bg-gray-50/30">
+            {callsFiltered?.length === 0 ? (
+              <p className="text-center py-4 text-gray-500">
+                Nenhum chamado encontrado.
+              </p>
+            ) : (
+              callsFiltered?.map((call: any) => (
+                <div
+                  key={call.id}
+                  className="rounded-xl border border-gray-200 p-4 space-y-4 shadow-sm bg-white"
+                >
+                  <div className="flex justify-between items-start">
+                    <div className="space-y-1">
+                      <p className="font-bold text-gray-900 text-base">
                         {call.description}
-                      </TableCell>
-
-                      {/* Gravidade */}
-                      <TableCell>
-                        <span
-                          className={cn(
-                            "inline-flex items-center justify-center px-2 py-1 text-xs font-semibold rounded-md",
-                            GRAVITIES_BADGE[call.gravityId],
-                          )}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {format(call.createdAt, "dd/MM/yyyy")}
+                      </p>
+                    </div>
+                    <DropdownMenu
+                      open={dropDownIsOpen && dropDownItemSelected === call.id}
+                      onOpenChange={(open) => {
+                        setDropDownItemSelected(call.id);
+                        setDropDownIsOpen(open);
+                      }}
+                    >
+                      <DropdownMenuTrigger className="p-2 -mr-2 outline-none">
+                        <MoreHorizontal className="w-5 h-5 text-gray-400" />
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setDropDownIsOpen(false);
+                            setDropDownItemSelected(null);
+                            setModalIsOpen(true);
+                            setRequestSelected(call);
+                          }}
                         >
-                          {getOptionName(call.gravityId, gravities)}
-                        </span>
-                      </TableCell>
-
-                      {/* Status */}
-                      <TableCell>
-                        <span
-                          className={cn(
-                            "inline-flex items-center justify-center px-2 py-1 text-xs font-semibold rounded-md",
-                            STATUS_BADGE[call.statusId],
-                          )}
+                          Editar
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="text-destructive"
+                          onClick={async () => {
+                            handleDeleteRegister({
+                              registerId: call.id,
+                              tableName: "resident_calls",
+                            });
+                          }}
                         >
-                          {getOptionName(call.statusId, status)}
-                        </span>
-                      </TableCell>
+                          Excluir
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
 
-                      <TableCell>
-                        {call.startDate
+                  <div className="grid grid-cols-1 gap-3 border-t border-gray-50 pt-3">
+                    <InfoField
+                      label="Apartamento"
+                      value={getOptionName(
+                        call.apartamentId,
+                        apartaments?.map((ap) => ({
+                          name: ap.apartmentNumber,
+                          id: ap.id,
+                        })),
+                      )}
+                    />
+                    <div className="space-y-0.5">
+                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">
+                        Gravidade
+                      </p>
+                      <span
+                        className={cn(
+                          "inline-flex items-center justify-center px-2 py-1 text-xs font-semibold rounded-md",
+                          GRAVITIES_BADGE[call.gravityId],
+                        )}
+                      >
+                        {getOptionName(call.gravityId, gravities)}
+                      </span>
+                    </div>
+                    <div className="space-y-0.5">
+                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">
+                        Status
+                      </p>
+                      <span
+                        className={cn(
+                          "inline-flex items-center justify-center px-2 py-1 text-xs font-semibold rounded-md",
+                          STATUS_BADGE[call.statusId],
+                        )}
+                      >
+                        {getOptionName(call.statusId, status)}
+                      </span>
+                    </div>
+                    <InfoField
+                      label="Início Atuação"
+                      value={
+                        call.startDate
                           ? format(
                               subHours(new Date(call.startDate), 3),
                               "dd/MM/yyyy HH:mm",
                             )
-                          : "-"}
-                      </TableCell>
-
-                      <TableCell>
-                        {call.endDate
+                          : "-"
+                      }
+                    />
+                    <InfoField
+                      label="Fim Atuação"
+                      value={
+                        call.endDate
                           ? format(
                               subHours(new Date(call.endDate), 3),
                               "dd/MM/yyyy HH:mm",
                             )
-                          : "-"}
-                      </TableCell>
+                          : "-"
+                      }
+                    />
 
-                      {/* Anexos */}
-                      <TableCell className="text-center">
-                        <ModalAttchament
-                          relatedId={call.id}
-                          relatedType="resident_calls"
-                        >
-                          <Button variant="ghost">
-                            <Paperclip className="w-5 h-5" />
-                          </Button>
-                        </ModalAttchament>
-                      </TableCell>
+                    <ModalAttchament
+                      relatedId={call.id}
+                      relatedType="resident_calls"
+                    >
+                      <Button variant="outline" className="w-full flex gap-2">
+                        <Paperclip className="w-4 h-4" />
+                        Anexos
+                      </Button>
+                    </ModalAttchament>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
 
-                      {/* Ações */}
-                      <TableCell className="text-center">
-                        <DropdownMenu
-                          open={
-                            dropDownIsOpen && dropDownItemSelected === call.id
-                          }
-                          onOpenChange={(open) => {
-                            setDropDownItemSelected(call.id);
-                            setDropDownIsOpen(open);
-                          }}
-                        >
-                          <DropdownMenuTrigger className="outline-none">
-                            <MoreHorizontal className="w-5 h-5 cursor-pointer text-gray-600" />
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent>
-                            <DropdownMenuItem
-                              onClick={() => {
-                                setDropDownIsOpen(false);
-                                setDropDownItemSelected(null);
-                                setModalIsOpen(true);
-                                setRequestSelected(call);
-                              }}
-                            >
-                              <span>Editar</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={async () => {
-                                handleDeleteRegister({
-                                  registerId: call.id,
-                                  tableName: "resident_calls",
-                                });
-                              }}
-                            >
-                              Excluir
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+          {/* 📋 VIEW DESKTOP (Tabela Original com Scroll Interno) */}
+          <div className="hidden md:block">
+            <div className="max-h-[70vh] overflow-y-auto border border-gray-300 rounded">
+              <Table className="min-w-full border-collapse">
+                <TableHeader className="sticky top-0 bg-white shadow-md z-10">
+                  <TableRow>
+                    <TableHead>Data</TableHead>
+                    <TableHead>Apartamento</TableHead>
+                    <TableHead>Descrição</TableHead>
+                    <TableHead>Gravidade</TableHead>
+                    <TableHead className="text-left">Status</TableHead>
+                    <TableHead className="text-center">
+                      Início Atuação
+                    </TableHead>
+                    <TableHead className="text-left">Fim Atuação</TableHead>
+                    <TableHead className="text-left">Anexos</TableHead>
+                    <TableHead className="text-center">Ações</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {callsFiltered?.length === 0 ? (
+                    <TableRow>
+                      <TableCell
+                        colSpan={9}
+                        className="text-center py-4 text-gray-500"
+                      >
+                        No interventions found.
                       </TableCell>
                     </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
+                  ) : (
+                    callsFiltered?.map((call: any) => (
+                      <TableRow key={call.id}>
+                        {/* Data */}
+                        <TableCell>
+                          {format(call.createdAt, "dd/MM/yyyy")}
+                        </TableCell>
+
+                        {/* Apartamento */}
+                        <TableCell>
+                          {getOptionName(
+                            call.apartamentId,
+                            apartaments?.map((ap) => ({
+                              name: ap.apartmentNumber,
+                              id: ap.id,
+                            })),
+                          )}
+                        </TableCell>
+
+                        {/* Descrição */}
+                        <TableCell className="max-w-[250px] truncate">
+                          {call.description}
+                        </TableCell>
+
+                        {/* Gravidade */}
+                        <TableCell>
+                          <span
+                            className={cn(
+                              "inline-flex items-center justify-center px-2 py-1 text-xs font-semibold rounded-md",
+                              GRAVITIES_BADGE[call.gravityId],
+                            )}
+                          >
+                            {getOptionName(call.gravityId, gravities)}
+                          </span>
+                        </TableCell>
+
+                        {/* Status */}
+                        <TableCell>
+                          <span
+                            className={cn(
+                              "inline-flex items-center justify-center px-2 py-1 text-xs font-semibold rounded-md",
+                              STATUS_BADGE[call.statusId],
+                            )}
+                          >
+                            {getOptionName(call.statusId, status)}
+                          </span>
+                        </TableCell>
+
+                        <TableCell>
+                          {call.startDate
+                            ? format(
+                                subHours(new Date(call.startDate), 3),
+                                "dd/MM/yyyy HH:mm",
+                              )
+                            : "-"}
+                        </TableCell>
+
+                        <TableCell>
+                          {call.endDate
+                            ? format(
+                                subHours(new Date(call.endDate), 3),
+                                "dd/MM/yyyy HH:mm",
+                              )
+                            : "-"}
+                        </TableCell>
+
+                        {/* Anexos */}
+                        <TableCell className="text-center">
+                          <ModalAttchament
+                            relatedId={call.id}
+                            relatedType="resident_calls"
+                          >
+                            <Button variant="ghost">
+                              <Paperclip className="w-5 h-5" />
+                            </Button>
+                          </ModalAttchament>
+                        </TableCell>
+
+                        {/* Ações */}
+                        <TableCell className="text-center">
+                          <DropdownMenu
+                            open={
+                              dropDownIsOpen && dropDownItemSelected === call.id
+                            }
+                            onOpenChange={(open) => {
+                              setDropDownItemSelected(call.id);
+                              setDropDownIsOpen(open);
+                            }}
+                          >
+                            <DropdownMenuTrigger className="outline-none">
+                              <MoreHorizontal className="w-5 h-5 cursor-pointer text-gray-600" />
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  setDropDownIsOpen(false);
+                                  setDropDownItemSelected(null);
+                                  setModalIsOpen(true);
+                                  setRequestSelected(call);
+                                }}
+                              >
+                                <span>Editar</span>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={async () => {
+                                  handleDeleteRegister({
+                                    registerId: call.id,
+                                    tableName: "resident_calls",
+                                  });
+                                }}
+                              >
+                                Excluir
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
           </div>
         </section>
       </div>

@@ -59,7 +59,7 @@ export function CardAttachement({
   return (
     <div
       key={file.id}
-      className="flex items-center justify-between bg-white border border-gray-200 p-4 rounded-md hover:shadow-md transition"
+      className="flex items-center justify-between bg-white border border-gray-200 py-4 px-2 rounded-md hover:shadow-md transition"
     >
       <div className="flex items-center gap-4 overflow-hidden">
         <FileText className="text-blue-500 w-7 h-7 flex-shrink-0" />
