@@ -12,10 +12,7 @@ import {
 } from "@/components/ui/select";
 import { FileDown, Pencil } from "lucide-react";
 import { useState } from "react";
-import {
-  format,
-  parseISO,
-} from "date-fns";
+import { format, parseISO } from "date-fns";
 
 import {
   Table,
@@ -49,6 +46,24 @@ import { userPagePermission } from "@/utils/user-page-permission";
 import { redirect } from "next/navigation";
 import { NotificationDropdown } from "@/components/notification";
 import { MonthYearPicker } from "@/components/month-year-select";
+
+// Helper para labels do mobile
+function InfoField({
+  label,
+  value,
+}: {
+  label: string;
+  value?: string | number;
+}) {
+  return (
+    <div className="space-y-0.5">
+      <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">
+        {label}
+      </p>
+      <p className="text-sm font-medium text-gray-900">{value || "-"}</p>
+    </div>
+  );
+}
 
 export default function OpeningOfCalls() {
   const { read } = userPagePermission({ pageId: 8 });
@@ -100,7 +115,7 @@ export default function OpeningOfCalls() {
 
   const formatterToHoursMin = (
     resolvedAte: string,
-    startedAt: string
+    startedAt: string,
   ): string => {
     const date1 = parseISO(resolvedAte);
     const date2 = parseISO(startedAt);
@@ -132,7 +147,7 @@ export default function OpeningOfCalls() {
         </h1>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-4 items-end">
+      <div className="flex flex-col gap-4 md:items-end md:flex-row">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Intervalo de datas
@@ -233,7 +248,7 @@ export default function OpeningOfCalls() {
         )}
       </div>
 
-      <section className="rounded-xl overflow-auto border">
+      <section className="rounded-xl md:overflow-auto border h-full">
         <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200">
           <h2 className="font-medium text-gray-800 text-lg">Chamados</h2>
 
@@ -261,139 +276,289 @@ export default function OpeningOfCalls() {
           )}
         </div>
 
-        <div className="max-h-[70vh] overflow-y-auto border border-gray-300 rounded">
-          <Table className="min-w-full border-collapse">
-            <TableHeader className="sticky top-0 bg-white shadow-md z-10">
-              <TableRow>
-                <TableHead>Data</TableHead>
-                <TableHead>Tipo Problema</TableHead>
-                <TableHead>Descrição</TableHead>
-                <TableHead className="text-left">Responsável</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-left">Data início atuação</TableHead>
-                <TableHead>Data Resolução</TableHead>
-                <TableHead className="text-center">
-                  Tempo de Resolução
-                </TableHead>
-                <TableHead className="text-center">Documentos</TableHead>
-                <TableHead className="text-center">Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {openingRecordsStatus === "pending" ? (
-                <>
-                  {Array.from({ length: 5 }).map((_, index) => (
-                    <TableRowSkeleton key={index} />
-                  ))}
-                </>
-              ) : (
-                openingRecords!
-                  .filter((openingRecord) => {
-                    const issueOptionsMatch =
-                      issueOptionSeleted === "-1"
-                        ? true
-                        : String(openingRecord.issueTypeId) ===
-                          String(issueOptionSeleted);
+        {/* 📱 VIEW MOBILE (Cards com Scroll Natural) */}
+        <div className="md:hidden mb-4 p-4 space-y-4 bg-gray-50/30">
+          {openingRecordsStatus === "pending" ? (
+            <p className="text-center py-4 text-gray-500">Carregando...</p>
+          ) : (
+            openingRecords!
+              .filter((openingRecord) => {
+                const issueOptionsMatch =
+                  issueOptionSeleted === "-1"
+                    ? true
+                    : String(openingRecord.issueTypeId) ===
+                      String(issueOptionSeleted);
 
-                    const statusOptionsMatch =
-                      statusOptionSelected === "-1"
-                        ? true
-                        : String(openingRecord.statusId) ===
-                          statusOptionSelected;
-                    return issueOptionsMatch && statusOptionsMatch;
-                  })
-                  .map((openingRecord: any) => (
-                    <TableRow key={openingRecord.id}>
-                      <TableCell>
+                const statusOptionsMatch =
+                  statusOptionSelected === "-1"
+                    ? true
+                    : String(openingRecord.statusId) === statusOptionSelected;
+                return issueOptionsMatch && statusOptionsMatch;
+              })
+              .map((openingRecord: any) => (
+                <div
+                  key={openingRecord.id}
+                  className="rounded-xl border border-gray-200 p-4 space-y-4 shadow-sm bg-white"
+                >
+                  <div className="flex justify-between items-start">
+                    <div className="space-y-1">
+                      <p className="font-bold text-gray-900 text-base">
+                        {openingRecord.description}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
                         {format(parseISO(openingRecord.date), "dd/MM/yyyy")}
-                      </TableCell>
-                      <TableCell>{openingRecord.issueTypesName}</TableCell>
-                      <TableCell>{openingRecord.description}</TableCell>
-                      <TableCell className="text-left">
-                        {openingRecord.responsibleName}
-                      </TableCell>
-                      <TableCell>{openingRecord.callStatusesName}</TableCell>
-                      <TableCell className="text-left">
-                        {openingRecord.startedAt
+                      </p>
+                    </div>
+                    <DropdownMenu
+                      open={
+                        dropdownOpen &&
+                        dropdownOpenToThisItem === openingRecord.id
+                      }
+                      onOpenChange={(open) => {
+                        if (!open) {
+                          setDropdownOpenToThisItem(undefined);
+                        } else {
+                          setDropdownOpenToThisItem(openingRecord.id);
+                        }
+                        setDropdownOpen(open);
+                      }}
+                    >
+                      <DropdownMenuTrigger className="p-2 -mr-2 outline-none">
+                        <Pencil className="w-5 h-5 text-gray-400" />
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setDropdownOpen(false);
+                            setOpeningRecordSelected(openingRecord);
+                            setModalActionIsOpen(true);
+                          }}
+                        >
+                          Editar
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="text-destructive"
+                          onClick={() =>
+                            handleDeleteOpeningCallRecord(openingRecord.id)
+                          }
+                        >
+                          Excluir
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4 border-t border-gray-50 pt-3">
+                    <InfoField
+                      label="Tipo Problema"
+                      value={openingRecord.issueTypesName}
+                    />
+                    <InfoField
+                      label="Responsável"
+                      value={openingRecord.responsibleName}
+                    />
+                    <InfoField
+                      label="Status"
+                      value={openingRecord.callStatusesName}
+                    />
+                    <InfoField
+                      label="Data início atuação"
+                      value={
+                        openingRecord.startedAt
                           ? format(
                               parseISO(openingRecord.startedAt),
-                              "dd/MM/yyyy HH:mm"
+                              "dd/MM/yyyy HH:mm",
                             )
-                          : "-"}
-                      </TableCell>
-                      <TableCell>
-                        {openingRecord.resolvedAt
+                          : "-"
+                      }
+                    />
+                    <InfoField
+                      label="Data Resolução"
+                      value={
+                        openingRecord.resolvedAt
                           ? format(
                               parseISO(openingRecord.resolvedAt),
-                              "dd/MM/yyyy HH:mm"
+                              "dd/MM/yyyy HH:mm",
                             )
-                          : "-"}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {openingRecord.startedAt && openingRecord.resolvedAt
+                          : "-"
+                      }
+                    />
+                    <InfoField
+                      label="Tempo de Resolução"
+                      value={
+                        openingRecord.startedAt && openingRecord.resolvedAt
                           ? formatterToHoursMin(
                               openingRecord.resolvedAt,
-                              openingRecord.startedAt
+                              openingRecord.startedAt,
                             )
-                          : "-"}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <button
-                          className="hover:underline font-medium cursor-pointer"
-                          onClick={() => {
-                            setOpeningRecordSelected(openingRecord);
-                            setModalDocumentsIsOpen(true);
-                          }}
-                        >
-                          {openingRecord.attachments.length}{" "}
-                          {openingRecord.attachments.length <= 1
+                          : "-"
+                      }
+                    />
+                    <div className="col-span-2">
+                      <InfoField
+                        label="Documentos"
+                        value={`${openingRecord.attachments.length} ${
+                          openingRecord.attachments.length <= 1
                             ? "anexo"
-                            : "anexos"}
-                        </button>
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <DropdownMenu
-                          open={
-                            dropdownOpen &&
-                            dropdownOpenToThisItem === openingRecord.id
-                          }
-                          onOpenChange={(open) => {
-                            if (!open) {
-                              setDropdownOpenToThisItem(undefined);
-                            } else {
-                              setDropdownOpenToThisItem(openingRecord.id);
+                            : "anexos"
+                        }`}
+                      />
+                      <button
+                        className="hover:underline font-medium cursor-pointer text-blue-600"
+                        onClick={() => {
+                          setOpeningRecordSelected(openingRecord);
+                          setModalDocumentsIsOpen(true);
+                        }}
+                      >
+                        Ver anexos
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))
+          )}
+        </div>
+
+        {/* 📋 VIEW DESKTOP (Tabela Original com Scroll Interno) */}
+        <div className="hidden md:block">
+          <div className="max-h-[70vh] overflow-y-auto border border-gray-300 rounded">
+            <Table className="min-w-full border-collapse">
+              <TableHeader className="sticky top-0 bg-white shadow-md z-10">
+                <TableRow>
+                  <TableHead>Data</TableHead>
+                  <TableHead>Tipo Problema</TableHead>
+                  <TableHead>Descrição</TableHead>
+                  <TableHead className="text-left">Responsável</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-left">
+                    Data início atuação
+                  </TableHead>
+                  <TableHead>Data Resolução</TableHead>
+                  <TableHead className="text-center">
+                    Tempo de Resolução
+                  </TableHead>
+                  <TableHead className="text-center">Documentos</TableHead>
+                  <TableHead className="text-center">Ações</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {openingRecordsStatus === "pending" ? (
+                  <>
+                    {Array.from({ length: 5 }).map((_, index) => (
+                      <TableRowSkeleton key={index} />
+                    ))}
+                  </>
+                ) : (
+                  openingRecords!
+                    .filter((openingRecord) => {
+                      const issueOptionsMatch =
+                        issueOptionSeleted === "-1"
+                          ? true
+                          : String(openingRecord.issueTypeId) ===
+                            String(issueOptionSeleted);
+
+                      const statusOptionsMatch =
+                        statusOptionSelected === "-1"
+                          ? true
+                          : String(openingRecord.statusId) ===
+                            statusOptionSelected;
+                      return issueOptionsMatch && statusOptionsMatch;
+                    })
+                    .map((openingRecord: any) => (
+                      <TableRow key={openingRecord.id}>
+                        <TableCell>
+                          {format(parseISO(openingRecord.date), "dd/MM/yyyy")}
+                        </TableCell>
+                        <TableCell>{openingRecord.issueTypesName}</TableCell>
+                        <TableCell>{openingRecord.description}</TableCell>
+                        <TableCell className="text-left">
+                          {openingRecord.responsibleName}
+                        </TableCell>
+                        <TableCell>{openingRecord.callStatusesName}</TableCell>
+                        <TableCell className="text-left">
+                          {openingRecord.startedAt
+                            ? format(
+                                parseISO(openingRecord.startedAt),
+                                "dd/MM/yyyy HH:mm",
+                              )
+                            : "-"}
+                        </TableCell>
+                        <TableCell>
+                          {openingRecord.resolvedAt
+                            ? format(
+                                parseISO(openingRecord.resolvedAt),
+                                "dd/MM/yyyy HH:mm",
+                              )
+                            : "-"}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {openingRecord.startedAt && openingRecord.resolvedAt
+                            ? formatterToHoursMin(
+                                openingRecord.resolvedAt,
+                                openingRecord.startedAt,
+                              )
+                            : "-"}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <button
+                            className="hover:underline font-medium cursor-pointer"
+                            onClick={() => {
+                              setOpeningRecordSelected(openingRecord);
+                              setModalDocumentsIsOpen(true);
+                            }}
+                          >
+                            {openingRecord.attachments.length}{" "}
+                            {openingRecord.attachments.length <= 1
+                              ? "anexo"
+                              : "anexos"}
+                          </button>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <DropdownMenu
+                            open={
+                              dropdownOpen &&
+                              dropdownOpenToThisItem === openingRecord.id
                             }
-                            setDropdownOpen(open);
-                          }}
-                        >
-                          <DropdownMenuTrigger className="outline-none ring-0 focus:outline-none focus:ring-0 cursor-pointer">
-                            <Pencil className="w-4 h-4 text-gray-700" />
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent>
-                            <DropdownMenuItem
-                              onClick={() => {
-                                setDropdownOpen(false);
-                                setOpeningRecordSelected(openingRecord);
-                                setModalActionIsOpen(true);
-                              }}
-                            >
-                              Editar
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() =>
-                                handleDeleteOpeningCallRecord(openingRecord.id)
+                            onOpenChange={(open) => {
+                              if (!open) {
+                                setDropdownOpenToThisItem(undefined);
+                              } else {
+                                setDropdownOpenToThisItem(openingRecord.id);
                               }
-                            >
-                              Excluir
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))
-              )}
-            </TableBody>
-          </Table>
+                              setDropdownOpen(open);
+                            }}
+                          >
+                            <DropdownMenuTrigger className="outline-none ring-0 focus:outline-none focus:ring-0 cursor-pointer">
+                              <Pencil className="w-4 h-4 text-gray-700" />
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  setDropdownOpen(false);
+                                  setOpeningRecordSelected(openingRecord);
+                                  setModalActionIsOpen(true);
+                                }}
+                              >
+                                Editar
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  handleDeleteOpeningCallRecord(
+                                    openingRecord.id,
+                                  )
+                                }
+                              >
+                                Excluir
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </div>
       </section>
     </div>
