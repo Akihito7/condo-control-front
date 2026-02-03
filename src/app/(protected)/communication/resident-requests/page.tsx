@@ -84,10 +84,14 @@ export default function ResidentRequests() {
     statusIdSelected,
   } = useResidentRequests();
 
-  const [dropDownIsOpen, setDropDownIsOpen] = useState(false);
-  const [dropDownItemSelected, setDropDownItemSelected] = useState<
+  // Estados separados para mobile e desktop para evitar conflitos
+  const [mobileDropDownIsOpen, setMobileDropDownIsOpen] = useState(false);
+  const [mobileDropDownItemSelected, setMobileDropDownItemSelected] = useState<
     number | null
   >(null);
+  const [desktopDropDownIsOpen, setDesktopDropDownIsOpen] = useState(false);
+  const [desktopDropDownItemSelected, setDesktopDropDownItemSelected] =
+    useState<number | null>(null);
 
   const queryClient = useQueryClient();
   function onDeleteSuccess() {
@@ -242,10 +246,13 @@ export default function ResidentRequests() {
                       </p>
                     </div>
                     <DropdownMenu
-                      open={dropDownIsOpen && dropDownItemSelected === call.id}
+                      open={
+                        mobileDropDownIsOpen &&
+                        mobileDropDownItemSelected === call.id
+                      }
                       onOpenChange={(open) => {
-                        setDropDownItemSelected(call.id);
-                        setDropDownIsOpen(open);
+                        setMobileDropDownItemSelected(call.id);
+                        setMobileDropDownIsOpen(open);
                       }}
                     >
                       <DropdownMenuTrigger className="p-2 -mr-2 outline-none">
@@ -254,8 +261,8 @@ export default function ResidentRequests() {
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem
                           onClick={() => {
-                            setDropDownIsOpen(false);
-                            setDropDownItemSelected(null);
+                            setMobileDropDownIsOpen(false);
+                            setMobileDropDownItemSelected(null);
                             setModalIsOpen(true);
                             setRequestSelected(call);
                           }}
@@ -463,11 +470,12 @@ export default function ResidentRequests() {
                         <TableCell className="text-center">
                           <DropdownMenu
                             open={
-                              dropDownIsOpen && dropDownItemSelected === call.id
+                              desktopDropDownIsOpen &&
+                              desktopDropDownItemSelected === call.id
                             }
                             onOpenChange={(open) => {
-                              setDropDownItemSelected(call.id);
-                              setDropDownIsOpen(open);
+                              setDesktopDropDownItemSelected(call.id);
+                              setDesktopDropDownIsOpen(open);
                             }}
                           >
                             <DropdownMenuTrigger className="outline-none">
@@ -476,8 +484,8 @@ export default function ResidentRequests() {
                             <DropdownMenuContent>
                               <DropdownMenuItem
                                 onClick={() => {
-                                  setDropDownIsOpen(false);
-                                  setDropDownItemSelected(null);
+                                  setDesktopDropDownIsOpen(false);
+                                  setDesktopDropDownItemSelected(null);
                                   setModalIsOpen(true);
                                   setRequestSelected(call);
                                 }}
