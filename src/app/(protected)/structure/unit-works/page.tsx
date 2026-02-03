@@ -73,6 +73,11 @@ export default function UnitWorks() {
     undefined,
   );
 
+  const [mobileDropdownOpen, setMobileDropdownOpen] = useState(false);
+  const [mobileDropdownItem, setMobileDropdownItem] = useState<
+    number | undefined
+  >();
+
   const queryClient = useQueryClient();
 
   function onDeleteSuccess() {
@@ -203,10 +208,10 @@ export default function UnitWorks() {
                     </span>
                   </div>
                   <DropdownMenu
-                    open={dropDownIsOpen && dropDownItemSelected === work.id}
+                    open={mobileDropdownOpen && mobileDropdownItem === work.id}
                     onOpenChange={(open) => {
-                      setDropDownItemSelected(work.id);
-                      setDropDownIsOpen(open);
+                      setMobileDropdownItem(work.id);
+                      setMobileDropdownOpen(open);
                     }}
                   >
                     <DropdownMenuTrigger className="outline-none">
