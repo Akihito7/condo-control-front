@@ -54,6 +54,10 @@ export function EmployeesTab({
   const [modalActionEmployeeIsOpen, setModalActionEmployeeIsOpen] =
     useState(false);
   const [employeeSelected, setEmployeeSelected] = useState<Employee>();
+  const [mobileDropdownOpen, setMobileDropdownOpen] = useState(false);
+  const [mobileDropdownItem, setMobileDropdownItem] = useState<
+    number | undefined
+  >();
 
   const canRenderModalActionEmployee =
     employeeRolesStatus === "success" &&
@@ -119,13 +123,26 @@ export function EmployeesTab({
               <div className="flex justify-between items-start">
                 <p className="font-semibold">{employee.name}</p>
 
-                <DropdownMenu>
+                <DropdownMenu
+                  open={
+                    mobileDropdownOpen && mobileDropdownItem === employee.id
+                  }
+                  onOpenChange={(open) => {
+                    if (!open) {
+                      setMobileDropdownItem(undefined);
+                    } else {
+                      setMobileDropdownItem(employee.id);
+                    }
+                    setMobileDropdownOpen(open);
+                  }}
+                >
                   <DropdownMenuTrigger asChild>
                     <Pencil className="w-4 h-4 text-gray-700" />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
                     <DropdownMenuItem
                       onClick={() => {
+                        setMobileDropdownOpen(false)
                         setEmployeeSelected(employee);
                         setModalActionEmployeeIsOpen(true);
                       }}

@@ -86,6 +86,10 @@ export default function DailyRequests() {
   const [dropDownItemSelected, setDropDownItemSelected] = useState<
     number | null
   >(null);
+  const [mobileDropdownOpen, setMobileDropdownOpen] = useState(false);
+  const [mobileDropdownItem, setMobileDropdownItem] = useState<
+    number | undefined
+  >();
   const [dailySelected, setDailySelected] = useState<any>(undefined);
 
   const filteredDailyRequests = React.useMemo(() => {
@@ -220,10 +224,12 @@ export default function DailyRequests() {
                       </p>
                     </div>
                     <DropdownMenu
-                      open={dropDownIsOpen && dropDownItemSelected === item.id}
+                      open={
+                        mobileDropdownOpen && mobileDropdownItem === item.id
+                      }
                       onOpenChange={(open) => {
-                        setDropDownItemSelected(item.id);
-                        setDropDownIsOpen(open);
+                        setMobileDropdownItem(item.id);
+                        setMobileDropdownOpen(open);
                       }}
                     >
                       <DropdownMenuTrigger className="p-2 -mr-2 outline-none">
@@ -232,6 +238,7 @@ export default function DailyRequests() {
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem
                           onClick={() => {
+                            setMobileDropdownOpen(false);
                             setModalIsOpen(true);
                             setDailySelected(item);
                           }}

@@ -75,6 +75,11 @@ export function Interventions({
   const [dropdownOpenToThisItem, setDropdownOpenToThisItem] =
     useState<number>();
 
+  const [mobileDropdownOpen, setMobileDropdownOpen] = useState(false);
+  const [mobileDropdownItem, setMobileDropdownItem] = useState<
+    number | undefined
+  >();
+
   const [interventionSelected, setInterventionSelected] =
     useState<Intervention>();
 
@@ -203,7 +208,17 @@ export function Interventions({
                   {item.prioritiesName}
                 </span>
 
-                <DropdownMenu>
+                <DropdownMenu
+                  open={mobileDropdownOpen && mobileDropdownItem === item.id}
+                  onOpenChange={(open) => {
+                    if (!open) {
+                      setMobileDropdownItem(undefined);
+                    } else {
+                      setMobileDropdownItem(item.id);
+                    }
+                    setMobileDropdownOpen(open);
+                  }}
+                >
                   <DropdownMenuTrigger asChild>
                     <Pencil className="w-4 h-4 text-gray-700" />
                   </DropdownMenuTrigger>
