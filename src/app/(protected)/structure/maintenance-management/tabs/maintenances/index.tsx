@@ -207,85 +207,7 @@ export function Maintenances({ date, setDate }: MaintenancesProps) {
         </div>
       </div>
 
-      {/* 📱 MOBILE */}
-      <div className="md:hidden space-y-4">
-        {filteredMaintenances.map((maintenance) => (
-          <div key={maintenance.id} className="rounded-xl border p-4 space-y-4">
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="font-semibold">
-                  {maintenance.assetsMaintenanceCode}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  {maintenance.typeMaintenance === "1"
-                    ? "Preventiva"
-                    : "Corretiva"}
-                </p>
-              </div>
-
-              <DropdownMenu>
-                <DropdownMenuTrigger>
-                  <MoreHorizontal className="w-5 h-5" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuItem
-                    onClick={() => {
-                      setMaintenanceSelected(maintenance);
-                      setModalUpdateIsOpen(true);
-                    }}
-                  >
-                    Editar
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => setMaintenanceSelectedToDelete(maintenance)}
-                  >
-                    Excluir
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <Info
-                label="Data"
-                value={
-                  maintenance.plannedStart
-                    ? format(maintenance.plannedStart, "dd/MM/yyyy HH:mm")
-                    : "-"
-                }
-              />
-              <Info label="Responsável" value={maintenance.supplier} />
-              <Info label="Contato" value={maintenance.contact} />
-              <Info
-                label="Valor"
-                value={maintenance.amount.toLocaleString("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                })}
-              />
-              <Info
-                label="Status"
-                value={getStatusName(maintenance.statusId)}
-              />
-            </div>
-
-            <Button
-              variant="outline"
-              className="w-full flex gap-2"
-              onClick={() => {
-                setMaintenanceSelected(maintenance);
-                setModalAttchamentIsOpen(true);
-              }}
-            >
-              <Paperclip className="w-4 h-4" />
-              Anexos
-            </Button>
-          </div>
-        ))}
-      </div>
-
-      {/* 📋 Tabela */}
-      <section className="hidden md:block rounded-xl overflow-auto border">
+      <section className="rounded-xl border overflow-hidden">
         <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200">
           <h2 className="font-medium text-gray-800 text-lg">Manutenções</h2>
 
@@ -295,8 +217,90 @@ export function Maintenances({ date, setDate }: MaintenancesProps) {
             assets={assets}
           />
         </div>
+        {/* 📱 MOBILE */}
+        <div className="md:hidden space-y-4">
+          {filteredMaintenances.map((maintenance) => (
+            <div
+              key={maintenance.id}
+              className="rounded-xl border p-4 space-y-4"
+            >
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="font-semibold">
+                    {maintenance.assetsMaintenanceCode}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {maintenance.typeMaintenance === "1"
+                      ? "Preventiva"
+                      : "Corretiva"}
+                  </p>
+                </div>
 
-        <div className="max-h-[70vh] overflow-y-auto border border-gray-300 rounded">
+                <DropdownMenu>
+                  <DropdownMenuTrigger>
+                    <MoreHorizontal className="w-5 h-5" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem
+                      onClick={() => {
+                        setMaintenanceSelected(maintenance);
+                        setModalUpdateIsOpen(true);
+                      }}
+                    >
+                      Editar
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        setMaintenanceSelectedToDelete(maintenance)
+                      }
+                    >
+                      Excluir
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <Info
+                  label="Data"
+                  value={
+                    maintenance.plannedStart
+                      ? format(maintenance.plannedStart, "dd/MM/yyyy HH:mm")
+                      : "-"
+                  }
+                />
+                <Info label="Responsável" value={maintenance.supplier} />
+                <Info label="Contato" value={maintenance.contact} />
+                <Info
+                  label="Valor"
+                  value={maintenance.amount.toLocaleString("pt-BR", {
+                    style: "currency",
+                    currency: "BRL",
+                  })}
+                />
+                <Info
+                  label="Status"
+                  value={getStatusName(maintenance.statusId)}
+                />
+              </div>
+
+              <Button
+                variant="outline"
+                className="w-full flex gap-2"
+                onClick={() => {
+                  setMaintenanceSelected(maintenance);
+                  setModalAttchamentIsOpen(true);
+                }}
+              >
+                <Paperclip className="w-4 h-4" />
+                Anexos
+              </Button>
+            </div>
+          ))}
+        </div>
+
+        {/* 📋 Tabela */}
+        <div className="hidden md:block max-h-[70vh] overflow-y-auto border border-gray-300 rounded">
           <Table className="min-w-full border-collapse">
             <TableHeader className="sticky top-0 bg-white shadow-md z-10">
               <TableRow>

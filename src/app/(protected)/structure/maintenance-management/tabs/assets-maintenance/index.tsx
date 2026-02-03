@@ -148,78 +148,79 @@ export function AssetsMaintenance() {
       </div>
 
       {/* MOBILE */}
-      <div className="md:hidden space-y-4">
-        {filteredAssets.map((asset) => (
-          <div key={asset.id} className="rounded-xl border p-4 space-y-4">
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="font-semibold">{asset.name}</p>
-                <p className="text-sm text-muted-foreground">{asset.code}</p>
-              </div>
 
-              <DropdownMenu>
-                <DropdownMenuTrigger>
-                  <MoreHorizontal className="w-5 h-5" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuItem
-                    onClick={() => {
-                      const details = assetDetails?.find(
-                        (a) => a.asset_id === asset.id,
-                      );
-                      if (!details) return;
-                      setAssetDetailsSelected(details);
-                      setIsOpenModalView(true);
-                    }}
-                  >
-                    Ver
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setAssetToDelete(asset)}>
-                    Excluir
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <Info label="Tipo" value={getType(asset.type)} />
-              <Info label="Fornecedor" value={asset.supplier} />
-              <Info label="Contato" value={asset.contact} />
-              <Info label="Instalação" value={asset.installationDate} />
-              <Info label="Frequência" value={asset.maintenanceFrequency} />
-              <Info
-                label="Vida útil estimada"
-                value={asset.estimatedUsefulLife}
-              />
-              <Info
-                label="Vida útil restante"
-                value={asset.remainingUsefulLife}
-              />
-            </div>
-
-            <Button
-              variant="outline"
-              className="w-full flex gap-2"
-              onClick={() => {
-                setAssetSelected(asset);
-                setModalAttchamentIsOpen(true);
-              }}
-            >
-              <Paperclip className="w-4 h-4" />
-              Anexos
-            </Button>
-          </div>
-        ))}
-      </div>
-
-      <section className="hidden md:block rounded-xl overflow-auto border">
+      <section className="rounded-xl border overflow-hidden">
         <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200">
           <h2 className="font-medium text-gray-800 text-lg">Ativos</h2>
 
           <ModalCreateAsset assetsTypes={assetsTypes} />
         </div>
 
-        <div className="max-h-[70vh] overflow-y-auto border border-gray-300 rounded">
+        <div className="md:hidden space-y-4">
+          {filteredAssets.map((asset) => (
+            <div key={asset.id} className="rounded-xl border p-4 space-y-4">
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="font-semibold">{asset.name}</p>
+                  <p className="text-sm text-muted-foreground">{asset.code}</p>
+                </div>
+
+                <DropdownMenu>
+                  <DropdownMenuTrigger>
+                    <MoreHorizontal className="w-5 h-5" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem
+                      onClick={() => {
+                        const details = assetDetails?.find(
+                          (a) => a.asset_id === asset.id,
+                        );
+                        if (!details) return;
+                        setAssetDetailsSelected(details);
+                        setIsOpenModalView(true);
+                      }}
+                    >
+                      Ver
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setAssetToDelete(asset)}>
+                      Excluir
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <Info label="Tipo" value={getType(asset.type)} />
+                <Info label="Fornecedor" value={asset.supplier} />
+                <Info label="Contato" value={asset.contact} />
+                <Info label="Instalação" value={asset.installationDate} />
+                <Info label="Frequência" value={asset.maintenanceFrequency} />
+                <Info
+                  label="Vida útil estimada"
+                  value={asset.estimatedUsefulLife}
+                />
+                <Info
+                  label="Vida útil restante"
+                  value={asset.remainingUsefulLife}
+                />
+              </div>
+
+              <Button
+                variant="outline"
+                className="w-full flex gap-2"
+                onClick={() => {
+                  setAssetSelected(asset);
+                  setModalAttchamentIsOpen(true);
+                }}
+              >
+                <Paperclip className="w-4 h-4" />
+                Anexos
+              </Button>
+            </div>
+          ))}
+        </div>
+
+        <div className="hidden md:block max-h-[70vh] overflow-y-auto border border-gray-300 rounded">
           <Table className="min-w-full border-collapse">
             <TableHeader className="sticky top-0 bg-white shadow-md z-10">
               <TableRow>
