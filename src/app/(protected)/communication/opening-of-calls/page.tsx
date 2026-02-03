@@ -85,6 +85,10 @@ export default function OpeningOfCalls() {
   const [dropdownOpenToThisItem, setDropdownOpenToThisItem] = useState<
     number | undefined
   >();
+    const [mobileDropdownOpen, setMobileDropdownOpen] = useState(false);
+  const [mobileDropdownItem, setMobileDropdownItem] = useState<
+    number | undefined
+  >();
 
   const queryClient = useQueryClient();
 
@@ -311,16 +315,16 @@ export default function OpeningOfCalls() {
                     </div>
                     <DropdownMenu
                       open={
-                        dropdownOpen &&
-                        dropdownOpenToThisItem === openingRecord.id
+                        mobileDropdownOpen &&
+                        mobileDropdownItem === openingRecord.id
                       }
                       onOpenChange={(open) => {
                         if (!open) {
-                          setDropdownOpenToThisItem(undefined);
+                          setMobileDropdownItem(undefined);
                         } else {
-                          setDropdownOpenToThisItem(openingRecord.id);
+                          setMobileDropdownItem(openingRecord.id);
                         }
-                        setDropdownOpen(open);
+                        setMobileDropdownOpen(open);
                       }}
                     >
                       <DropdownMenuTrigger className="p-2 -mr-2 outline-none">
@@ -329,7 +333,7 @@ export default function OpeningOfCalls() {
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem
                           onClick={() => {
-                            setDropdownOpen(false);
+                            setMobileDropdownOpen(false);
                             setOpeningRecordSelected(openingRecord);
                             setModalActionIsOpen(true);
                           }}
