@@ -133,7 +133,7 @@ export function ModalActionEmployee({
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const queryClient = useQueryClient();
 
-  async function onSubmit(data: EmployeeFormData) {
+  async function onSubmit(data: EmployeeFormData) {   
     if (type === "create") {
       await handleCreateEmployee(data);
     } else {

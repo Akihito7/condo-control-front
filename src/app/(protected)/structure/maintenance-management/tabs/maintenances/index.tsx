@@ -20,13 +20,11 @@ import {
 } from "@/components/ui/table";
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
   DialogDescription,
-  DialogClose,
 } from "@/components/ui/dialog";
 import {
   DropdownMenu,
@@ -34,7 +32,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Paperclip, Router } from "lucide-react";
+import { MoreHorizontal, Paperclip } from "lucide-react";
 import { ModalCreateMaintenance } from "./modal-create-maintenance";
 import { useMaintenances } from "./use-maintenances";
 import { format } from "date-fns";
@@ -45,48 +43,46 @@ import { deleteIntervention } from "@/api/delete-intervention";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ModalUpdateMaintenance } from "./modal-update-maintenance";
 import { Button } from "@/components/ui/button";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 interface MaintenancesProps {
   date: Date;
   setDate: React.Dispatch<React.SetStateAction<Date>>;
 }
+
+function Info({ label, value }: { label: string; value?: string }) {
+  return (
+    <div className="space-y-0.5">
+      <p className="text-xs text-muted-foreground">{label}</p>
+      <p className="text-sm font-medium">{value || "-"}</p>
+    </div>
+  );
+}
+
 export function Maintenances({ date, setDate }: MaintenancesProps) {
-  const [code, setCode] = useState<string>("");
-  const [assetSelected, setAssetSelected] = useState<string>("-1");
-  const [typeSelected, setTypeSelected] = useState<string>("-1");
-  const [statusSelected, setStatusSelected] = useState<string>("-1");
+  const [code, setCode] = useState("");
+  const [assetSelected, setAssetSelected] = useState("-1");
+  const [typeSelected, setTypeSelected] = useState("-1");
+  const [statusSelected, setStatusSelected] = useState("-1");
   const [maintenanceSelected, setMaintenanceSelected] =
     useState<Maintenance | null>(null);
   const [modalAttchamentIsOpen, setModalAttchamentIsOpen] = useState(false);
   const [modalUpdateIsOpen, setModalUpdateIsOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [dropdownOpenToThisItem, setDropdownOpenToThisItem] = useState<
-    number | undefined
-  >();
+  const [dropdownOpenToThisItem, setDropdownOpenToThisItem] =
+    useState<number>();
   const [maintenanceSelectedToDelete, setMaintenanceSelectedToDelete] =
     useState<Maintenance | null>(null);
 
   const dateFormatted = format(date, "yyyy-MM-dd");
 
-  const {
-    priorityOptions,
-    priorityOptionsStatus,
-    maintenancesStatusOptions,
-    maintenancesStatusOptionsStatus,
-    assets,
-    assetsStatus,
-    maintenances,
-    maintenancesStatus,
-  } = useMaintenances({ dateFormatted });
+  const { priorityOptions, maintenancesStatusOptions, assets, maintenances } =
+    useMaintenances({ dateFormatted });
 
-  const getStatusName = (statusId: number) => {
-    const status = maintenancesStatusOptions?.find(
+  const getStatusName = (statusId: number) =>
+    maintenancesStatusOptions?.find(
       (status) => Number(status.id) === Number(statusId),
-    );
-
-    return status?.name ?? "";
-  };
+    )?.name ?? "";
 
   const queryClient = useQueryClient();
   const { mutateAsync: handleDeleteIntervention } = useMutation({
@@ -100,56 +96,49 @@ export function Maintenances({ date, setDate }: MaintenancesProps) {
     },
   });
 
-  const filteredMaintenances = maintenances?.filter((maintenance) => {
-    const matchesCode = code
-      ? maintenance.assetsMaintenanceCode
-          ?.toLowerCase()
-          .includes(code.toLowerCase())
-      : true;
+  const filteredMaintenances =
+    maintenances?.filter((maintenance) => {
+      const matchesCode = code
+        ? maintenance.assetsMaintenanceCode
+            ?.toLowerCase()
+            .includes(code.toLowerCase())
+        : true;
 
-    const matchesAsset =
-      assetSelected === "-1"
-        ? true
-        : String(maintenance.assetsMaintenanceId) === assetSelected;
+      const matchesAsset =
+        assetSelected === "-1"
+          ? true
+          : String(maintenance.assetsMaintenanceId) === assetSelected;
 
-    const matchesType =
-      typeSelected === "-1"
-        ? true
-        : String(maintenance.typeMaintenance) === typeSelected;
+      const matchesType =
+        typeSelected === "-1"
+          ? true
+          : String(maintenance.typeMaintenance) === typeSelected;
 
-    const matchesStatus =
-      statusSelected === "-1"
-        ? true
-        : String(maintenance.statusId) === statusSelected;
+      const matchesStatus =
+        statusSelected === "-1"
+          ? true
+          : String(maintenance.statusId) === statusSelected;
 
-    return matchesCode && matchesAsset && matchesType && matchesStatus;
-  });
-
-  const getMaintenanceById = (id: number) => {
-    const maintenance = maintenances?.find(
-      (maintenance) => maintenance.id === id,
-    );
-
-    return maintenance;
-  };
+      return matchesCode && matchesAsset && matchesType && matchesStatus;
+    }) ?? [];
 
   const searchParams = useSearchParams();
   useEffect(() => {
     const maintenanceId = searchParams.get("maintenanceId");
+    if (!maintenanceId || !maintenances?.length) return;
 
-    if (!maintenanceId || !dateFormatted) return;
+    const found = maintenances.find(
+      (maintenance) => maintenance.id === Number(maintenanceId),
+    );
+    if (!found) return;
 
-    if (!maintenances || maintenances.length === 0) return;
-
-    const maintenanceSelected = getMaintenanceById(Number(maintenanceId));
-
-    if (!maintenanceSelected) return;
-    setMaintenanceSelected(maintenanceSelected);
+    setMaintenanceSelected(found);
     setModalUpdateIsOpen(true);
   }, [maintenances, searchParams]);
 
   return (
     <div className="space-y-6">
+      {/* filtros */}
       <div className="flex flex-col gap-4 md:flex-row md:items-end w-full">
         <div className="space-y-2">
           <Label>Selecione o mês e ano</Label>
@@ -165,18 +154,15 @@ export function Maintenances({ date, setDate }: MaintenancesProps) {
           <Input
             placeholder="Ex: ELV-001"
             value={code}
-            onChange={(event) => setCode(event.target.value)}
+            onChange={(e) => setCode(e.target.value)}
           />
         </div>
 
         <div className="space-y-2">
           <Label>Ativo</Label>
-          <Select
-            value={assetSelected}
-            onValueChange={(value) => setAssetSelected(value)}
-          >
+          <Select value={assetSelected} onValueChange={setAssetSelected}>
             <SelectTrigger className="w-[250px]">
-              <SelectValue placeholder="Selecione o ativo" />
+              <SelectValue />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="-1">Todos</SelectItem>
@@ -191,12 +177,9 @@ export function Maintenances({ date, setDate }: MaintenancesProps) {
 
         <div className="space-y-2">
           <Label>Tipo</Label>
-          <Select
-            value={typeSelected}
-            onValueChange={(value) => setTypeSelected(value)}
-          >
+          <Select value={typeSelected} onValueChange={setTypeSelected}>
             <SelectTrigger className="w-[250px]">
-              <SelectValue placeholder="Selecione o tipo" />
+              <SelectValue />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="-1">Todos</SelectItem>
@@ -208,12 +191,9 @@ export function Maintenances({ date, setDate }: MaintenancesProps) {
 
         <div className="space-y-2">
           <Label>Status</Label>
-          <Select
-            value={statusSelected}
-            onValueChange={(value) => setStatusSelected(value)}
-          >
+          <Select value={statusSelected} onValueChange={setStatusSelected}>
             <SelectTrigger className="w-[250px]">
-              <SelectValue placeholder="Selecione o status" />
+              <SelectValue />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="-1">Todos</SelectItem>
@@ -227,8 +207,85 @@ export function Maintenances({ date, setDate }: MaintenancesProps) {
         </div>
       </div>
 
+      {/* 📱 MOBILE */}
+      <div className="md:hidden space-y-4">
+        {filteredMaintenances.map((maintenance) => (
+          <div key={maintenance.id} className="rounded-xl border p-4 space-y-4">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="font-semibold">
+                  {maintenance.assetsMaintenanceCode}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  {maintenance.typeMaintenance === "1"
+                    ? "Preventiva"
+                    : "Corretiva"}
+                </p>
+              </div>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger>
+                  <MoreHorizontal className="w-5 h-5" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setMaintenanceSelected(maintenance);
+                      setModalUpdateIsOpen(true);
+                    }}
+                  >
+                    Editar
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => setMaintenanceSelectedToDelete(maintenance)}
+                  >
+                    Excluir
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <Info
+                label="Data"
+                value={
+                  maintenance.plannedStart
+                    ? format(maintenance.plannedStart, "dd/MM/yyyy HH:mm")
+                    : "-"
+                }
+              />
+              <Info label="Responsável" value={maintenance.supplier} />
+              <Info label="Contato" value={maintenance.contact} />
+              <Info
+                label="Valor"
+                value={maintenance.amount.toLocaleString("pt-BR", {
+                  style: "currency",
+                  currency: "BRL",
+                })}
+              />
+              <Info
+                label="Status"
+                value={getStatusName(maintenance.statusId)}
+              />
+            </div>
+
+            <Button
+              variant="outline"
+              className="w-full flex gap-2"
+              onClick={() => {
+                setMaintenanceSelected(maintenance);
+                setModalAttchamentIsOpen(true);
+              }}
+            >
+              <Paperclip className="w-4 h-4" />
+              Anexos
+            </Button>
+          </div>
+        ))}
+      </div>
+
       {/* 📋 Tabela */}
-      <section className="rounded-xl overflow-auto border">
+      <section className="hidden md:block rounded-xl overflow-auto border">
         <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200">
           <h2 className="font-medium text-gray-800 text-lg">Manutenções</h2>
 
@@ -334,13 +391,14 @@ export function Maintenances({ date, setDate }: MaintenancesProps) {
         </div>
       </section>
 
-      {/* 📎 Modal de anexos */}
+      {/* modais */}
       <ModalAttachments
         isOpen={modalAttchamentIsOpen}
         setIsOpen={setModalAttchamentIsOpen}
         maintenanceSelected={maintenanceSelected}
         setMaintenanceSelected={setMaintenanceSelected}
       />
+
       <ModalUpdateMaintenance
         assets={assets}
         maintenance={maintenanceSelected}
@@ -353,32 +411,15 @@ export function Maintenances({ date, setDate }: MaintenancesProps) {
 
       <Dialog
         open={!!maintenanceSelectedToDelete}
-        onOpenChange={(open) => {
-          if (!open) setMaintenanceSelectedToDelete(null);
-        }}
+        onOpenChange={() => setMaintenanceSelectedToDelete(null)}
       >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Confirmar exclusão</DialogTitle>
             <DialogDescription>
-              Tem certeza que deseja excluir a manutenção no ativo{" "}
-              <strong>
-                {maintenanceSelectedToDelete?.assetsMaintenanceName}
-              </strong>{" "}
-              <br />
-              {maintenanceSelectedToDelete?.plannedStart
-                ? "para a data " +
-                  format(
-                    maintenanceSelectedToDelete.plannedStart,
-                    "dd/MM/yyyy HH:mm",
-                  ) +
-                  "?"
-                : ""}
-              <br />
-              Esta ação não poderá ser desfeita.
+              Tem certeza que deseja excluir esta manutenção?
             </DialogDescription>
           </DialogHeader>
-
           <DialogFooter>
             <Button
               variant="outline"
@@ -386,7 +427,6 @@ export function Maintenances({ date, setDate }: MaintenancesProps) {
             >
               Cancelar
             </Button>
-
             <Button
               variant="destructive"
               onClick={async () => {
