@@ -90,6 +90,10 @@ export default function AssetManagement() {
   const [dropdownOpenToThisItem, setDropdownOpenToThisItem] = useState<
     number | undefined
   >();
+  const [mobileDropdownOpen, setMobileDropdownOpen] = useState(false);
+  const [mobileDropdownItem, setMobileDropdownItem] = useState<
+    number | undefined
+  >();
   const [updatingImage, setUpdatingImaged] = useState(false);
 
   const [areaSelected, setAreaSelected] = useState("-1");
@@ -233,10 +237,10 @@ export default function AssetManagement() {
                     </div>
                   </div>
                   <DropdownMenu
-                    open={dropdownOpen && dropdownOpenToThisItem === asset.id}
+                    open={mobileDropdownOpen && mobileDropdownItem === asset.id}
                     onOpenChange={(open) => {
-                      setDropdownOpenToThisItem(open ? asset.id : undefined);
-                      setDropdownOpen(open);
+                      setMobileDropdownItem(open ? asset.id : undefined);
+                      setMobileDropdownOpen(open);
                     }}
                   >
                     <DropdownMenuTrigger className="p-2 outline-none">
@@ -245,6 +249,7 @@ export default function AssetManagement() {
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem
                         onClick={() => {
+                          setMobileDropdownOpen(false);
                           setAssetSelected(asset);
                           setModalReportIsOpen(true);
                         }}
@@ -253,6 +258,7 @@ export default function AssetManagement() {
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => {
+                          setMobileDropdownOpen(false);
                           setAssetSelected(asset);
                           setModalAssetIsOpen(true);
                         }}
