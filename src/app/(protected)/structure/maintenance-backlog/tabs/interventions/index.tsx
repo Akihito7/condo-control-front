@@ -225,6 +225,7 @@ export function Interventions({
                   <DropdownMenuContent>
                     <DropdownMenuItem
                       onClick={() => {
+                        setMobileDropdownOpen(false);
                         setModalTypeAction("edit");
                         setInterventionSelected(item);
                         setModalActionIntervationIsOpen(true);
@@ -234,6 +235,7 @@ export function Interventions({
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => {
+                        setMobileDropdownOpen(false);
                         setModalTypeAction("view");
                         setInterventionSelected(item);
                         setModalActionIntervationIsOpen(true);

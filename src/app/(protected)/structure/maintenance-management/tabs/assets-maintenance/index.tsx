@@ -191,6 +191,7 @@ export function AssetsMaintenance() {
                           (a) => a.asset_id === asset.id,
                         );
                         if (!details) return;
+                        setMobileDropdownOpen(false);
                         setAssetDetailsSelected(details);
                         setIsOpenModalView(true);
                       }}

@@ -220,6 +220,7 @@ export default function UnitWorks() {
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem
                         onClick={() => {
+                          setMobileDropdownOpen(false);
                           setModalIsOpen(true);
                           setWorkSelected(work);
                         }}

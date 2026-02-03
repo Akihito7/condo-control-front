@@ -260,6 +260,7 @@ export function Maintenances({ date, setDate }: MaintenancesProps) {
                   <DropdownMenuContent>
                     <DropdownMenuItem
                       onClick={() => {
+                        setMobileDropdownOpen(false);
                         setMaintenanceSelected(maintenance);
                         setModalUpdateIsOpen(true);
                       }}
