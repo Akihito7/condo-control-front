@@ -4,7 +4,13 @@ import { Breadcrumb } from "@/components/breadcrumb";
 import { ButtonOpenSidebar } from "@/components/button-open-sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { FileDown, ImageOff, Paperclip, Pencil } from "lucide-react";
+import {
+  FileDown,
+  ImageOff,
+  Paperclip,
+  Pencil,
+  MoreHorizontal,
+} from "lucide-react";
 import {
   Table,
   TableBody,
@@ -25,8 +31,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
-  DialogClose,
 } from "@/components/ui/dialog";
 
 import {
@@ -45,6 +49,23 @@ import { NotificationDropdown } from "@/components/notification";
 import { ModalReport } from "./modal-report";
 import Link from "next/link";
 
+function InfoField({
+  label,
+  value,
+}: {
+  label: string;
+  value?: string | number;
+}) {
+  return (
+    <div className="space-y-0.5">
+      <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">
+        {label}
+      </p>
+      <p className="text-sm font-medium text-gray-900">{value || "-"}</p>
+    </div>
+  );
+}
+
 export default function AssetManagement() {
   const {
     assetSelected,
@@ -52,10 +73,7 @@ export default function AssetManagement() {
     modalAssetIsOpen,
     setModalAssetIsOpen,
     categoriesOptions,
-    categoriesOptionsStatus,
     areasOptions,
-    areasOptionsStatus,
-    statusOptionsStatus,
     statusOptions,
     assets,
     statusAssets,
@@ -90,23 +108,22 @@ export default function AssetManagement() {
   const filteredAssets = assets?.filter((asset) => {
     const matchArea =
       areaSelected === "-1" || String(asset.areaId) === areaSelected;
-
     const matchCode =
       codeSearch.trim() === "" ||
       asset.codeItem.toLowerCase().includes(codeSearch.toLowerCase());
-
     return matchArea && matchCode;
   });
 
   function applyStylesIfHasReportNotFinished(hasReportNotFinished: boolean) {
     if (!hasReportNotFinished) return "";
-    return "border-1 border-red-500 text-red-400";
+    return "border-red-500 text-red-500 bg-red-50";
   }
 
   return (
-    <main className="bg-gray-50 min-h-screen overflow-auto w-full p-0 py-8 px-2 sm:p-8 flex flex-col gap-6">
+    // Removido overflow-auto e min-h-screen travado para permitir scroll natural no mobile
+    <main className="bg-gray-50 w-full p-4 sm:p-8 flex flex-col gap-6">
       <div className="space-y-2">
-        <div className="flex items-center mb-8 gap-2">
+        <div className="flex items-center mb-4 sm:mb-8 gap-2">
           <ButtonOpenSidebar />
           <Breadcrumb paths={["Início", "Estrutura e operações"]} />
           <div className="ml-auto">
@@ -118,20 +135,15 @@ export default function AssetManagement() {
         </h1>
       </div>
 
+      {/* Filtros */}
       <div className="flex flex-col gap-4 md:items-end md:flex-row">
         <div className="flex flex-col gap-4 md:flex-row md:items-end w-full">
-          {/* Filtro área */}
-          <div>
+          <div className="w-full md:w-auto">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Área
             </label>
-            <Select
-              value={areaSelected}
-              onValueChange={(value) => {
-                setAreaSelected(value);
-              }}
-            >
-              <SelectTrigger className="col-span-3 w-[250px]">
+            <Select value={areaSelected} onValueChange={setAreaSelected}>
+              <SelectTrigger className="w-full md:w-[250px]">
                 <SelectValue placeholder="Selecione a area" />
               </SelectTrigger>
               <SelectContent>
@@ -145,14 +157,13 @@ export default function AssetManagement() {
             </Select>
           </div>
 
-          {/* Filtro código */}
-          <div>
+          <div className="w-full md:w-auto">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Busca por Código
             </label>
             <Input
               placeholder="Ex: CAD-001"
-              className="w-[250px]"
+              className="w-full md:w-[250px]"
               value={codeSearch}
               onChange={(e) => setCodeSearch(e.target.value)}
             />
@@ -161,17 +172,16 @@ export default function AssetManagement() {
 
         <Button
           variant="outline"
-          className="ml-auto flex items-center gap-2 h-10 cursor-pointer"
+          className="flex items-center gap-2 h-10 w-full md:w-auto"
         >
           <FileDown className="w-6 h-6" />
           Exportar PDF
         </Button>
       </div>
 
-      <section className="rounded-xl border">
+      <section className="rounded-xl border bg-white">
         <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200">
           <h2 className="font-medium text-gray-800 text-lg">Patrimônios</h2>
-
           <ModalActionAsset
             assetSelected={assetSelected}
             setAssetSelected={setAssetSelected as any}
@@ -184,139 +194,231 @@ export default function AssetManagement() {
           />
         </div>
 
-        <div className="max-h-[70vh] overflow-y-auto border border-gray-300 rounded">
-          <Table className="min-w-full border-collapse">
-            <TableHeader className="sticky top-0 bg-white shadow-md z-10">
-              <TableRow>
-                <TableHead>Foto</TableHead>
-                <TableHead>Item</TableHead>
-                <TableHead>Código</TableHead>
-                <TableHead>Área</TableHead>
-                <TableHead className="text-left">Categoria</TableHead>
-                <TableHead className="text-center">Status</TableHead>
-                <TableHead className="text-left">Reports</TableHead>
-                <TableHead className="text-center">Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {statusAssets === "pending" ? (
-                <>
-                  {Array.from({ length: 5 }).map((_, index) => (
-                    <TableRowSkeleton className="h-18" key={index} />
-                  ))}
-                </>
-              ) : filteredAssets?.length ? (
-                filteredAssets.map((asset, index) => (
-                  <TableRow key={index}>
-                    <TableCell
-                      onClick={() => {
-                        setAssetSelected(asset);
-                        setModalPhotoIsOpen(true);
-                      }}
-                    >
-                      {asset.publicUrl ? (
-                        <img
-                          src={asset.publicUrl}
-                          alt="foto do item"
-                          className="w-16 h-16 rounded-lg object-cover"
-                        />
-                      ) : (
-                        <div className="w-16 h-16 flex items-center justify-center rounded-lg bg-gray-200 text-gray-500">
-                          <ImageOff className="w-6 h-6" />
-                        </div>
-                      )}
-                    </TableCell>
-                    <TableCell>{asset.name}</TableCell>
-                    <TableCell>{asset.codeItem}</TableCell>
-                    <TableCell>{asset.condominiumAreasName}</TableCell>
-                    <TableCell>{asset.assetCategoriesName}</TableCell>
-                    <TableCell className="text-center">
-                      {asset.assetStatusName}
-                    </TableCell>
-                    <TableCell>
-                      <Link
-                        href={`asset-management/${asset.id}`}
-                        className={`flex items-center justify-center gap-1 px-2 py-1 bg-gray-100 rounded hover:bg-gray-200 transition w-12 h-12 
-                          ${applyStylesIfHasReportNotFinished(
-                            asset.hasReportNotFinished,
-                          )}`}
-                      >
-                        <Paperclip
-                          className={`w-4 h-4${
-                            asset.hasReportNotFinished
-                              ? "text-red-400"
-                              : "text-gray-700 "
-                          }`}
-                        />
-                        <span>{asset.reportCount ?? 0}</span>
-                      </Link>
-                    </TableCell>
-
-                    <TableCell className="text-center">
-                      <DropdownMenu
-                        open={
-                          dropdownOpen && dropdownOpenToThisItem === asset.id
-                        }
-                        onOpenChange={(open) => {
-                          if (!open) {
-                            setDropdownOpenToThisItem(undefined);
-                          } else {
-                            setDropdownOpenToThisItem(asset.id);
-                          }
-                          setDropdownOpen(open);
+        {/* 📱 VIEW MOBILE - Sem travas de scroll interno */}
+        <div className="md:hidden p-4 space-y-4">
+          {statusAssets === "pending" ? (
+            <p className="text-center py-4 text-gray-500">Carregando...</p>
+          ) : filteredAssets?.length ? (
+            filteredAssets.map((asset) => (
+              <div
+                key={asset.id}
+                className="rounded-xl border border-gray-200 p-4 space-y-4 shadow-sm bg-white"
+              >
+                <div className="flex justify-between items-start">
+                  <div
+                    className="flex gap-4 items-center"
+                    onClick={() => {
+                      setAssetSelected(asset);
+                      setModalPhotoIsOpen(true);
+                    }}
+                  >
+                    {asset.publicUrl ? (
+                      <img
+                        src={asset.publicUrl}
+                        className="w-14 h-14 rounded-lg object-cover"
+                        alt="foto"
+                      />
+                    ) : (
+                      <div className="w-14 h-14 flex items-center justify-center rounded-lg bg-gray-100 text-gray-400">
+                        <ImageOff className="w-6 h-6" />
+                      </div>
+                    )}
+                    <div>
+                      <p className="font-bold text-gray-900 leading-tight">
+                        {asset.name}
+                      </p>
+                      <span className="text-xs font-medium text-gray-500">
+                        {asset.codeItem}
+                      </span>
+                    </div>
+                  </div>
+                  <DropdownMenu
+                    open={dropdownOpen && dropdownOpenToThisItem === asset.id}
+                    onOpenChange={(open) => {
+                      setDropdownOpenToThisItem(open ? asset.id : undefined);
+                      setDropdownOpen(open);
+                    }}
+                  >
+                    <DropdownMenuTrigger className="p-2 outline-none">
+                      <MoreHorizontal className="w-5 h-5 text-gray-400" />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem
+                        onClick={() => {
+                          setAssetSelected(asset);
+                          setModalReportIsOpen(true);
                         }}
                       >
-                        <DropdownMenuTrigger className="outline-none ring-0 focus:outline-none focus:ring-0 cursor-pointer">
-                          <Pencil className="w-4 h-4 text-gray-700" />
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                          <DropdownMenuItem
-                            onClick={() => {
-                              setDropdownOpen(false);
-                              setDropdownOpenToThisItem(undefined);
-                              setAssetSelected(asset);
-                              setModalReportIsOpen(true);
-                            }}
-                          >
-                            Reportar Problema
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => {
-                              setDropdownOpen(false);
-                              setDropdownOpenToThisItem(undefined);
-                              setAssetSelected(asset);
-                              setModalAssetIsOpen(true);
-                            }}
-                          >
-                            Editar
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={async () => {
-                              await handleDeleteAsset(asset.id);
-                            }}
-                          >
-                            Excluir
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                        Reportar Problema
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => {
+                          setAssetSelected(asset);
+                          setModalAssetIsOpen(true);
+                        }}
+                      >
+                        Editar
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="text-destructive"
+                        onClick={() => handleDeleteAsset(asset.id)}
+                      >
+                        Excluir
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 border-t pt-3">
+                  <InfoField label="Área" value={asset.condominiumAreasName} />
+                  <InfoField
+                    label="Categoria"
+                    value={asset.assetCategoriesName}
+                  />
+                  <InfoField label="Status" value={asset.assetStatusName} />
+                  <InfoField
+                    label="Reports"
+                    value={`${asset.reportCount ?? 0} registros`}
+                  />
+                </div>
+
+                <Link
+                  href={`asset-management/${asset.id}`}
+                  className={`flex items-center justify-center w-full py-3 rounded-lg border font-medium text-sm transition ${applyStylesIfHasReportNotFinished(asset.hasReportNotFinished)} bg-gray-50 border-gray-200 text-gray-700`}
+                >
+                  Ver Histórico
+                </Link>
+              </div>
+            ))
+          ) : (
+            <div className="text-center py-10 text-gray-500">
+              Nenhum patrimônio encontrado
+            </div>
+          )}
+        </div>
+
+        {/* 📋 VIEW DESKTOP - Mantido scroll interno de 70vh */}
+        <div className="hidden md:block">
+          <div className="max-h-[70vh] overflow-y-auto border-gray-300">
+            <Table className="min-w-full border-collapse">
+              <TableHeader className="sticky top-0 bg-white shadow-md z-10">
+                <TableRow>
+                  <TableHead>Foto</TableHead>
+                  <TableHead>Item</TableHead>
+                  <TableHead>Código</TableHead>
+                  <TableHead>Área</TableHead>
+                  <TableHead className="text-left">Categoria</TableHead>
+                  <TableHead className="text-center">Status</TableHead>
+                  <TableHead className="text-left">Reports</TableHead>
+                  <TableHead className="text-center">Ações</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {statusAssets === "pending" ? (
+                  Array.from({ length: 5 }).map((_, index) => (
+                    <TableRowSkeleton key={index} />
+                  ))
+                ) : filteredAssets?.length ? (
+                  filteredAssets.map((asset, index) => (
+                    <TableRow key={index}>
+                      <TableCell
+                        onClick={() => {
+                          setAssetSelected(asset);
+                          setModalPhotoIsOpen(true);
+                        }}
+                      >
+                        {asset.publicUrl ? (
+                          <img
+                            src={asset.publicUrl}
+                            className="w-16 h-16 rounded-lg object-cover"
+                          />
+                        ) : (
+                          <div className="w-16 h-16 flex items-center justify-center rounded-lg bg-gray-200 text-gray-500">
+                            <ImageOff className="w-6 h-6" />
+                          </div>
+                        )}
+                      </TableCell>
+                      <TableCell>{asset.name}</TableCell>
+                      <TableCell>{asset.codeItem}</TableCell>
+                      <TableCell>{asset.condominiumAreasName}</TableCell>
+                      <TableCell>{asset.assetCategoriesName}</TableCell>
+                      <TableCell className="text-center">
+                        {asset.assetStatusName}
+                      </TableCell>
+                      <TableCell>
+                        <Link
+                          href={`asset-management/${asset.id}`}
+                          className={`flex items-center justify-center gap-1 px-2 py-1 bg-gray-100 rounded hover:bg-gray-200 transition w-12 h-12 ${applyStylesIfHasReportNotFinished(asset.hasReportNotFinished)}`}
+                        >
+                          <Paperclip
+                            className={`w-4 h-4 ${asset.hasReportNotFinished ? "text-red-400" : "text-gray-700 "}`}
+                          />
+                          <span>{asset.reportCount ?? 0}</span>
+                        </Link>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <DropdownMenu
+                          open={
+                            dropdownOpen && dropdownOpenToThisItem === asset.id
+                          }
+                          onOpenChange={(open) => {
+                            setDropdownOpenToThisItem(
+                              open ? asset.id : undefined,
+                            );
+                            setDropdownOpen(open);
+                          }}
+                        >
+                          <DropdownMenuTrigger className="outline-none ring-0 cursor-pointer">
+                            <Pencil className="w-4 h-4 text-gray-700" />
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setDropdownOpen(false);
+                                setAssetSelected(asset);
+                                setModalReportIsOpen(true);
+                              }}
+                            >
+                              Reportar Problema
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setDropdownOpen(false);
+                                setAssetSelected(asset);
+                                setModalAssetIsOpen(true);
+                              }}
+                            >
+                              Editar
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={async () => {
+                                await handleDeleteAsset(asset.id);
+                              }}
+                            >
+                              Excluir
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={8}
+                      className="text-center py-6 text-gray-500"
+                    >
+                      Nenhum patrimônio encontrado
                     </TableCell>
                   </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={7}
-                    className="text-center py-6 text-gray-500"
-                  >
-                    Nenhum patrimônio encontrado
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </div>
       </section>
 
+      {/* Modais (Mantidos conforme original) */}
       <Dialog
         open={modalPhotoIsOpen && !!assetSelected?.id}
         onOpenChange={(open) => {
@@ -333,12 +435,11 @@ export default function AssetManagement() {
           <DialogHeader>
             <DialogTitle>Foto</DialogTitle>
           </DialogHeader>
-
           {!newPhoto && assetSelected?.publicUrl ? (
             <>
               <img
                 src={assetSelected?.publicUrl}
-                alt="foto do item"
+                alt="foto"
                 className="w-32 h-32 rounded-lg object-cover mx-auto"
               />
               <div className="flex w-full gap-4 mt-4">
@@ -363,51 +464,48 @@ export default function AssetManagement() {
               </span>
             </div>
           )}
-
-          {previewPhoto && <img src={previewPhoto} alt="preview new Image" />}
-          <label className="flex flex-col items-center justify-center gap-2 rounded-md border-2 border-dashed border-gray-400 text-gray-600 cursor-pointer p-8 hover:border-gray-600">
-            <Paperclip />
-            Clique para adicionar uma nova foto
+          {previewPhoto && (
+            <img
+              src={previewPhoto}
+              alt="preview"
+              className="mt-4 rounded-lg mx-auto max-h-40"
+            />
+          )}
+          <label className="flex flex-col items-center justify-center gap-2 rounded-md border-2 border-dashed border-gray-400 text-gray-600 cursor-pointer p-8 hover:border-gray-600 mt-4">
+            <Paperclip /> Clique para adicionar uma nova foto
             <input
               ref={inputRef}
               className="hidden"
               type="file"
-              onChange={(event) => {
-                const files = event.target.files;
-                if (files && files.length > 0) {
-                  setNewPhoto(files[0]);
-                } else {
-                  setPreviewPhoto(null);
-                  setNewPhoto(null);
-                }
+              onChange={(e) => {
+                const f = e.target.files;
+                if (f && f.length > 0) setNewPhoto(f[0]);
               }}
             />
           </label>
-
           {newPhoto && (
-            <div className="flex w-full gap-4">
+            <div className="flex w-full gap-4 mt-4">
               <Button
                 className="flex-1"
                 variant="outline"
                 onClick={() => {
                   setPreviewPhoto(null);
                   setNewPhoto(null);
-                  if (inputRef && inputRef.current) {
-                    inputRef.current.value = "";
-                  }
+                  if (inputRef.current) inputRef.current.value = "";
                 }}
               >
                 Voltar
               </Button>
               <Button
                 disabled={updatingImage}
+                className="flex-1"
                 onClick={async () => {
                   setUpdatingImaged(true);
-                  const formData = new FormData();
-                  formData.append("photo", newPhoto);
+                  const fd = new FormData();
+                  fd.append("photo", newPhoto);
                   await handleChangeAssetImage({
                     assetId: assetSelected!.id,
-                    formData,
+                    formData: fd,
                   });
                   setNewPhoto(undefined);
                   setPreviewPhoto(undefined);
@@ -415,9 +513,8 @@ export default function AssetManagement() {
                   setAssetSelected(undefined);
                   setUpdatingImaged(false);
                 }}
-                className="flex-1"
               >
-                Confirmar troca de foto
+                Confirmar troca
               </Button>
             </div>
           )}
@@ -426,7 +523,7 @@ export default function AssetManagement() {
 
       <ModalReport
         isOpen={modalReportIsOpen}
-        setIsOpen={(value: boolean) => setModalReportIsOpen(value)}
+        setIsOpen={setModalReportIsOpen}
         assetSelected={assetSelected}
         setAssetSelected={setAssetSelected}
       />
