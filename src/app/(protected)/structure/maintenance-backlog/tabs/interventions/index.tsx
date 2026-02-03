@@ -322,7 +322,7 @@ export function Interventions({
           ))}
         </div>
 
-        <div className="max-h-[70vh] overflow-y-auto border border-gray-300 rounded">
+        <div className="max-h-[70vh] overflow-y-auto border border-gray-300 rounded hidden md:block">
           <Table className="min-w-full border-collapse">
             <TableHeader className="sticky top-0 bg-white shadow-md z-10">
               <TableRow>
