@@ -17,7 +17,11 @@ import { CondominiumArea } from "@/api/get-management-commom-spaces";
 import React, { useEffect } from "react";
 import { DayWithEvents } from "@/api/fetch-events-by-condominium-area";
 import { format } from "date-fns";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  QueryClient,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { createSpaceEvent } from "@/api/create-space-event";
 import { Apartment } from "@/api/fetch-apartaments";
 import ReactSelect from "react-select";
@@ -150,6 +154,15 @@ export function ModalAddEvent({
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["events"],
+        exact: false,
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["indicators-common-spaces"],
+        exact: false,
+      });
+      queryClient.refetchQueries({
+        queryKey: ["indicators-common-spaces"],
         exact: false,
       });
     },
