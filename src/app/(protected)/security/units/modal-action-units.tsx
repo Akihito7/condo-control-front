@@ -123,15 +123,15 @@ export function ModalActionUnits({
     type === "create"
       ? "Adicionar Unidade"
       : type === "edit"
-      ? "Editar Unidade"
-      : "Visualizar Unidade";
+        ? "Editar Unidade"
+        : "Visualizar Unidade";
 
   const modalDescription =
     type === "create"
       ? "Preencha os campos para adicionar uma nova unidade."
       : type === "edit"
-      ? "Atualize os dados da unidade."
-      : "Visualize as informações da unidade.";
+        ? "Atualize os dados da unidade."
+        : "Visualize as informações da unidade.";
 
   useEffect(() => {
     if (type === "edit") {
@@ -168,17 +168,16 @@ export function ModalActionUnits({
         <Button variant="outline">Adicionar Unidade</Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="max-w-full sm:max-w-[700px] md:max-w-[900px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl">{modalTitle}</DialogTitle>
           <DialogDescription>{modalDescription}</DialogDescription>
         </DialogHeader>
-
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-4">
           {/* =========================
               Status
           ========================= */}
-          <div className="flex flex-col gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label>Status</Label>
             <Select
               value={getValues("status_id")}
@@ -210,7 +209,7 @@ export function ModalActionUnits({
           {/* =========================
               Apartamento
           ========================= */}
-          <div className="flex flex-col gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label>Apartamento</Label>
             <Select
               value={getValues("apartment_id")}
@@ -242,7 +241,7 @@ export function ModalActionUnits({
           {/* =========================
               Morador / Hóspede
           ========================= */}
-          <div className="flex flex-col gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label>Morador Principal / Hóspede</Label>
             <Input
               {...register("guest")}
@@ -258,7 +257,7 @@ export function ModalActionUnits({
           {/* =========================
               Contato
           ========================= */}
-          <div className="flex flex-col gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label>Contato</Label>
             <Input
               {...register("contact")}
@@ -276,7 +275,7 @@ export function ModalActionUnits({
           {/* =========================
               Corretor / Imobiliária
           ========================= */}
-          <div className="flex flex-col gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
             <Label>Corretor / Imobiliária</Label>
             <Input
               {...register("responsible")}
