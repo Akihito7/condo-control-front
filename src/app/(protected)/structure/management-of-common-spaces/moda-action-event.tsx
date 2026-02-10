@@ -93,6 +93,14 @@ export function ModalAddGuests({
     }) => updateSpaceEvent({ eventId, guests, periodSelectedIds }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["events"], exact: false });
+      queryClient.invalidateQueries({
+        queryKey: ["indicators-common-spaces"],
+        exact: false,
+      });
+      queryClient.refetchQueries({
+        queryKey: ["indicators-common-spaces"],
+        exact: false,
+      });
     },
   });
 
@@ -107,6 +115,14 @@ export function ModalAddGuests({
     mutationFn: (eventId: number) => deleteSpaceEvent(eventId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["events"], exact: false });
+      queryClient.invalidateQueries({
+        queryKey: ["indicators-common-spaces"],
+        exact: false,
+      });
+      queryClient.refetchQueries({
+        queryKey: ["indicators-common-spaces"],
+        exact: false,
+      });
     },
   });
 
@@ -136,10 +152,10 @@ export function ModalAddGuests({
 
     const newGuests = data.guests.filter((guest) => {
       const cpfIsNew = eventSelected.spaceEventGuests.every(
-        (g) => g.cpf.toLowerCase() !== guest.cpf.toLowerCase()
+        (g) => g.cpf.toLowerCase() !== guest.cpf.toLowerCase(),
       );
       const nameIsNew = eventSelected.spaceEventGuests.every(
-        (g) => g.name.toLowerCase() !== guest.name.toLowerCase()
+        (g) => g.name.toLowerCase() !== guest.name.toLowerCase(),
       );
       return cpfIsNew || nameIsNew;
     });
@@ -153,14 +169,12 @@ export function ModalAddGuests({
     handleClose();
   };
 
-  console.log(eventSelected, events);
-
   const eventsWithoutEventSelected = events.filter(
-    (event) => event.id !== eventSelected?.id
+    (event) => event.id !== eventSelected?.id,
   );
 
   const hoursAlreadyReserved = eventsWithoutEventSelected.flatMap(
-    (event) => event.areaAvailabilityIdSelecteds
+    (event) => event.areaAvailabilityIdSelecteds,
   );
 
   const totalPeriodSelected = watch("periodSelecteds")?.length;
@@ -194,9 +208,9 @@ export function ModalAddGuests({
                 <p className="font-semibold text-gray-900">
                   {format(
                     parseISO(
-                      eventSelected.eventDate as any
+                      eventSelected.eventDate as any,
                     ).toISOString() as any,
-                    "dd/MM/yyyy"
+                    "dd/MM/yyyy",
                   )}
                 </p>
               </div>
@@ -210,12 +224,12 @@ export function ModalAddGuests({
                   Início:{" "}
                   {format(
                     parseISO(`1970-01-01T${eventSelected.startTime}`),
-                    "HH:mm"
+                    "HH:mm",
                   )}{" "}
                   - Fim:{" "}
                   {format(
                     parseISO(`1970-01-01T${eventSelected.endTime}`),
-                    "HH:mm"
+                    "HH:mm",
                   )}
                 </p>
               </div>
@@ -282,7 +296,7 @@ export function ModalAddGuests({
                     value={value
                       ?.map((id) => {
                         const period = areaAvailabilityOptions?.find(
-                          (p) => String(p.id) === String(id)
+                          (p) => String(p.id) === String(id),
                         );
                         return period
                           ? { label: period.name, value: String(period.id) }
@@ -295,7 +309,7 @@ export function ModalAddGuests({
                     }}
                     options={areaAvailabilityOptions
                       ?.filter(
-                        (period) => !hoursAlreadyReserved.includes(period.id)
+                        (period) => !hoursAlreadyReserved.includes(period.id),
                       )
                       .map((period) => ({
                         label: period.name,

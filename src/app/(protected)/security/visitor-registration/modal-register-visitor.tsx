@@ -117,7 +117,7 @@ export function ModalRegisterVisitor({
         <Button variant="outline">Registrar Visitante</Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-auto">
+      <DialogContent className="max-w-full sm:max-w-[700px] md:max-w-[900px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Registro de Visitantes</DialogTitle>
           <DialogDescription>
@@ -132,7 +132,7 @@ export function ModalRegisterVisitor({
           noValidate
         >
           <fieldset className="border border-gray-200 rounded-md p-4 space-y-4">
-            <div className="grid grid-cols-4 items-center gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
               <Label htmlFor="unit" className="text-right">
                 Unidade/Apto
               </Label>
@@ -167,7 +167,7 @@ export function ModalRegisterVisitor({
               )}
             </div>
 
-            <div className="grid grid-cols-4 items-center gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
               <Label htmlFor="visitorType" className="text-right">
                 Tipo de visitante
               </Label>
@@ -183,7 +183,7 @@ export function ModalRegisterVisitor({
               )}
             </div>
 
-            <div className="grid grid-cols-4 items-center gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
               <Label htmlFor="vehicle" className="text-right">
                 Veículo
               </Label>
@@ -215,7 +215,7 @@ export function ModalRegisterVisitor({
                 )}
               </div>
 
-              <div className="grid grid-cols-4 items-center gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
                 <Label
                   htmlFor={`people.${index}.fullName`}
                   className="text-right"
@@ -233,7 +233,7 @@ export function ModalRegisterVisitor({
                 )}
               </div>
 
-              <div className="grid grid-cols-4 items-center gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">  
                 <Label htmlFor={`people.${index}.cpf`} className="text-right">
                   CPF
                 </Label>
