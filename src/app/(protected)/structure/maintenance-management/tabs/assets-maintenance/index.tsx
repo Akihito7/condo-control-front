@@ -42,6 +42,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ModalViewAsset } from "./modal-view-asset";
 import { AssetMaintenanceReport } from "@/api/get-asset-maintenances-details";
+import { ModalEditAsset } from "./modal-edit-asset";
 
 function Info({ label, value }: { label: string; value?: string }) {
   return (
@@ -65,6 +66,7 @@ export function AssetsMaintenance() {
   const [dropdownOpenToThisItem, setDropdownOpenToThisItem] =
     useState<number>();
   const [isOpenModalView, setIsOpenModalView] = useState(false);
+  const [isOpenModalEdit, setIsOpenModalEdit] = useState(false);
   const [assetDetailsSelected, setAssetDetailsSelected] =
     useState<AssetMaintenanceReport | null>(null);
 
@@ -335,7 +337,16 @@ export function AssetsMaintenance() {
                           >
                             Ver
                           </DropdownMenuItem>
-                          <DropdownMenuItem>Editar</DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              setAssetSelected(asset);
+                              setDropdownOpen(false);
+                              setDropdownOpenToThisItem(undefined);
+                              setIsOpenModalEdit(true);
+                            }}
+                          >
+                            Editar
+                          </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => {
                               setDropdownOpen(false);
@@ -396,6 +407,13 @@ export function AssetsMaintenance() {
         assetSelected={assetDetailsSelected}
         isOpen={isOpenModalView && !!assetDetailsSelected}
         setIsOpen={setIsOpenModalView}
+      />
+
+      <ModalEditAsset
+        assetsTypes={assetsTypes}
+        assetSelected={assetSelected!!}
+        setIsOpen={setIsOpenModalEdit}
+        isOpen={isOpenModalEdit && !!assetSelected}
       />
     </div>
   );
