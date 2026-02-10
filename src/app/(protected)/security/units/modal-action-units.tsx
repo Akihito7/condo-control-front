@@ -22,23 +22,27 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Option } from "@/api/fetch-work-areas";
-import { Apartament } from "@/api/backoffice/fetch-apartaments";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addUnit } from "@/api/add-unit";
 import { updateGenericRegister } from "@/api/update-generic.register";
+import { Plus, Trash2 } from "lucide-react";
+import { updateUnit } from "@/api/update-unit";
 
-/* =========================
-   Schema
-========================= */
 export const unitSchema = z.object({
   status_id: z.string().min(1, "Informe o status"),
   apartment_id: z.string().min(1, "Informe o apartamento"),
   guest: z.string().min(1, "Informe o morador principal ou hóspede"),
   contact: z.string().min(1, "Informe o contato"),
-  responsible: z.string().min(1, "Informe o responsável"),
+  responsibles: z.array(
+    z.object({
+      responsibleId: z.number().nullable().optional(),
+      name: z.string().min(2, "Informe um nome"),
+      creci: z.string().min(8, "Informe um CRECI válido"),
+    }),
+  ),
 });
 
 export type UnitFormData = z.infer<typeof unitSchema>;
@@ -53,9 +57,6 @@ interface ModalActionUnitsProps {
   setUnitSelected: React.Dispatch<React.SetStateAction<undefined>>;
 }
 
-/* =========================
-   Component
-========================= */
 export function ModalActionUnits({
   isOpen,
   setIsOpen,
@@ -74,6 +75,7 @@ export function ModalActionUnits({
     setValue,
     getValues,
     formState: { errors },
+    control,
   } = useForm<UnitFormData>({
     resolver: zodResolver(unitSchema),
     defaultValues: {
@@ -81,8 +83,13 @@ export function ModalActionUnits({
       apartment_id: "",
       guest: "",
       contact: "",
-      responsible: "",
+      responsibles: [{ name: "", creci: "" }],
     },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "responsibles",
   });
 
   const isDisabled = type === "view";
@@ -94,7 +101,7 @@ export function ModalActionUnits({
   });
 
   const { mutateAsync: handleUpdateRegister } = useMutation({
-    mutationFn: updateGenericRegister<any>,
+    mutationFn: updateUnit,
   });
 
   async function onSubmit(data: UnitFormData) {
@@ -105,8 +112,7 @@ export function ModalActionUnits({
       const dataCloned: Partial<UnitFormData> = data;
       delete dataCloned.apartment_id;
       await handleUpdateRegister({
-        registerId: unit.id,
-        tableName: "units",
+        unitId: unit.id,
         data: {
           ...dataCloned,
           apartament_id,
@@ -139,8 +145,14 @@ export function ModalActionUnits({
         apartment_id: unit.apartamentId.toString(),
         contact: unit.contact,
         guest: unit.guest,
-        responsible: unit.responsible,
         status_id: unit.statusId.toString(),
+        responsibles: unit.unitResponsibles.map((responsible: any) => {
+          return {
+            responsibleId: responsible.id,
+            name: responsible.name,
+            creci: responsible.creci,
+          };
+        }),
       });
     }
   }, [unit]);
@@ -154,7 +166,7 @@ export function ModalActionUnits({
             apartment_id: "",
             contact: "",
             guest: "",
-            responsible: "",
+            responsibles: [{ name: "", creci: "" }],
             status_id: "",
           });
           setIsOpen(false);
@@ -272,27 +284,76 @@ export function ModalActionUnits({
             </p>
           )}
 
-          {/* =========================
-              Corretor / Imobiliária
-          ========================= */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4 items-center">
-            <Label>Corretor / Imobiliária</Label>
-            <Input
-              {...register("responsible")}
-              placeholder="Nome do responsável"
-              disabled={isDisabled}
-            />
+          <div className="flex items-center justify-between">
+            <Label> Corretor / Imobiliária</Label>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => append({ name: "", creci: "" })}
+            >
+              <Plus className="w-4 h-4 mr-1" />
+              Adicionar
+            </Button>
           </div>
 
-          {errors.responsible && !isDisabled && (
-            <p className="text-red-500 text-sm -mt-2">
-              {errors.responsible.message}
-            </p>
-          )}
+          <div className="space-y-4">
+            {fields.map((field, index) => (
+              <div key={field.id} className="border rounded-lg p-4 bg-muted/30">
+                {/* Header */}
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-sm font-medium text-muted-foreground">
+                    Responsável {index + 1}
+                  </span>
 
-          {/* =========================
-              Footer
-          ========================= */}
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={async () => {
+                      remove(index);
+                    }}
+                  >
+                    <Trash2 className="w-5 h-5 text-red-500" />
+                  </Button>
+                </div>
+
+                {/* Inputs */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Nome</Label>
+
+                    <Input
+                      placeholder="Ex: João Silva"
+                      {...register(`responsibles.${index}.name`)}
+                    />
+
+                    {errors.responsibles?.[index]?.name && (
+                      <p className="text-xs text-red-500">
+                        {errors.responsibles[index]?.name?.message}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>CRECI</Label>
+
+                    <Input
+                      placeholder="Ex: 12345678"
+                      {...register(`responsibles.${index}.creci`)}
+                    />
+
+                    {errors.responsibles?.[index]?.creci && (
+                      <p className="text-xs text-red-500">
+                        {errors.responsibles[index]?.creci?.message}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
           <DialogFooter className="pt-4">
             <DialogClose asChild>
               <Button ref={closeButtonRef} variant="ghost">

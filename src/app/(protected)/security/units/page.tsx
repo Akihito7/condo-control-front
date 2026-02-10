@@ -53,7 +53,7 @@ export default function Units() {
 
   function getOption(optionId: number | string, options: Option[]) {
     const foundOption = options?.find(
-      (option) => option.id.toString() === optionId.toString()
+      (option) => option.id.toString() === optionId.toString(),
     );
 
     return foundOption?.name ?? "-";
@@ -108,6 +108,8 @@ export default function Units() {
   const [dropDownItemSelected, setDropDownItemSelected] = useState<
     number | null
   >(null);
+
+  console.log(units);
 
   return (
     <main className="bg-gray-50 min-h-screen w-full p-0 py-8 px-2 sm:p-8 flex flex-col gap-6">
@@ -207,13 +209,15 @@ export default function Units() {
                         apartaments?.map(({ id, apartmentNumber }) => ({
                           id,
                           name: apartmentNumber,
-                        })) ?? []
+                        })) ?? [],
                       )}
                     </TableCell>
                     <TableCell>{unit.guest}</TableCell>
                     <TableCell>{unit.contact}</TableCell>
                     <TableCell className="text-center">
-                      {unit.responsible}
+                      {unit.unitResponsibles
+                        ?.map((unit: any) => `${unit.name} `)
+                        .join("/ ")}
                     </TableCell>
 
                     <TableCell className="text-center">
