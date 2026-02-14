@@ -45,7 +45,7 @@ export function Sidebar() {
   const { isOpen, setIsOpen, sidebarRef } = useSidebarContext();
   const { user, userIsLoading } = useUserContext();
   const [isSubMenuOpen, setIsSubMenuOpen] = useState<Record<string, boolean>>(
-    {}
+    {},
   );
 
   const isMobile = useIsMobile();
@@ -54,7 +54,7 @@ export function Sidebar() {
     deleteCookies("@smartCondo:token");
     redirect("/signin");
   }
- 
+
   useEffect(() => {
     if (!isOpen) setIsSubMenuOpen({});
   }, [isOpen]);
@@ -76,7 +76,7 @@ export function Sidebar() {
         }}
         className={clsx(
           "h-screen bg-white border-r border-gray-200 flex flex-col font-sans text-sm text-gray-800 transition-all duration-300 ease-in-out",
-          isMobile ? (isOpen ? "w-72" : "hidden") : isOpen ? "w-90" : "w-16"
+          isMobile ? (isOpen ? "w-72" : "hidden") : isOpen ? "w-90" : "w-16",
         )}
       >
         {/* Cabeçalho Skeleton */}
@@ -119,17 +119,21 @@ export function Sidebar() {
       }}
       className={clsx(
         "h-screen bg-white border-r border-gray-200 flex flex-col font-sans text-sm text-gray-800 transition-all duration-300 ease-in-out",
-        isMobile ? (isOpen ? "w-72" : "hidden") : isOpen ? "w-90" : "w-16"
+        isMobile ? (isOpen ? "w-72" : "hidden") : isOpen ? "w-90" : "w-16",
       )}
     >
       <div className="p-6 border-b border-gray-200">
         <h1
           className={clsx(
             "text-xl font-semibold tracking-tight transition-all duration-300 origin-left",
-            isOpen ? "opacity-100 scale-100" : "opacity-0 scale-90"
+            isOpen ? "opacity-100 scale-100" : "opacity-0 scale-90",
           )}
         >
-          CondoControl
+          {user.condominiumLogo ? (
+            <img className="w-12 h-12 object-fill" src={user.condominiumLogo} />
+          ) : (
+            "CondoControl,"
+          )}
         </h1>
       </div>
 

@@ -18,9 +18,10 @@ export type User = {
   userAssociationApartmentId: number | null;
   userAssociationCondominiumId: number;
   condominiumId: number;
-  pagesWithPermissionByRole: RolePageRelation[]
-  modulesWithPermissionByRole: ModulePermissionByRole[]
-  tabStructure: Module[]
+  condominiumLogo: string | null;
+  pagesWithPermissionByRole: RolePageRelation[];
+  modulesWithPermissionByRole: ModulePermissionByRole[];
+  tabStructure: Module[];
 };
 
 export type RolePageRelation = {
@@ -55,7 +56,7 @@ interface Page {
   pageCreatedAt: string;
   pageRoutePath: string;
   pageUpdatedAt: string | null;
-  pageIconName: string,
+  pageIconName: string;
 }
 
 export interface Module {
@@ -65,10 +66,7 @@ export interface Module {
   modulePages: Page[];
 }
 
-
-
-
 export async function fetchMe(): Promise<User> {
   const response = await api.get("auth/me");
-  return response.data
+  return response.data;
 }
