@@ -52,7 +52,7 @@ export function OpeningCard({
       </CardHeader>
       <CardContent className="flex flex-col gap-1">
         <span className={`text-2xl md:text-3xl font-bold dark:text-foreground`}>
-          {isHours ? formatHours(value) : value.toFixed(0)}{" "}
+          {isHours ? formatHours(value) : value?.toFixed(0)}{" "}
           {isHours && (
             <Button
               onClick={toggleTypeHours}

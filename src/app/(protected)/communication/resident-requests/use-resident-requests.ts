@@ -2,6 +2,7 @@ import { fetchApartaments } from "@/api/fetch-apartaments";
 import { fetchResidentCallGravities } from "@/api/fetch-resident-call-gravities";
 import { fetchResidentCallStatus } from "@/api/fetch-resident-call-status";
 import { fetchResidentCalls } from "@/api/fetch-resident-calls";
+import { fetchResidentRequestCards } from "@/api/fetch-resident-request-cards";
 import { useUserContext } from "@/providers/use-user-context";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
@@ -56,6 +57,15 @@ export function useResidentRequests() {
       }),
   });
 
+  const { data: cards, status: cardsStatus } = useQuery({
+    queryKey: ["resident-calls", "cards", startDateFormatted, endDateFormatted],
+    queryFn: () =>
+      fetchResidentRequestCards({
+        startDate: startDateFormatted,
+        endDate: endDateFormatted,
+      }),
+  });
+
   return {
     range,
     setRange,
@@ -71,5 +81,7 @@ export function useResidentRequests() {
     setApartamentIdSelected,
     setStatusIdSelected,
     statusIdSelected,
+    cards,
+    cardsStatus,
   };
 }

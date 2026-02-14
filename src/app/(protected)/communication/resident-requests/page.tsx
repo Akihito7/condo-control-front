@@ -26,7 +26,15 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { DatePickRange } from "@/components/date-pick-ranger";
 import { Button } from "@/components/ui/button";
-import { FileDown, MoreHorizontal, Paperclip } from "lucide-react";
+import {
+  CheckCircle2,
+  Clock,
+  FileDown,
+  MoreHorizontal,
+  Paperclip,
+  RefreshCw,
+  Unlock,
+} from "lucide-react";
 import { useResidentRequests } from "./use-resident-requests";
 import { ModalActionResident } from "./modal-action-resident";
 import { useCommandDelete } from "@/commands/use-command.delete";
@@ -35,6 +43,8 @@ import { format, subHours } from "date-fns";
 import { Option } from "@/api/fetch-work-areas";
 import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
+import { OpeningCard } from "../opening-of-calls/opening-card";
+import { CardSkeleton } from "@/components/card-skeleton";
 
 const STATUS_BADGE: Record<number, string> = {
   1: "bg-slate-200 text-slate-700", // PENDENTE
@@ -82,6 +92,8 @@ export default function ResidentRequests() {
     setApartamentIdSelected,
     setStatusIdSelected,
     statusIdSelected,
+    cards,
+    cardsStatus,
   } = useResidentRequests();
 
   // Estados separados para mobile e desktop para evitar conflitos
@@ -206,6 +218,43 @@ export default function ResidentRequests() {
             <FileDown className="w-6 h-6" />
             Exportar PDF
           </Button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {cardsStatus === "pending" ? (
+            <>
+              {Array.from({ length: 4 }).map((_, index) => (
+                <CardSkeleton key={index} />
+              ))}
+            </>
+          ) : (
+            <>
+              <OpeningCard
+                title="Chamados em andamento (mês)"
+                icon={<Unlock size={20} color="#22c55e" />}
+                value={cards!.onGoing}
+              />
+
+              <OpeningCard
+                title="Chamados Resolvidos (mês)"
+                icon={<CheckCircle2 size={20} color="#16a34a" />}
+                value={cards!.solved}
+              />
+
+              <OpeningCard
+                title="Total chamados (mês)"
+                icon={<Clock size={20} color="#f59e0b" />}
+                value={cards!.total}
+              />
+
+              <OpeningCard
+                title="Tempo Médio Resolução (H) (mês)"
+                icon={<RefreshCw size={20} color="#3b82f6" />}
+                value={cards!.averageTime}
+                isHours={true}
+              />
+            </>
+          )}
         </div>
 
         <section className="rounded-xl border bg-white overflow-hidden">
