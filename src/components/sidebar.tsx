@@ -132,7 +132,7 @@ export function Sidebar() {
           {user.condominiumLogo ? (
             <img className="w-12 h-12 object-fill" src={user.condominiumLogo} />
           ) : (
-            "CondoControl,"
+            "CondoControl"
           )}
         </h1>
       </div>
