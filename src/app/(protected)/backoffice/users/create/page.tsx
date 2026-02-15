@@ -26,8 +26,8 @@ import { createUser } from "@/api/backoffice/create-user";
 import { AxiosError } from "axios";
 const SchemaCreateUserForm = z.object({
   name: z.string().min(1, "O nome é obrigatório"),
-  documentNumber: z.string().min(1, "O número do documento é obrigatório"),
-  phone: z.string().min(1, "O telefone é obrigatório"),
+  documentNumber: z.string().optional().nullable(),
+  phone: z.string().optional().nullable(),
   email: z.string().email("E-mail inválido"),
   password: z.string().min(6, "A senha deve ter pelo menos 6 caracteres"),
   isSuper: z.boolean().optional(),
