@@ -6,7 +6,7 @@ import { useSidebarContext } from "@/providers/use-sidebar-context";
 import { useUserContext } from "@/providers/use-user-context";
 import { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import {
   ChevronUp,
   ChevronDown,
@@ -50,9 +50,10 @@ export function Sidebar() {
 
   const isMobile = useIsMobile();
 
+  const router = useRouter();
+
   async function handleLogout() {
-    deleteCookies("@smartCondo:token");
-    redirect("/signin");
+    router.push('/logout')
   }
 
   useEffect(() => {
