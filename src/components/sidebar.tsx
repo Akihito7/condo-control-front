@@ -47,13 +47,14 @@ export function Sidebar() {
   const [isSubMenuOpen, setIsSubMenuOpen] = useState<Record<string, boolean>>(
     {},
   );
+  const [dropdonwMenuIsOpen, setDropdownMenuIsOpen] = useState(false);
 
   const isMobile = useIsMobile();
 
   const router = useRouter();
 
   async function handleLogout() {
-    router.push('/logout')
+    router.push("/logout");
   }
 
   useEffect(() => {
@@ -119,7 +120,7 @@ export function Sidebar() {
         zIndex: isMobile ? 999 : 1,
       }}
       className={clsx(
-        "h-screen bg-white border-r border-gray-200 flex flex-col font-sans text-sm text-gray-800 transition-all duration-300 ease-in-out",
+        "h-screen overflow-hidden bg-white border-r border-gray-200 flex flex-col font-sans text-sm text-gray-800 transition-all duration-300 ease-in-out",
         isMobile ? (isOpen ? "w-72" : "hidden") : isOpen ? "w-90" : "w-16",
       )}
     >
@@ -138,7 +139,7 @@ export function Sidebar() {
         </h1>
       </div>
 
-      <nav className="flex-1 px-2 py-6 space-y-2">
+      <nav className="flex-1 overflow-y-auto px-2 py-6 space-y-2">
         {/* Home sempre visível */}
         <div>
           <button
@@ -178,7 +179,7 @@ export function Sidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="p-4 border-t border-gray-200 hover:bg-gray-50 transition">
+      <div className="flex items-center justify-center py-4 border-t border-gray-200 hover:bg-gray-50 transition">
         {isOpen ? (
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center">
@@ -191,7 +192,10 @@ export function Sidebar() {
               <p className="text-xs text-gray-500">{user.email}</p>
             </div>
 
-            <DropdownMenu>
+            <DropdownMenu
+              open={dropdonwMenuIsOpen}
+              onOpenChange={setDropdownMenuIsOpen}
+            >
               <DropdownMenuTrigger asChild>
                 <Button variant="outline">
                   <MoreHorizontal className="w-5 h-5" />
@@ -213,7 +217,16 @@ export function Sidebar() {
             </DropdownMenu>
           </div>
         ) : (
-          <UserCircle className="w-6 h-6" />
+          <div
+            onClick={() => {
+              setIsOpen(true);
+            }}
+            className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center"
+          >
+            <span className="text-gray-700 font-semibold">
+              {user?.name?.slice(0, 2)}
+            </span>
+          </div>
         )}
       </div>
     </aside>

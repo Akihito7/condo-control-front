@@ -16,7 +16,7 @@ export default async function Layout({
       <UserContextProvider>
         <QueryProvider>
           <NotificationContextProvider>
-            <div className="layout-base">
+            <div className="layout-base overflow-y-hidden">
               <Sidebar />
               {children}
               <Toaster />
