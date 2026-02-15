@@ -26,8 +26,8 @@ import { createUser } from "@/api/backoffice/create-user";
 import { AxiosError } from "axios";
 const SchemaCreateUserForm = z.object({
   name: z.string().min(1, "O nome é obrigatório"),
-  documentNumber: z.string().optional().nullable(),
-  phone: z.string().optional().nullable(),
+  documentNumber: z.string().optional(),
+  phone: z.string().optional(),
   email: z.string().email("E-mail inválido"),
   password: z.string().min(6, "A senha deve ter pelo menos 6 caracteres"),
   isSuper: z.boolean().optional(),
@@ -58,6 +58,10 @@ export default function UsersCreate() {
     formState: { errors },
   } = useForm<CreateUserFormValues>({
     resolver: zodResolver(SchemaCreateUserForm),
+    defaultValues: {
+      phone: "",
+      documentNumber: "",
+    },
   });
 
   const queryClient = useQueryClient();
