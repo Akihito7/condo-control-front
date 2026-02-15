@@ -4,6 +4,7 @@ import { QueryProvider } from "@/providers/query-provider";
 import { UserContextProvider } from "@/contexts/user-context";
 import { SidebarContextProvider } from "@/contexts/sidebar-context";
 import { NotificationContextProvider } from "@/contexts/notification-context";
+import { Toaster } from "sonner";
 
 export default async function Layout({
   children,
@@ -18,6 +19,7 @@ export default async function Layout({
             <div className="layout-base">
               <Sidebar />
               {children}
+              <Toaster />
             </div>
           </NotificationContextProvider>
         </QueryProvider>

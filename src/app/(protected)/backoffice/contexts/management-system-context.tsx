@@ -12,7 +12,7 @@ import { fetchPlans, Plan } from "@/api/backoffice/fetch-plans";
 import { fetchTenants, Tenant } from "@/api/backoffice/fetch-tenants";
 import { fetchUsers, User } from "@/api/backoffice/fetch-users";
 import { useQuery } from "@tanstack/react-query";
-import React, { createContext, useContext } from "react";
+import React, { createContext, useContext, useState } from "react";
 
 type Status = "error" | "success" | "pending";
 
@@ -31,9 +31,11 @@ interface ManagementSystemContextProps {
   statusPages: Status;
   modules: Module[] | undefined;
   statusModules: Status;
+  condominiumIdSelected: null | number;
+  setCondominiumIdSelected: React.Dispatch<React.SetStateAction<null | number>>;
 }
 const ManagementSystemContext = createContext<ManagementSystemContextProps>(
-  {} as ManagementSystemContextProps
+  {} as ManagementSystemContextProps,
 );
 
 export function ManagementSystemContextProvider({
@@ -41,6 +43,9 @@ export function ManagementSystemContextProvider({
 }: {
   children: React.ReactNode;
 }) {
+  const [condominiumIdSelected, setCondominiumIdSelected] = useState<
+    null | number
+  >(null);
   const { data: users, status: statusUsers } = useQuery({
     queryKey: ["users"],
     queryFn: fetchUsers,
@@ -52,8 +57,9 @@ export function ManagementSystemContextProvider({
   });
 
   const { data: apartaments, status: apartamentsStatus } = useQuery({
-    queryKey: ["apartaments"],
-    queryFn: fetchApartaments,
+    queryKey: ["apartaments", condominiumIdSelected],
+    queryFn: () => fetchApartaments({ condominiumId: condominiumIdSelected! }),
+    enabled: !!condominiumIdSelected,
   });
 
   const { data: plans, status: statusPlans } = useQuery({
@@ -93,6 +99,8 @@ export function ManagementSystemContextProvider({
         statusPages,
         modules,
         statusModules,
+        condominiumIdSelected,
+        setCondominiumIdSelected,
       }}
     >
       {children}
@@ -105,7 +113,7 @@ export function useManagementSystemContext() {
 
   if (!data) {
     throw new Error(
-      "useManagementSystemContext must be used within a ManagementSystemProvider"
+      "useManagementSystemContext must be used within a ManagementSystemProvider",
     );
   }
 

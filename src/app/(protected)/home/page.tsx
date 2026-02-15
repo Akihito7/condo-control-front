@@ -48,7 +48,9 @@ export default function HomePage() {
           </div>
           <div className="flex-1">
             <img
-              src="ilustration.svg"
+              src={
+                user.condominiumLogo ? user.condominiumLogo : "ilustration.svg"
+              }
               alt="Condomínio"
               className="drop-shadow-lg"
             />

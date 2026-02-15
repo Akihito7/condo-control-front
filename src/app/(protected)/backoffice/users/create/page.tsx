@@ -5,6 +5,7 @@ import { ButtonOpenSidebar } from "@/components/button-open-sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 import {
   Select,
   SelectContent,
@@ -22,6 +23,7 @@ import { useManagementSystemContext } from "../../contexts/management-system-con
 import { useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createUser } from "@/api/backoffice/create-user";
+import { AxiosError } from "axios";
 const SchemaCreateUserForm = z.object({
   name: z.string().min(1, "O nome é obrigatório"),
   documentNumber: z.string().min(1, "O número do documento é obrigatório"),
@@ -38,8 +40,13 @@ const SchemaCreateUserForm = z.object({
 export type CreateUserFormValues = z.infer<typeof SchemaCreateUserForm>;
 
 export default function UsersCreate() {
-  const { apartaments, apartamentsStatus, condominiums } =
-    useManagementSystemContext();
+  const {
+    apartaments,
+    apartamentsStatus,
+    condominiums,
+    setCondominiumIdSelected,
+    condominiumIdSelected,
+  } = useManagementSystemContext();
 
   const router = useRouter();
 
@@ -64,17 +71,24 @@ export default function UsersCreate() {
       });
       router.back();
     },
+    onError: (error) => {
+      if (error instanceof AxiosError) {
+        const message =
+          error?.response?.data?.message || error?.message || "Erro inesperado";
+
+        return toast.error(message);
+      }
+      toast.error(error.message);
+    },
   });
 
   async function handleCreateUser(data: CreateUserFormValues) {
     await mutateCreateUser(data);
   }
 
-  const condominiumSelectedId = watch("condominium");
-
   useEffect(() => {
     setValue("apartment", undefined);
-  }, [condominiumSelectedId]);
+  }, [condominiumIdSelected]);
 
   return (
     <>
@@ -245,7 +259,10 @@ export default function UsersCreate() {
                     <Label>Condomínio</Label>
                     <Select
                       {...field}
-                      onValueChange={field.onChange}
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                        setCondominiumIdSelected(Number(value));
+                      }}
                       value={field.value}
                     >
                       <SelectTrigger className="w-[250px]">
@@ -277,26 +294,17 @@ export default function UsersCreate() {
                       {...field}
                       onValueChange={field.onChange}
                       value={field.value}
-                      disabled={!condominiumSelectedId}
+                      disabled={!condominiumIdSelected}
                     >
                       <SelectTrigger className="w-[250px]">
                         <SelectValue placeholder="Selecione um apartamento" />
                       </SelectTrigger>
                       <SelectContent>
-                        {apartaments
-                          ?.filter(
-                            (apartament) =>
-                              apartament.condominiumId ===
-                              Number(condominiumSelectedId)
-                          )
-                          .map((apartament, index) => (
-                            <SelectItem
-                              key={index}
-                              value={String(apartament.id)}
-                            >
-                              {apartament.apartmentNumber}
-                            </SelectItem>
-                          ))}
+                        {apartaments?.map((apartament, index) => (
+                          <SelectItem key={index} value={String(apartament.id)}>
+                            {apartament.apartmentNumber}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </>
