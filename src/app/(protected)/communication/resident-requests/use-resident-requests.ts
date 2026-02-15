@@ -29,7 +29,7 @@ export function useResidentRequests() {
   const condominiumId = user.condominiumId;
 
   const { data: apartaments } = useQuery({
-    queryKey: ["apartaments"],
+    queryKey: ["resident-requests", "apartaments"],
     queryFn: () => fetchApartaments({ condominiumId }),
   });
 
@@ -39,7 +39,7 @@ export function useResidentRequests() {
   });
 
   const { data: gravities } = useQuery({
-    queryKey: ["gravities"],
+    queryKey: ["resident-requests", "gravities"],
     queryFn: fetchResidentCallGravities,
   });
 
