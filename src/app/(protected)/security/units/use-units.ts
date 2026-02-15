@@ -29,12 +29,12 @@ export function useUnits() {
   });
 
   const { data: statuses } = useQuery({
-    queryKey: ["statuses"],
+    queryKey: ["statuses", "units"],
     queryFn: fetchUnitStatuses,
   });
 
   const { data: units, status: unitsStatus } = useQuery({
-    queryKey: ["units"],
+    queryKey: ["units", "status"],
     queryFn: fetchSecurityUnits,
   });
 
