@@ -17,7 +17,7 @@ export function useUnitWorks() {
 
   const { data: unitWorksStatuses, status: unitWorksStatusesStatus } = useQuery(
     {
-      queryKey: ["statuses"],
+      queryKey: ["unit-works", "statuses"],
       queryFn: fetchUnitWorksStatus,
     },
   );
@@ -28,7 +28,7 @@ export function useUnitWorks() {
   });
 
   const { data: unitWorks, status: unitWorksStatus } = useQuery({
-    queryKey: ["works", startDateFormatted],
+    queryKey: ["unit-works", "works", startDateFormatted],
     queryFn: fetchUnitWorks,
   });
 

@@ -17,12 +17,12 @@ export function useDailyRequests() {
   const condominiumId = user.condominiumId;
 
   const { data: statusOptions } = useQuery({
-    queryKey: ["status", "options"],
+    queryKey: ["daily-request", "status", "options"],
     queryFn: getDailyRequestStatusOptions,
   });
 
   const { data: gravitiesOptions } = useQuery({
-    queryKey: ["gravities", "options"],
+    queryKey: ["daily-request", "gravities", "options"],
     queryFn: getDailyRequestGravitiesOptions,
   });
 

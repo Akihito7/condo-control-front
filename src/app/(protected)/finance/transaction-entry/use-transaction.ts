@@ -76,12 +76,12 @@ export function useTransaction({
     });
 
   const { data: apartments, error: errorApartments } = useQuery({
-    queryKey: ["apartments"],
+    queryKey: ["transaction-entry", "apartments"],
     queryFn: async () => fetchApartments({ condominiumId }),
   });
 
   const { data: paymentStatusOptions, error: errorPaymentStatus } = useQuery({
-    queryKey: ["payment-status"],
+    queryKey: ["transaction-entry", "payment-status"],
     queryFn: fetchPaymentStatusOptions,
   });
 

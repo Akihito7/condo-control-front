@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import { deleteDelinquencyRegister } from "@/api/delete-delinquency-register";
 import { fetchCategoriesOptions } from "@/api/fecth-categories-options";
@@ -7,44 +7,47 @@ import { fetchDelinquencyMonthlyEvolution } from "@/api/fetch-delinquency-monthl
 import { fetchDeliquencyRegisters } from "@/api/fetch-delinquency-registers";
 import { useUserContext } from "@/providers/use-user-context";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { format } from "date-fns"
+import { format } from "date-fns";
 
 interface UseDelinquencyControlProps {
-  date: Date
+  date: Date;
 }
 export function useDelinquencyControl({ date }: UseDelinquencyControlProps) {
-
   const { user } = useUserContext();
 
   const condominiumId = user.condominiumId;
 
-  const dateFormmated = format(date, 'yyyy-MM-dd');
+  const dateFormmated = format(date, "yyyy-MM-dd");
 
   const queryClient = useQueryClient();
 
   const { data: categoriesOptions, status: categorioOptionsStatus } = useQuery({
-    queryKey: ['categoriesOptions'],
-    queryFn: fetchCategoriesOptions
-  })
+    queryKey: ["delinquency-control", "categoriesOptions"],
+    queryFn: fetchCategoriesOptions,
+  });
 
   const { data: apartaments, error: errorApartaments } = useQuery({
-    queryKey: ['apartments'],
-    queryFn: async () => fetchApartments({ condominiumId })
-  })
+    queryKey: ["delinquency-control", "apartments"],
+    queryFn: async () => fetchApartments({ condominiumId }),
+  });
 
-  const { data: delinequencyRegisters, status: deliquencyRegistersStatus } = useQuery({
-    queryKey: ['delinquencyRegisters', dateFormmated],
-    queryFn: () => fetchDeliquencyRegisters({ condominiumId, date: dateFormmated }),
-    enabled: !!condominiumId
-  })
-
+  const { data: delinequencyRegisters, status: deliquencyRegistersStatus } =
+    useQuery({
+      queryKey: ["delinquencyRegisters", dateFormmated],
+      queryFn: () =>
+        fetchDeliquencyRegisters({ condominiumId, date: dateFormmated }),
+      enabled: !!condominiumId,
+    });
 
   const { mutateAsync: handeDeleteRegister } = useMutation({
     mutationFn: (delinquencyId: number) =>
       deleteDelinquencyRegister({ delinquencyId }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['delinquencyRegisters'], exact: false })
-    }
+      queryClient.invalidateQueries({
+        queryKey: ["delinquencyRegisters"],
+        exact: false,
+      });
+    },
   });
 
   return {
@@ -55,7 +58,5 @@ export function useDelinquencyControl({ date }: UseDelinquencyControlProps) {
     delinequencyRegisters,
     deliquencyRegistersStatus,
     handeDeleteRegister,
-
-  }
-
+  };
 }

@@ -13,66 +13,67 @@ export function useAssetManagement() {
   const [assetSelected, setAssetSelected] = useState<Asset | undefined>();
   const [modalAssetIsOpen, setModalAssetIsOpen] = useState(false);
 
-  const {
-    user
-  } = useUserContext();
+  const { user } = useUserContext();
   const { condominiumId } = user;
 
   const queryClient = useQueryClient();
 
-  const { data: categoriesOptions, status: categoriesOptionsStatus } = useQuery({
-    queryKey: ['categories'],
-    queryFn: fetchAssetCategories,
-    enabled: !!condominiumId
-  });
+  const { data: categoriesOptions, status: categoriesOptionsStatus } = useQuery(
+    {
+      queryKey: ["categories"],
+      queryFn: fetchAssetCategories,
+      enabled: !!condominiumId,
+    },
+  );
 
   const { data: areasOptions, status: areasOptionsStatus } = useQuery({
-    queryKey: ['areas'],
+    queryKey: ["asset-management", "areas"],
     queryFn: () => fetchCondominiumAreas(condominiumId),
-    enabled: !!condominiumId
-  })
+    enabled: !!condominiumId,
+  });
 
   const { data: statusOptions, status: statusOptionsStatus } = useQuery({
-    queryKey: ['status'],
+    queryKey: ["asset-management", "status"],
     queryFn: fetchAssetStatus,
-    enabled: !!condominiumId
-  })
+    enabled: !!condominiumId,
+  });
 
   const { data: assets, status: statusAssets } = useQuery({
     queryKey: [condominiumId],
     queryFn: async () => fetchAssets({ condominiumId }),
-    enabled: !!condominiumId
-  })
+    enabled: !!condominiumId,
+  });
 
   const { mutateAsync: handleDeleteAsset } = useMutation({
     mutationFn: async (assetId: number) => deleteAsset(assetId),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [condominiumId]
-      })
-    }
-  })
+        queryKey: [condominiumId],
+      });
+    },
+  });
 
   const { mutateAsync: handleChangeAssetImage } = useMutation({
-    mutationFn: ({
-      formData,
-      assetId
-    }: any) => updateAssetImage({ assetId, formData }),
+    mutationFn: ({ formData, assetId }: any) =>
+      updateAssetImage({ assetId, formData }),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [condominiumId]
-      })
-    }
-  })
+        queryKey: [condominiumId],
+      });
+    },
+  });
 
-  const { mutateAsync: handleDeleteAssetImage, status: deleteAssetImageStatus } = useMutation({
+  const {
+    mutateAsync: handleDeleteAssetImage,
+    status: deleteAssetImageStatus,
+  } = useMutation({
     mutationFn: (assetId: number) => deleteAssetImage({ assetId }),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [condominiumId]
-      })
-    }
-  })
+        queryKey: [condominiumId],
+      });
+    },
+  });
 
   return {
     assetSelected,
@@ -90,5 +91,5 @@ export function useAssetManagement() {
     handleDeleteAsset,
     handleChangeAssetImage,
     handleDeleteAssetImage,
-  }
+  };
 }
